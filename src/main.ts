@@ -21,22 +21,32 @@ import './index.css'
 // and placed in same folder as main.js
 import App from './App.vue'
 
-const myApp = createApp(App)
-
-// Router
-import router from './router'
-myApp.use(router)
+const app = createApp(App)
 
 // network graph
 import "v-network-graph/lib/style.css"
 import VNetworkGraph from "v-network-graph"
 
-myApp.use(VNetworkGraph)
+app.use(VNetworkGraph)
 
-myApp.use(Quasar, {
+// Axios
+import { installApiv1, apiv1 } from './request'
+app.use(installApiv1)
+
+// Vuex
+import { store, key as storeKey } from './store'
+app.use(store, storeKey)
+store.commit("setApi", { apiv1 })
+
+// Router
+import router from './router'
+app.use(router)
+
+
+app.use(Quasar, {
 	plugins: {}, // import Quasar plugins and add here
 	lang: quasarLang,
 })
 
 // Assumes you have a <div id="app"></div> in your index.html
-myApp.mount('#app')
+app.mount('#app')
