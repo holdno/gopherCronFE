@@ -20,10 +20,6 @@ export function useApiv1(): AxiosInstance {
 	return obj
 }
 
-// export function useApiv1(): AxiosInstance {
-// 	return apiv1
-// }
-
 export interface User {
 	id: number,
 	name: string,

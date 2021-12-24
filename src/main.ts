@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import { Quasar } from 'quasar'
+import { Quasar, Notify, useQuasar } from 'quasar'
 import quasarLang from 'quasar/lang/zh-CN'
 
 
@@ -23,6 +23,16 @@ import App from './App.vue'
 
 const app = createApp(App)
 
+app.use(Quasar, {
+	plugins: {
+		Notify,
+	},
+	config: {
+		notify: { /* look at QuasarConfOptions from the API card */ }
+	},
+	lang: quasarLang,
+})
+
 // network graph
 import "v-network-graph/lib/style.css"
 import VNetworkGraph from "v-network-graph"
@@ -30,23 +40,18 @@ import VNetworkGraph from "v-network-graph"
 app.use(VNetworkGraph)
 
 // Axios
-import { installApiv1, apiv1 } from './request'
+import { apiv1, installApiv1 } from './request'
 app.use(installApiv1)
 
 // Vuex
 import { store, key as storeKey } from './store'
 app.use(store, storeKey)
-store.commit("setApi", { apiv1 })
+store.commit("setQuasar", { $q: app.config.globalProperties.$q })
+store.commit("setApi", { apiv1: apiv1 })
 
 // Router
 import router from './router'
 app.use(router)
-
-
-app.use(Quasar, {
-	plugins: {}, // import Quasar plugins and add here
-	lang: quasarLang,
-})
 
 // Assumes you have a <div id="app"></div> in your index.html
 app.mount('#app')
