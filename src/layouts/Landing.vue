@@ -2,7 +2,7 @@
 	<q-layout
 		view="hHh Lpr lff"
 		style="height: 100%"
-		class="shadow-2 rounded-borders tw-flex tw-flex-no-wrap"
+		class="rounded-borders tw-flex tw-flex-no-wrap"
 	>
 		<q-header elevated class="bg-black">
 			<q-toolbar>
@@ -19,8 +19,6 @@
 			@mouseout="miniState = true"
 			:width="200"
 			:breakpoint="500"
-			bordered
-			class="bg-grey-3"
 		>
 			<q-scroll-area class="fit">
 				<q-list padding>

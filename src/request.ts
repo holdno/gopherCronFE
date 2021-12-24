@@ -50,3 +50,22 @@ export async function userInfo(api: AxiosInstance): Promise<User> {
 		throw new Error(data.meta.msg);
 	}
 }
+
+export interface Project {
+	id: number,
+	remark: string,
+	taskCount: number,
+	title: string,
+	uid: number,
+}
+
+export async function projectList(api: AxiosInstance): Promise<Project[]> {
+	const resp = await api.get("/project/list")
+	const data = resp.data
+	if (data.meta.code == 0) {
+		const r = data.response
+		return r.list.map((p: any) => ({ id: p.project_id, remark: p.remark, taskCount: p.task_count, title: p.title, uid: p.uid }))
+	} else {
+		throw new Error(data.meta.msg);
+	}
+}

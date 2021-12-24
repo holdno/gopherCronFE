@@ -2,9 +2,9 @@ import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import Cookies from 'js-cookie'
 
-import { login, useApiv1, User, userInfo } from './request'
+import { login, Project, projectList, User, userInfo } from './request'
 import { AxiosInstance } from 'axios'
-import { QVueGlobals, useQuasar } from 'quasar'
+import { QVueGlobals } from 'quasar'
 // 为 store state 声明类型
 export interface State {
 	logined: boolean,
@@ -12,6 +12,9 @@ export interface State {
 	token?: string,
 	apiv1?: AxiosInstance,
 	$q?: QVueGlobals,
+
+
+	projects: Project[],
 }
 
 // 定义 injection key
@@ -24,7 +27,8 @@ export const store = createStore<State>({
 	strict: import.meta.env.DEV,
 	state() {
 		return {
-			logined: false
+			logined: false,
+			projects: [],
 		}
 	},
 	getters: {
@@ -79,6 +83,9 @@ export const store = createStore<State>({
 			else
 				throw error
 		},
+		setProjects(state, { projects }) {
+			state.projects = projects
+		}
 	},
 	actions: {
 		async checkLogin({ commit, state }) {
@@ -109,6 +116,15 @@ export const store = createStore<State>({
 				commit("error", { error: e })
 			}
 		},
+		async fetchProjects({ commit }) {
+			const api = this.getters.apiv1;
+			try {
+				const projects = await projectList(api)
+				commit("setProjects", { projects })
+			} catch (e) {
+				commit("error", { error: e })
+			}
+		}
 	}
 })
 

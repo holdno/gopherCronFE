@@ -28,6 +28,7 @@ app.use(Quasar, {
 		Notify,
 	},
 	config: {
+		dark: true,  /* false, "auto" */
 		notify: { /* look at QuasarConfOptions from the API card */ }
 	},
 	lang: quasarLang,
