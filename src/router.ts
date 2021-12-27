@@ -6,30 +6,51 @@ const routes = [
 		meta: { requiresAuth: true },
 		children: [
 			{
+				name: 'summary',
 				path: 'summary',
 				component: () => import('./pages/Summary.vue'),
 			},
 			{
-				path: 'projects',
+				name: 'projects',
+				path: 'project',
 				component: () => import('./pages/ProjectList.vue'),
+				children: [
+					{
+						name: 'project',
+						path: ':projectId(\\d+)/task',
+						component: () => import('./pages/TaskList.vue'),
+						props: (route: RouteLocationNormalizedLoaded) => ({ projectId: Number(route.params.projectId) }),
+						children: [
+							{
+								name: 'task',
+								path: ':taskId',
+								component: () => import('./pages/TaskDetail.vue'),
+								props: (route: RouteLocationNormalizedLoaded) => ({ id: route.params.taskId }),
+							}
+						]
+					},
+				],
 			},
 			{
-				path: 'taskflows',
+				name: 'taskflow',
+				path: 'taskflow',
 				component: () => import('./pages/TaskflowList.vue'),
 			}
 		]
 	},
 	{
+		name: "login",
 		path: "/login",
 		component: () => import("./pages/Login.vue"),
 	},
 	{
+		name: "logout",
 		path: "/logout",
 		redirect: "/login",
 	},
 ]
 
-import { createWebHistory, createRouter } from "vue-router"
+import { createWebHistory, createRouter, RouteLocationNormalizedLoaded } from "vue-router"
 import { store } from "./store"
 
 const Router = createRouter({

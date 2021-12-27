@@ -69,3 +69,53 @@ export async function projectList(api: AxiosInstance): Promise<Project[]> {
 		throw new Error(data.meta.msg);
 	}
 }
+
+export interface Task {
+	id: string,
+	name: string,
+	projectId: number,
+	command: string,
+	cronExpr: string,
+	remark: string,
+	timeout: number,
+	createTime: number,
+	status: number,
+	isRunning: number,
+	noseize: number,
+	exclusion: number,
+	clientIp: string
+	tmpId: string,
+}
+
+export async function taskList(api: AxiosInstance, projectId: number): Promise<Task[]> {
+	const resp = await api.get(
+		"/crontab/list",
+		{
+			params: {
+				project_id: projectId,
+			}
+		},
+	)
+	const data = resp.data
+	if (data.meta.code == 0) {
+		const r = data.response
+		return r.list.map((v: any) => ({
+			id: v.task_id,
+			name: v.name,
+			projectId: v.project_id,
+			command: v.command,
+			cronExpr: v.cron,
+			remark: v.remark,
+			timout: v.timout,
+			createTime: v.create_time,
+			status: v.status,
+			isRunning: v.is_running,
+			noseize: v.noseize,
+			exclusion: v.exclusion,
+			clientIp: v.client_ip,
+			tmpId: v.tmp_id,
+		}))
+	} else {
+		throw new Error(data.meta.msg);
+	}
+}

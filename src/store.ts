@@ -2,7 +2,7 @@ import { InjectionKey } from 'vue'
 import { createStore, useStore as baseUseStore, Store } from 'vuex'
 import Cookies from 'js-cookie'
 
-import { login, Project, projectList, User, userInfo } from './request'
+import { login, Project, projectList, User, userInfo, Task, taskList } from './request'
 import { AxiosInstance } from 'axios'
 import { QVueGlobals } from 'quasar'
 // 为 store state 声明类型
@@ -15,6 +15,7 @@ export interface State {
 
 
 	projects: Project[],
+	tasks: Task[]
 }
 
 // 定义 injection key
@@ -29,6 +30,7 @@ export const store = createStore<State>({
 		return {
 			logined: false,
 			projects: [],
+			tasks: [],
 		}
 	},
 	getters: {
@@ -85,7 +87,10 @@ export const store = createStore<State>({
 		},
 		setProjects(state, { projects }) {
 			state.projects = projects
-		}
+		},
+		setTasks(state, { tasks }) {
+			state.tasks = tasks
+		},
 	},
 	actions: {
 		async checkLogin({ commit, state }) {
@@ -121,6 +126,15 @@ export const store = createStore<State>({
 			try {
 				const projects = await projectList(api)
 				commit("setProjects", { projects })
+			} catch (e) {
+				commit("error", { error: e })
+			}
+		},
+		async fetchTasks({ commit }, { projectId }) {
+			const api = this.getters.apiv1
+			try {
+				const tasks = await taskList(api, projectId)
+				commit("setTasks", { tasks })
 			} catch (e) {
 				commit("error", { error: e })
 			}

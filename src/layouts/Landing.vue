@@ -1,9 +1,5 @@
 <template>
-	<q-layout
-		view="hHh Lpr lff"
-		style="height: 100%"
-		class="rounded-borders tw-flex tw-flex-no-wrap"
-	>
+	<q-layout view="hHh Lpr lff" class="rounded-borders tw-flex tw-flex-no-wrap tw-h-full">
 		<q-header elevated class="bg-black">
 			<q-toolbar>
 				<q-btn flat @click="drawer = !drawer" round dense icon="menu" />
@@ -22,7 +18,7 @@
 		>
 			<q-scroll-area class="fit">
 				<q-list padding>
-					<q-item clickable v-ripple to="summary">
+					<q-item clickable v-ripple :to="{ name: 'summary' }">
 						<q-item-section avatar>
 							<q-icon name="timeline" />
 						</q-item-section>
@@ -30,7 +26,7 @@
 						<q-item-section>Overview</q-item-section>
 					</q-item>
 
-					<q-item clickable v-ripple to="projects">
+					<q-item clickable v-ripple :to="{ name: 'projects' }">
 						<q-item-section avatar>
 							<q-icon name="view_list" />
 						</q-item-section>
@@ -38,7 +34,7 @@
 						<q-item-section>Projects</q-item-section>
 					</q-item>
 
-					<q-item clickable v-ripple to="taskflows">
+					<q-item clickable v-ripple :to="{ name: 'taskflow' }">
 						<q-item-section avatar>
 							<q-icon name="mediation" />
 						</q-item-section>
@@ -48,7 +44,7 @@
 
 					<q-separator />
 
-					<q-item clickable v-ripple to="logout">
+					<q-item clickable v-ripple :to="{ name: 'logout' }">
 						<q-item-section avatar>
 							<q-icon name="logout" />
 						</q-item-section>
@@ -59,7 +55,7 @@
 			</q-scroll-area>
 		</q-drawer>
 
-		<q-page-container>
+		<q-page-container class="tw-w-full">
 			<router-view />
 		</q-page-container>
 	</q-layout>
