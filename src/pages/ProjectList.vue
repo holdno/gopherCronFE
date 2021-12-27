@@ -1,6 +1,6 @@
 <template>
-  <div class="q-pa-md tw-flex tw-flex-row tw-w-full tw-max-h-screen">
-    <div class="tw-basis-1/6 tw-h-full">
+  <div class="q-pa-md lg:tw-flex lg:tw-flex-row tw-w-full tw-max-h-screen">
+    <div :class="'tw-basis-1/6 tw-h-full tw-w-full ' + visibilyClass">
       <ProjectList />
     </div>
     <router-view />
@@ -10,8 +10,16 @@
 <script setup lang="ts">
   import { useStore } from '../store';
   import ProjectList from '../components/ProjectList.vue';
-  import { onBeforeMount } from 'vue';
+  import { computed, onBeforeMount } from 'vue';
+  import { useRoute } from 'vue-router';
 
   const store = useStore();
   onBeforeMount(() => store.commit('setTasks', { tasks: [] }));
+
+  const route = useRoute();
+  const visibilyClass = computed(() =>
+    route.name && ['project', 'task'].includes(route.name.toString())
+      ? 'tw-hidden lg:tw-block'
+      : '',
+  );
 </script>
