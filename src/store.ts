@@ -19,7 +19,7 @@ export interface State {
 }
 
 // 定义 injection key
-export const key: InjectionKey<Store<State>> = Symbol()
+export const key: InjectionKey<Store<State>> = Symbol("Vuex Store")
 
 // 创建一个新的 store 实例
 export const COOKIE_TOKEN = "access-token"
@@ -75,7 +75,7 @@ export const store = createStore<State>({
 				delete api.defaults.headers.common[COOKIE_TOKEN]
 		},
 		error(state, { error }) {
-			let q = state.$q
+			const q = state.$q
 			if (q)
 				q.notify({
 					message: error.message,

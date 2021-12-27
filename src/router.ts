@@ -1,14 +1,17 @@
+import { createWebHistory, createRouter, RouteLocationNormalizedLoaded } from "vue-router"
+import { store } from "./store"
+
 const routes = [
 	{
 		path: '/',
 		redirect: "summary",
-		component: () => import('./layouts/Landing.vue'),
+		component: () => import('./layouts/LandingLayout.vue'),
 		meta: { requiresAuth: true },
 		children: [
 			{
 				name: 'summary',
 				path: 'summary',
-				component: () => import('./pages/Summary.vue'),
+				component: () => import('./pages/SummaryPage.vue'),
 			},
 			{
 				name: 'projects',
@@ -49,9 +52,6 @@ const routes = [
 		redirect: "/login",
 	},
 ]
-
-import { createWebHistory, createRouter, RouteLocationNormalizedLoaded } from "vue-router"
-import { store } from "./store"
 
 const Router = createRouter({
 	history: createWebHistory(),

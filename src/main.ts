@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import { Quasar, Notify, useQuasar } from 'quasar'
+import { Quasar, Notify } from 'quasar'
 import quasarLang from 'quasar/lang/zh-CN'
 
 
@@ -21,6 +21,19 @@ import './index.css'
 // and placed in same folder as main.js
 import App from './App.vue'
 
+// network graph
+import "v-network-graph/lib/style.css"
+import VNetworkGraph from "v-network-graph"
+
+// Axios
+import { apiv1, installApiv1 } from './request'
+
+// Vuex
+import { store, key as storeKey } from './store'
+
+// Router
+import router from './router'
+
 const app = createApp(App)
 
 app.use(Quasar, {
@@ -34,24 +47,11 @@ app.use(Quasar, {
 	lang: quasarLang,
 })
 
-// network graph
-import "v-network-graph/lib/style.css"
-import VNetworkGraph from "v-network-graph"
-
 app.use(VNetworkGraph)
-
-// Axios
-import { apiv1, installApiv1 } from './request'
 app.use(installApiv1)
-
-// Vuex
-import { store, key as storeKey } from './store'
 app.use(store, storeKey)
 store.commit("setQuasar", { $q: app.config.globalProperties.$q })
 store.commit("setApi", { apiv1: apiv1 })
-
-// Router
-import router from './router'
 app.use(router)
 
 // Assumes you have a <div id="app"></div> in your index.html

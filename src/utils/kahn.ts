@@ -1,14 +1,13 @@
-import _default from "v-network-graph/components/network-graph.vue"
 import { Task } from "../types"
 
 export function TaskInLevels(tasks: Task[]): string[][] {
-	let igraph = new Map<string, string[]>()
-	let graph = new Map<string, string[]>()
-	for (let task of tasks) {
+	const igraph = new Map<string, string[]>()
+	const graph = new Map<string, string[]>()
+	for (const task of tasks) {
 		igraph.set(task.id, task.deps || [])
 		if (task.deps) {
-			for (let parentId of task.deps) {
-				let children = graph.get(parentId) || []
+			for (const parentId of task.deps) {
+				const children = graph.get(parentId) || []
 				children.push(task.id)
 				graph.set(parentId, children)
 			}
@@ -16,7 +15,7 @@ export function TaskInLevels(tasks: Task[]): string[][] {
 	}
 
 	let S: string[] = []
-	let inCountMap = new Map<string, number>()
+	const inCountMap = new Map<string, number>()
 	igraph.forEach((incomes, node) => {
 		inCountMap.set(node, incomes.length);
 		if (inCountMap.get(node) === 0) {
@@ -24,7 +23,7 @@ export function TaskInLevels(tasks: Task[]): string[][] {
 		}
 	})
 
-	let levels: string[][] = []
+	const levels: string[][] = []
 	levels.push(Object.assign([], S))
 
 	S = S.reverse()
@@ -41,12 +40,12 @@ export function TaskInLevels(tasks: Task[]): string[][] {
 		} else {
 			const outcomes = graph.get(node)
 			if (!outcomes) continue
-			for (let outcome of outcomes) {
+			for (const outcome of outcomes) {
 				let inCount = inCountMap.get(outcome)
 				if (inCount === undefined) continue
 				inCount--
 				inCountMap.set(outcome, inCount)
-				if (inCount == 0) {
+				if (inCount === 0) {
 					NS.push(outcome)
 				}
 			}

@@ -5,7 +5,7 @@ export const apiv1 = axios.create({
 	baseURL: import.meta.env.VITE_API_V1_BASE_URL,
 })
 
-export const keyApiv1: InjectionKey<AxiosInstance> = Symbol()
+export const keyApiv1: InjectionKey<AxiosInstance> = Symbol("ApiV1 Axio Instance")
 
 export function installApiv1(app: App) {
 	app.provide(keyApiv1, apiv1)
@@ -32,7 +32,7 @@ export async function login(api: AxiosInstance, account: string, password: strin
 		password: password
 	})
 	const data = resp.data
-	if (data.meta.code == 0) {
+	if (data.meta.code === 0) {
 		const r = data.response
 		return [{ id: r.id, name: r.name, permissions: r.permission.split(',') }, r.token]
 	} else {
@@ -43,7 +43,7 @@ export async function login(api: AxiosInstance, account: string, password: strin
 export async function userInfo(api: AxiosInstance): Promise<User> {
 	const resp = await api.get("/user/info")
 	const data = resp.data
-	if (data.meta.code == 0) {
+	if (data.meta.code === 0) {
 		const r = data.response
 		return { id: r.id, name: r.name, permissions: r.permission.split(',') }
 	} else {
@@ -62,7 +62,7 @@ export interface Project {
 export async function projectList(api: AxiosInstance): Promise<Project[]> {
 	const resp = await api.get("/project/list")
 	const data = resp.data
-	if (data.meta.code == 0) {
+	if (data.meta.code === 0) {
 		const r = data.response
 		return r.list.map((p: any) => ({ id: p.project_id, remark: p.remark, taskCount: p.task_count, title: p.title, uid: p.uid }))
 	} else {
@@ -97,7 +97,7 @@ export async function taskList(api: AxiosInstance, projectId: number): Promise<T
 		},
 	)
 	const data = resp.data
-	if (data.meta.code == 0) {
+	if (data.meta.code === 0) {
 		const r = data.response
 		return r.list.map((v: any) => ({
 			id: v.task_id,
