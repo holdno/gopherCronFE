@@ -1,17 +1,19 @@
 <template>
   <div class="q-pa-xs tw-h-full tw-w-full">
-    <q-input
-      v-model="filter"
-      borderless
-      dense
-      debounce="300"
-      placeholder="Search"
-      class="q-pa-xs"
-    >
-      <template #append>
-        <q-icon name="search" />
-      </template>
-    </q-input>
+    <div class="q-pa-xs tw-flex tw-justify-around">
+      <q-input
+        v-model="filter"
+        borderless
+        dense
+        debounce="300"
+        placeholder="Search"
+      >
+        <template #append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <q-btn :to="{ name: 'create_task' }" icon="add" />
+    </div>
     <q-list class="q-pa-xs tw-h-full">
       <q-scroll-area class="tw-h-full tw-overscroll-contain">
         <q-item

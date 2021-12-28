@@ -121,7 +121,7 @@ export async function taskList(
       command: v.command,
       cronExpr: v.cron,
       remark: v.remark,
-      timout: v.timout,
+      timeout: v.timeout,
       createTime: v.create_time,
       status: v.status,
       isRunning: v.is_running,
@@ -156,5 +156,23 @@ export async function saveTask(api: AxiosInstance, task: Task) {
   const data = resp.data;
   if (data.meta.code !== 0) {
     throw new Error(data.meta.msg);
+  } else {
+    const v = data.response;
+    return {
+      id: v.task_id,
+      name: v.name,
+      projectId: v.project_id,
+      command: v.command,
+      cronExpr: v.cron,
+      remark: v.remark,
+      timout: v.timout,
+      createTime: v.create_time,
+      status: v.status,
+      isRunning: v.is_running,
+      noseize: v.noseize,
+      exclusion: v.exclusion,
+      clientIp: v.client_ip,
+      tmpId: v.tmp_id,
+    };
   }
 }

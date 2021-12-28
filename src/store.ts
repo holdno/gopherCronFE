@@ -153,8 +153,9 @@ export const store = createStore<State>({
     async saveTask({ commit }, { task }) {
       const api = this.getters.apiv1;
       try {
-        await saveTask(api, task);
+        const oldOrNew = await saveTask(api, task);
         commit('updateTask', { task });
+        return oldOrNew;
       } catch (e) {
         commit('error', { error: e });
       }

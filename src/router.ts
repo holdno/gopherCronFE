@@ -36,6 +36,15 @@ const routes = [
                 component: () => import('./pages/TaskDetail.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: route.params.taskId,
+                  projectId: Number(route.params.projectId),
+                }),
+              },
+              {
+                name: 'create_task',
+                path: 'create',
+                component: () => import('./pages/TaskDetail.vue'),
+                props: (route: RouteLocationNormalizedLoaded) => ({
+                  projectId: Number(route.params.projectId),
                 }),
               },
             ],
