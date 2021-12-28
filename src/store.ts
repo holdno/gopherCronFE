@@ -10,6 +10,7 @@ import {
   userInfo,
   Task,
   taskList,
+  saveTask,
 } from './request';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
@@ -95,6 +96,13 @@ export const store = createStore<State>({
     setTasks(state, { tasks }) {
       state.tasks = tasks;
     },
+    updateTask(state, { task }) {
+      const idx = state.tasks.findIndex((t) => t.id === task.id);
+      if (idx === -1) {
+        return;
+      }
+      state.tasks[idx] = task;
+    },
   },
   actions: {
     async checkLogin({ commit, state }) {
@@ -138,6 +146,15 @@ export const store = createStore<State>({
       try {
         const tasks = await taskList(api, projectId);
         commit('setTasks', { tasks });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async saveTask({ commit }, { task }) {
+      const api = this.getters.apiv1;
+      try {
+        await saveTask(api, task);
+        commit('updateTask', { task });
       } catch (e) {
         commit('error', { error: e });
       }

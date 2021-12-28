@@ -134,3 +134,27 @@ export async function taskList(
     throw new Error(data.meta.msg);
   }
 }
+
+export async function saveTask(api: AxiosInstance, task: Task) {
+  const payload = JSON.stringify({
+    project_id: task.projectId,
+    task_id: task.id,
+    name: task.name,
+    command: task.command,
+    cron: task.cronExpr,
+    remark: task.remark,
+    timeout: task.timeout,
+    status: task.status,
+    noseize: task.noseize,
+    exclusion: task.exclusion,
+  });
+  const resp = await api.post('/crontab/save', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
