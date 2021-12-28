@@ -176,3 +176,24 @@ export async function saveTask(api: AxiosInstance, task: Task) {
     };
   }
 }
+
+export interface RecentLogCount {
+  success: Number;
+  error: Number;
+  date: String;
+}
+
+export async function recentLog(api: AxiosInstance): Promise<RecentLogCount[]> {
+  const resp = await api.get('/log/recent');
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    const r = data.response;
+    return r.map((v: any) => ({
+      success: v.success_count,
+      error: v.error_count,
+      date: v.date,
+    }));
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}

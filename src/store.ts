@@ -11,6 +11,8 @@ import {
   Task,
   taskList,
   saveTask,
+  recentLog,
+  RecentLogCount,
 } from './request';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
@@ -24,6 +26,8 @@ export interface State {
 
   projects: Project[];
   tasks: Task[];
+
+  recentLogCountRecords: RecentLogCount[];
 }
 
 // 定义 injection key
@@ -39,6 +43,7 @@ export const store = createStore<State>({
       logined: false,
       projects: [],
       tasks: [],
+      recentLogCountRecords: [],
     };
   },
   getters: {
@@ -103,6 +108,9 @@ export const store = createStore<State>({
       }
       state.tasks[idx] = task;
     },
+    setRecentLogCount(state, { records }) {
+      state.recentLogCountRecords = records;
+    },
   },
   actions: {
     async checkLogin({ commit, state }) {
@@ -156,6 +164,15 @@ export const store = createStore<State>({
         const oldOrNew = await saveTask(api, task);
         commit('updateTask', { task });
         return oldOrNew;
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async recentLog({ commit }) {
+      const api = this.getters.apiv1;
+      try {
+        const recentLogCount = await recentLog(api);
+        commit('setRecentLogCount', { records: recentLogCount });
       } catch (e) {
         commit('error', { error: e });
       }

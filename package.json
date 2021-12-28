@@ -12,6 +12,7 @@
     "@quasar/extras": "^1.12.2",
     "@types/js-cookie": "^3.0.1",
     "axios": "^0.24.0",
+    "echarts": "^5.2.2",
     "js-cookie": "^3.0.1",
     "quasar": "^2.3.4",
     "v-network-graph": "^0.3.10",
