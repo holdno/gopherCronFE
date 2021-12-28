@@ -6,24 +6,43 @@
       :model-value="task.id"
       disable
       label="任务 ID"
+      square
+      filled
+      class="tw-mb-6"
     />
     <q-input
       key="project"
       :model-value="project ? project.title : ''"
       disable
       label="所属项目"
+      square
+      filled
+      class="tw-mb-6"
     />
-    <q-input key="name" v-model="editable.name" label="任务名称" />
+    <q-input
+      key="name"
+      v-model="editable.name"
+      label="任务名称"
+      square
+      filled
+      class="tw-mb-6"
+    />
     <q-input
       key="cron"
       v-model="editable.cronExpr"
       label="调度计划 (*秒 *分 *时 *日 *月 *周 *年)"
+      square
+      filled
+      class="tw-mb-6"
     />
     <q-input
       key="timeout"
       v-model="editable.timeout"
       type="number"
       label="超时时间 (单位:秒 s 0则不限制)"
+      square
+      filled
+      class="tw-mb-6"
     />
     <q-input
       key="command"
@@ -31,6 +50,9 @@
       type="textarea"
       label="执行指令"
       autogrow
+      square
+      filled
+      class="tw-mb-6"
     />
     <q-input
       key="remark"
@@ -38,6 +60,9 @@
       type="textarea"
       label="任务备注"
       autogrow
+      square
+      filled
+      class="tw-mb-6"
     />
     <q-toggle
       key="noseize"
@@ -45,6 +70,7 @@
       :false-value="0"
       :true-value="1"
       label="并行调度"
+      class="tw-mb-6"
     />
     <q-toggle
       key="status"
@@ -52,6 +78,7 @@
       :false-value="0"
       :true-value="1"
       label="是否启用"
+      class="tw-mb-6"
     />
     <div class="q-pa-sm">
       <q-btn
