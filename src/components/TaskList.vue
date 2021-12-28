@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-xs tw-max-w-sm">
+  <div class="q-pa-xs">
     <q-input
       v-model="filter"
       borderless
@@ -23,16 +23,12 @@
             <strong>{{ task.name }}</strong>
           </q-card-section>
           <q-separator />
-          <q-card-section class="tw-flex tw-flex-center tw-flew-row">
-            <div class="tw-basis-1/2">
+          <q-card-section class="tw-flex tw-justify-around">
+            <div>
               {{ task.cronExpr }}
             </div>
-            <q-spinner-gears v-if="task.isRunning !== 0" class="tw-basis-1/4" />
-            <q-icon
-              v-if="task.isRunning === 0"
-              class="tw-basis-1/4"
-              name="done_all"
-            />
+            <q-spinner-gears v-if="task.isRunning !== 0" />
+            <q-icon v-if="task.isRunning === 0" name="done_all" />
           </q-card-section>
         </q-card>
       </q-item>

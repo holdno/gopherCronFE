@@ -1,8 +1,10 @@
 <template>
-  <div :class="'tw-basis-1/6 tw-h-full tw-w-full ' + visibilyClass">
+  <div
+    :class="'xl:tw-basis-1/6 tw-basis-1/4 tw-h-full tw-w-full ' + visibilyClass"
+  >
     <TaskList :project-id="props.projectId" />
   </div>
-  <div class="tw-basis-2/3 tw-h-full tw-w-full">
+  <div class="xl:tw-basis-2/3 tw-basis-1/2 tw-h-full tw-w-full">
     <router-view />
   </div>
 </template>

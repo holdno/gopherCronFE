@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-xs tw-max-w-sm">
+  <div class="q-pa-xs">
     <q-input
       v-model="filter"
       borderless

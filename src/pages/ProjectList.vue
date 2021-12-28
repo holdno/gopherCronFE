@@ -1,6 +1,10 @@
 <template>
   <div class="q-pa-md lg:tw-flex lg:tw-flex-row tw-w-full tw-max-h-screen">
-    <div :class="'tw-basis-1/6 tw-h-full tw-w-full ' + visibilyClass">
+    <div
+      :class="
+        'xl:tw-basis-1/6 tw-basis-1/4 tw-h-full tw-w-full ' + visibilyClass
+      "
+    >
       <ProjectList />
     </div>
     <router-view />
