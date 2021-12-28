@@ -23,7 +23,7 @@
 
   const route = useRoute();
   const visibilyClass = computed(() =>
-    route.name && route.name.toString() === 'task'
+    route.name && ['task', 'create_task'].includes(route.name.toString())
       ? 'tw-hidden lg:tw-block'
       : '',
   );
