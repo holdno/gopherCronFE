@@ -12,8 +12,8 @@
         <q-icon name="search" />
       </template>
     </q-input>
-    <q-list class="q-pa-xs tw-h-full">
-      <q-scroll-area class="tw-h-full tw-overscroll-contain">
+    <q-scroll-area class="tw-h-[95%]" visible>
+      <q-list class="q-pa-xs">
         <q-item
           v-for="project in projects"
           :key="project.id"
@@ -28,8 +28,8 @@
             </q-card>
           </div>
         </q-item>
-      </q-scroll-area>
-    </q-list>
+      </q-list>
+    </q-scroll-area>
   </div>
 </template>
 

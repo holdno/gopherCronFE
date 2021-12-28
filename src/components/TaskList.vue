@@ -14,8 +14,8 @@
       </q-input>
       <q-btn :to="{ name: 'create_task' }" icon="add" />
     </div>
-    <q-list class="q-pa-xs tw-h-full">
-      <q-scroll-area class="tw-h-full tw-overscroll-contain">
+    <q-scroll-area class="tw-h-[95%]" visible>
+      <q-list class="q-pa-xs">
         <q-item
           v-for="task in tasks"
           :key="task.id"
@@ -36,8 +36,8 @@
             </q-card-section>
           </q-card>
         </q-item>
-      </q-scroll-area>
-    </q-list>
+      </q-list>
+    </q-scroll-area>
   </div>
 </template>
 
