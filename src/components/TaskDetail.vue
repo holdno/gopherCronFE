@@ -86,6 +86,7 @@
         type="submit"
         label="保存"
         :disable="!modified || !canSave"
+        class="lg:tw-w-20 tw-w-full"
       />
       <q-btn
         color="primary"
@@ -93,6 +94,7 @@
         label="重置"
         flat
         :disable="!modified"
+        class="lg:tw-w-20 tw-w-full"
       />
     </div>
     <div class="q-pa-sm">
