@@ -1,37 +1,40 @@
 <template>
-  <div class="q-pa-xs">
+  <div class="q-pa-xs tw-h-full tw-w-full">
     <q-input
       v-model="filter"
       borderless
       dense
       debounce="300"
       placeholder="Search"
+      class="q-pa-xs"
     >
       <template #append>
         <q-icon name="search" />
       </template>
     </q-input>
-    <q-list class="tw-w-full">
-      <q-item
-        v-for="task in tasks"
-        :key="task.id"
-        class="tw-w-full"
-        :to="{ name: 'task', params: { taskId: task.id } }"
-      >
-        <q-card class="tw-w-full">
-          <q-card-section class="text-center">
-            <strong>{{ task.name }}</strong>
-          </q-card-section>
-          <q-separator />
-          <q-card-section class="tw-flex tw-justify-around">
-            <div>
-              {{ task.cronExpr }}
-            </div>
-            <q-spinner-gears v-if="task.isRunning !== 0" />
-            <q-icon v-if="task.isRunning === 0" name="done_all" />
-          </q-card-section>
-        </q-card>
-      </q-item>
+    <q-list class="q-pa-xs tw-h-full">
+      <q-scroll-area class="tw-h-full tw-overscroll-contain">
+        <q-item
+          v-for="task in tasks"
+          :key="task.id"
+          class="tw-w-full"
+          :to="{ name: 'task', params: { taskId: task.id } }"
+        >
+          <q-card class="tw-w-full">
+            <q-card-section class="text-center">
+              <strong>{{ task.name }}</strong>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="tw-flex tw-justify-around">
+              <div>
+                {{ task.cronExpr }}
+              </div>
+              <q-spinner-gears v-if="task.isRunning !== 0" />
+              <q-icon v-if="task.isRunning === 0" name="done_all" />
+            </q-card-section>
+          </q-card>
+        </q-item>
+      </q-scroll-area>
     </q-list>
   </div>
 </template>

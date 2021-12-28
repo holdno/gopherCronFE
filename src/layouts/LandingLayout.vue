@@ -58,7 +58,7 @@
       </q-scroll-area>
     </q-drawer>
 
-    <q-page-container class="tw-w-full">
+    <q-page-container class="tw-w-full tw-h-screen">
       <router-view />
     </q-page-container>
   </q-layout>
