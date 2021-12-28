@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint --fix --ext .ts,.js,.vue src",
+    "pretty": "prettier --write ."
   },
   "dependencies": {
     "@quasar/extras": "^1.12.2",
