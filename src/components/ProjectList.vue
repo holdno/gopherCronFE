@@ -14,20 +14,22 @@
     </q-input>
     <q-scroll-area class="tw-h-[95%]" visible>
       <q-list class="q-pa-xs">
-        <q-item
+        <router-link
           v-for="project in projects"
           :key="project.id"
-          class="tw-w-full"
           :to="{ name: 'project', params: { projectId: project.id } }"
         >
-          <div class="tw-w-full">
-            <q-card>
-              <q-card-section class="text-center">
-                <strong>{{ project.title }}</strong>
-              </q-card-section>
-            </q-card>
+          <div
+            :class="
+              (!actived(project)
+                ? 'tw-bg-[#27272a] '
+                : 'tw-bg-primary tw-text-black ') +
+              'tw-w-full q-pa-md tw-mb-1 tw-rounded-md tw-items-center hover:tw-bg-primary'
+            "
+          >
+            {{ project.title }}
           </div>
-        </q-item>
+        </router-link>
       </q-list>
     </q-scroll-area>
   </div>
@@ -35,6 +37,7 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref } from 'vue';
+  import { useRoute } from 'vue-router';
   import { Project } from '../request';
   import { useStore } from '../store';
 
@@ -49,4 +52,8 @@
         p.id.toString().indexOf(filter.value) >= 0,
     ),
   );
+  function actived(project: Project): boolean {
+    const route = useRoute();
+    return route.params.projectId === project.id.toString();
+  }
 </script>

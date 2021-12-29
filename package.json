@@ -14,6 +14,8 @@
     "axios": "^0.24.0",
     "echarts": "^5.2.2",
     "js-cookie": "^3.0.1",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
     "quasar": "^2.3.4",
     "v-network-graph": "^0.3.10",
     "vue": "^3.2.25",

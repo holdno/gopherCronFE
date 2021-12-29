@@ -40,7 +40,7 @@ app.use(Quasar, {
     Notify,
   },
   config: {
-    dark: 'auto' /* true, false, "auto" */,
+    dark: true /* true, false, "auto" */,
     notify: {
       /* look at QuasarConfOptions from the API card */
     },
