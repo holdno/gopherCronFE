@@ -13,6 +13,7 @@ import {
   saveTask,
   recentLog,
   RecentLogCount,
+  createProject,
 } from './request';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
@@ -28,6 +29,8 @@ export interface State {
   tasks: Task[];
 
   recentLogCountRecords: RecentLogCount[];
+
+  currentError?: Error;
 }
 
 // 定义 injection key
@@ -86,6 +89,7 @@ export const store = createStore<State>({
       if (api) delete api.defaults.headers.common[COOKIE_TOKEN];
     },
     error(state, { error }) {
+      state.currentError = error;
       const q = state.$q;
       if (q)
         q.notify({
@@ -94,6 +98,9 @@ export const store = createStore<State>({
           position: 'top-right',
         });
       else throw error;
+    },
+    clearError(state) {
+      state.currentError = undefined;
     },
     setProjects(state, { projects }) {
       state.projects = projects;
@@ -173,6 +180,15 @@ export const store = createStore<State>({
       try {
         const recentLogCount = await recentLog(api);
         commit('setRecentLogCount', { records: recentLogCount });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async createProject({ dispatch, commit }, { title, remark }) {
+      const api = this.getters.apiv1;
+      try {
+        await createProject(api, title, remark);
+        await dispatch('fetchProjects');
       } catch (e) {
         commit('error', { error: e });
       }

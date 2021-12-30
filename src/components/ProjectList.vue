@@ -1,17 +1,43 @@
 <template>
   <div class="q-pa-xs tw-h-full tw-w-full">
-    <q-input
-      v-model="filter"
-      borderless
-      dense
-      debounce="300"
-      placeholder="Search"
-      class="q-pa-xs"
-    >
-      <template #append>
-        <q-icon name="search" />
-      </template>
-    </q-input>
+    <q-dialog v-model="showAddDialog" :no-backdrop-dismiss="!canDismiss">
+      <q-card class="tw-w-96">
+        <q-form @submit="onSubmit">
+          <q-card-section>
+            <div class="text-h6">创建项目</div>
+          </q-card-section>
+          <q-card-section>
+            <q-input v-model="newProject.title" type="text" label="项目名" />
+            <q-input v-model="newProject.remark" type="textarea" label="备注" />
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              label="创建"
+              color="primary"
+              type="submit"
+              :disable="!canSubmit"
+            />
+            <q-btn v-close-popup flat label="取消" />
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog>
+    <div class="q-pa-xs tw-flex tw-justify-around">
+      <q-input
+        v-model="filter"
+        borderless
+        dense
+        debounce="300"
+        placeholder="Search"
+        class="q-pa-xs"
+      >
+        <template #append>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <q-btn icon="add" @click="showAddDialog = true" />
+    </div>
     <q-scroll-area class="tw-h-[95%]" visible>
       <q-list class="q-pa-xs">
         <router-link
@@ -36,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
   import { Project } from '../request';
   import { useStore } from '../store';
@@ -55,5 +81,36 @@
   function actived(project: Project): boolean {
     const route = useRoute();
     return route.params.projectId === project.id.toString();
+  }
+
+  const showAddDialog = ref(false);
+  const newProject = ref({
+    title: '',
+    remark: '',
+  });
+  const canDismiss = computed(() => {
+    const p = newProject.value;
+    return p.title.trim() === '' && p.remark.trim() === '';
+  });
+  const canSubmit = computed(() => {
+    const p = newProject.value;
+    return p.title.trim() !== '';
+  });
+  watchEffect(() => {
+    if (!showAddDialog.value) {
+      newProject.value = {
+        title: '',
+        remark: '',
+      };
+    }
+  });
+  async function onSubmit() {
+    const p = newProject.value;
+    store.commit('clearError');
+    await store.dispatch('createProject', {
+      title: p.title.trim(),
+      remark: p.remark.trim(),
+    });
+    if (store.state.currentError === undefined) showAddDialog.value = false;
   }
 </script>

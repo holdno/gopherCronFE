@@ -197,3 +197,23 @@ export async function recentLog(api: AxiosInstance): Promise<RecentLogCount[]> {
     throw new Error(data.meta.msg);
   }
 }
+
+export async function createProject(
+  api: AxiosInstance,
+  title: string,
+  remark: string,
+) {
+  const payload = JSON.stringify({
+    title: title,
+    remark: remark,
+  });
+  const resp = await api.post('/project/create', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
