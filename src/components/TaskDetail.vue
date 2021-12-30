@@ -1,107 +1,121 @@
 <template>
-  <q-form class="q-pa-md tw-w-full" @submit="onSumbit" @reset="onReset">
-    <q-input
-      v-if="task"
-      key="id"
-      :model-value="task.id"
-      disable
-      label="任务 ID"
-      square
-      filled
-      class="tw-mb-6"
-    />
-    <q-input
-      key="project"
-      :model-value="project ? project.title : ''"
-      disable
-      label="所属项目"
-      square
-      filled
-      class="tw-mb-6"
-    />
-    <q-input
-      key="name"
-      v-model="editable.name"
-      label="任务名称"
-      square
-      filled
-      class="tw-mb-6"
-    />
-    <q-input
-      key="cron"
-      v-model="editable.cronExpr"
-      label="调度计划 (*秒 *分 *时 *日 *月 *周 *年)"
-      square
-      filled
-      class="tw-mb-6"
-    />
-    <q-input
-      key="timeout"
-      v-model="editable.timeout"
-      type="number"
-      label="超时时间 (单位:秒 s 0则不限制)"
-      square
-      filled
-      class="tw-mb-6"
-    />
-    <q-input
-      key="command"
-      v-model="editable.command"
-      type="textarea"
-      label="执行指令"
-      autogrow
-      square
-      filled
-      class="tw-mb-6"
-    />
-    <q-input
-      key="remark"
-      v-model="editable.remark"
-      type="textarea"
-      label="任务备注"
-      autogrow
-      square
-      filled
-      class="tw-mb-6"
-    />
-    <q-toggle
-      key="noseize"
-      v-model="editable.noseize"
-      :false-value="0"
-      :true-value="1"
-      label="并行调度"
-      class="tw-mb-6"
-    />
-    <q-toggle
-      key="status"
-      v-model="editable.status"
-      :false-value="0"
-      :true-value="1"
-      label="是否启用"
-      class="tw-mb-6"
-    />
-    <div class="q-pa-sm">
-      <q-btn
-        color="primary"
-        type="submit"
-        label="保存"
-        :disable="!modified || !canSave"
-        class="lg:tw-w-20 tw-w-full"
-      />
-      <q-btn
-        color="primary"
-        type="reset"
-        label="重置"
-        flat
-        :disable="!modified"
-        class="lg:tw-w-20 tw-w-full"
-      />
+  <div class="q-pa-md">
+    <div class="tw-text-[#7e7e7e] tw-py-1">
+      <p class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg">
+        <span><q-icon name="folder" /> {{ project?.title }} </span>
+        <span>
+          ID:
+          {{ projectId }}
+        </span>
+      </p>
+      <p v-if="project && project.remark.trim() !== ''" class="tw-py-3">
+        {{ project.remark }}
+      </p>
     </div>
-    <div class="q-pa-sm">
-      <p>TODO: 展示在线节点信息</p>
-      <p>TODO: 执行按钮</p>
-    </div>
-  </q-form>
+    <q-form class="tw-w-full" @submit="onSumbit" @reset="onReset">
+      <q-input
+        v-if="task"
+        key="id"
+        :model-value="task.id"
+        disable
+        label="任务 ID"
+        square
+        filled
+        class="tw-mb-6"
+      />
+      <q-input
+        key="project"
+        :model-value="project ? project.title : ''"
+        disable
+        label="所属项目"
+        square
+        filled
+        class="tw-mb-6"
+      />
+      <q-input
+        key="name"
+        v-model="editable.name"
+        label="任务名称"
+        square
+        filled
+        class="tw-mb-6"
+      />
+      <q-input
+        key="cron"
+        v-model="editable.cronExpr"
+        label="调度计划 (*秒 *分 *时 *日 *月 *周 *年)"
+        square
+        filled
+        class="tw-mb-6"
+      />
+      <q-input
+        key="timeout"
+        v-model="editable.timeout"
+        type="number"
+        label="超时时间 (单位:秒 s 0则不限制)"
+        square
+        filled
+        class="tw-mb-6"
+      />
+      <q-input
+        key="command"
+        v-model="editable.command"
+        type="textarea"
+        label="执行指令"
+        autogrow
+        square
+        filled
+        class="tw-mb-6"
+      />
+      <q-input
+        key="remark"
+        v-model="editable.remark"
+        type="textarea"
+        label="任务备注"
+        autogrow
+        square
+        filled
+        class="tw-mb-6"
+      />
+      <q-toggle
+        key="noseize"
+        v-model="editable.noseize"
+        :false-value="0"
+        :true-value="1"
+        label="并行调度"
+        class="tw-mb-6"
+      />
+      <q-toggle
+        key="status"
+        v-model="editable.status"
+        :false-value="0"
+        :true-value="1"
+        label="是否启用"
+        class="tw-mb-6"
+      />
+      <div class="q-pa-sm">
+        <q-btn
+          color="primary"
+          type="submit"
+          label="保存"
+          :disable="!modified || !canSave"
+          class="lg:tw-w-20 tw-w-full"
+        />
+        <q-btn
+          color="primary"
+          type="reset"
+          label="重置"
+          flat
+          :disable="!modified"
+          class="lg:tw-w-20 tw-w-full"
+        />
+      </div>
+      <div class="q-pa-sm">
+        <p>TODO: 展示在线节点信息</p>
+        <p>TODO: 执行按钮</p>
+      </div>
+    </q-form>
+  </div>
 </template>
 
 <script setup lang="ts">
