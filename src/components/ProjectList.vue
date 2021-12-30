@@ -36,6 +36,7 @@
           <q-icon name="search" />
         </template>
       </q-input>
+      <q-btn :loading="loading" icon="refresh" @click="fetchProjects" />
       <q-btn icon="add" @click="showAddDialog = true" />
     </div>
     <q-scroll-area class="tw-h-[95%]" visible>
@@ -68,7 +69,13 @@
   import { useStore } from '../store';
 
   const store = useStore();
-  onMounted(() => store.dispatch('fetchProjects'));
+  const loading = computed(() => store.state.loadingProjects);
+  onMounted(async () => {
+    await store.dispatch('fetchProjects');
+  });
+  async function fetchProjects() {
+    await store.dispatch('fetchProjects');
+  }
 
   const filter = ref('');
   const projects = computed(() =>

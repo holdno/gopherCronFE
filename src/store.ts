@@ -27,6 +27,7 @@ export interface State {
   $q?: QVueGlobals;
 
   projects: Project[];
+  loadingProjects: boolean;
   tasks: Task[];
   loadingTasks: boolean;
 
@@ -47,6 +48,7 @@ export const store = createStore<State>({
     return {
       logined: false,
       projects: [],
+      loadingProjects: false,
       tasks: [],
       loadingTasks: false,
       recentLogCountRecords: [],
@@ -106,6 +108,12 @@ export const store = createStore<State>({
     clearError(state) {
       state.currentError = undefined;
     },
+    loadingProjects(state) {
+      state.loadingProjects = true;
+    },
+    unloadingProjects(state) {
+      state.loadingProjects = false;
+    },
     setProjects(state, { projects }) {
       state.projects = projects;
     },
@@ -158,6 +166,7 @@ export const store = createStore<State>({
       }
     },
     async fetchProjects({ commit }) {
+      commit('loadingProjects');
       const api = this.getters.apiv1;
       try {
         const projects = await projectList(api);
@@ -165,6 +174,7 @@ export const store = createStore<State>({
       } catch (e) {
         commit('error', { error: e });
       }
+      commit('unloadingProjects');
     },
     async fetchTasks({ commit }, { projectId }) {
       commit('loadingTasks');
