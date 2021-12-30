@@ -90,7 +90,7 @@
   import { useStore } from '../store';
   import { Task } from '../request';
   import { formatTimestamp } from '../utils/datetime';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
 
   const props = defineProps({
     projectId: {
@@ -122,10 +122,14 @@
     store.state.projects.find((p) => p.id === props.projectId),
   );
   const showDeleteConfirm = ref(false);
+  const router = useRouter();
   async function deleteProject(projectId: number) {
     store.commit('clearError');
     await store.dispatch('deleteProject', { projectId });
-    if (store.state.currentError === undefined) showDeleteConfirm.value = false;
+    if (store.state.currentError === undefined) {
+      router.push({ name: 'projects' });
+      showDeleteConfirm.value = false;
+    }
   }
 </script>
 
