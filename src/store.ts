@@ -14,6 +14,7 @@ import {
   recentLog,
   RecentLogCount,
   createProject,
+  deleteProject,
 } from './request';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
@@ -189,6 +190,15 @@ export const store = createStore<State>({
       const api = this.getters.apiv1;
       try {
         await createProject(api, title, remark);
+        await dispatch('fetchProjects');
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async deleteProject({ dispatch, commit }, { projectId }) {
+      const api = this.getters.apiv1;
+      try {
+        await deleteProject(api, projectId);
         await dispatch('fetchProjects');
       } catch (e) {
         commit('error', { error: e });

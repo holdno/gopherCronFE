@@ -1,5 +1,23 @@
 <template>
   <div class="q-pa-xs tw-h-full tw-w-full">
+    <q-dialog v-model="showDeleteConfirm">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="delete" color="primary" text-color="white" />
+          <span class="q-ml-sm"> 是否要删除项目 {{ project?.title }}</span>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn v-close-popup flat label="取消" color="primary" />
+          <q-btn
+            flat
+            label="删除"
+            color="red"
+            @click="() => project && deleteProject(project.id)"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <div class="q-pa-xs tw-flex tw-justify-around">
       <q-input
         v-model="filter"
@@ -13,6 +31,7 @@
         </template>
       </q-input>
       <q-btn :to="{ name: 'create_task' }" icon="add" />
+      <q-btn icon="delete" @click="showDeleteConfirm = true" />
     </div>
     <q-scroll-area class="tw-h-[95%]" visible>
       <q-list class="q-pa-md">
@@ -93,6 +112,16 @@
   function actived(task: Task): boolean {
     const route = useRoute();
     return route.params.taskId === task.id;
+  }
+
+  const project = computed(() =>
+    store.state.projects.find((p) => p.id === props.projectId),
+  );
+  const showDeleteConfirm = ref(false);
+  async function deleteProject(projectId: number) {
+    store.commit('clearError');
+    await store.dispatch('deleteProject', { projectId });
+    if (store.state.currentError === undefined) showDeleteConfirm.value = false;
   }
 </script>
 

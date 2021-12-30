@@ -217,3 +217,18 @@ export async function createProject(
     throw new Error(data.meta.msg);
   }
 }
+
+export async function deleteProject(api: AxiosInstance, projectId: number) {
+  const payload = JSON.stringify({
+    project_id: projectId,
+  });
+  const resp = await api.post('/project/delete', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
