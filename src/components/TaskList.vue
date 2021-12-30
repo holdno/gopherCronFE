@@ -46,7 +46,7 @@
               (!actived(task)
                 ? 'tw-bg-[#27272a] '
                 : 'tw-bg-primary tw-text-black ') +
-              'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-[10px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
+              'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-4 tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
             "
           >
             <div :class="'task__status' + task.status">

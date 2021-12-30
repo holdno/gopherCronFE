@@ -1,16 +1,18 @@
 <template>
   <div class="q-pa-md">
-    <div class="tw-text-[#7e7e7e] tw-py-1">
-      <p class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg">
+    <div class="tw-text-[#7e7e7e] tw-mb-4">
+      <div
+        class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg tw-mb-4"
+      >
         <span><q-icon name="folder" /> {{ project?.title }} </span>
         <span>
           ID:
           {{ projectId }}
         </span>
-      </p>
-      <p v-if="project && project.remark.trim() !== ''" class="tw-py-3">
+      </div>
+      <div v-if="project && project.remark.trim() !== ''" class="tw-pb-4">
         {{ project.remark }}
-      </p>
+      </div>
     </div>
     <q-form class="tw-w-full" @submit="onSumbit" @reset="onReset">
       <q-input
@@ -21,7 +23,7 @@
         label="任务 ID"
         square
         filled
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <q-input
         key="project"
@@ -30,7 +32,7 @@
         label="所属项目"
         square
         filled
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <q-input
         key="name"
@@ -38,7 +40,7 @@
         label="任务名称"
         square
         filled
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <q-input
         key="cron"
@@ -46,7 +48,7 @@
         label="调度计划 (*秒 *分 *时 *日 *月 *周 *年)"
         square
         filled
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <q-input
         key="timeout"
@@ -55,7 +57,7 @@
         label="超时时间 (单位:秒 s 0则不限制)"
         square
         filled
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <q-input
         key="command"
@@ -65,7 +67,7 @@
         autogrow
         square
         filled
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <q-input
         key="remark"
@@ -75,7 +77,7 @@
         autogrow
         square
         filled
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <q-toggle
         key="noseize"
@@ -83,7 +85,7 @@
         :false-value="0"
         :true-value="1"
         label="并行调度"
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <q-toggle
         key="status"
@@ -91,7 +93,7 @@
         :false-value="0"
         :true-value="1"
         label="是否启用"
-        class="tw-mb-6"
+        class="tw-mb-4"
       />
       <div class="q-pa-sm">
         <q-btn

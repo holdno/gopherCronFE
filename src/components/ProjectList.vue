@@ -50,7 +50,7 @@
               (!actived(project)
                 ? 'tw-bg-[#27272a] '
                 : 'tw-bg-primary tw-text-black ') +
-              'tw-w-full q-pa-md tw-mb-1 tw-rounded-md tw-items-center hover:tw-bg-primary'
+              'tw-w-full q-pa-md tw-mb-4 tw-rounded-md tw-items-center hover:tw-bg-primary'
             "
           >
             {{ project.title }}
