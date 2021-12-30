@@ -45,7 +45,7 @@
             <q-item-section>Taskflows</q-item-section>
           </q-item>
 
-          <q-separator />
+          <q-separator class="tw-bg-stone-800" />
 
           <q-item v-ripple clickable :to="{ name: 'logout' }">
             <q-item-section avatar>

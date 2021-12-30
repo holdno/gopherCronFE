@@ -1,24 +1,43 @@
 <template>
-  <div class="q-pa-xs tw-h-full tw-w-full">
+  <div class="q-pa-md tw-h-full tw-w-full">
     <q-dialog v-model="showAddDialog" :no-backdrop-dismiss="!canDismiss">
-      <q-card class="tw-w-96">
+      <q-card class="tw-w-96 q-pa-sm">
         <q-form @submit="onSubmit">
           <q-card-section>
             <div class="text-h6">创建项目</div>
           </q-card-section>
           <q-card-section>
-            <q-input v-model="newProject.title" type="text" label="项目名" />
-            <q-input v-model="newProject.remark" type="textarea" label="备注" />
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn
-              flat
-              label="创建"
-              color="primary"
-              type="submit"
-              :disable="!canSubmit"
+            <q-input
+              v-model="newProject.title"
+              type="text"
+              label="项目名"
+              square
+              filled
+              class="tw-mb-4"
             />
-            <q-btn v-close-popup flat label="取消" />
+            <q-input
+              v-model="newProject.remark"
+              type="textarea"
+              label="备注"
+              square
+              filled
+            />
+          </q-card-section>
+          <q-card-actions align="around">
+            <q-btn
+              color="primary"
+              text-color="black"
+              type="submit"
+              label="创建"
+              :disable="!canSubmit"
+              class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
+            />
+            <q-btn
+              v-close-popup
+              flat
+              label="取消"
+              class="lg:tw-w-24 tw-w-full"
+            />
           </q-card-actions>
         </q-form>
       </q-card>
@@ -50,7 +69,7 @@
               (!actived(project)
                 ? 'tw-bg-[#27272a] '
                 : 'tw-bg-primary tw-text-black ') +
-              'tw-w-full q-pa-md tw-mb-4 tw-rounded-md tw-items-center hover:tw-bg-primary'
+              'tw-w-full q-pa-md tw-mb-4 tw-rounded-md tw-items-center hover:tw-bg-primary hover:tw-text-black'
             "
           >
             {{ project.title }}
