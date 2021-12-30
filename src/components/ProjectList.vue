@@ -30,14 +30,13 @@
         dense
         debounce="300"
         placeholder="Search"
-        class="q-pa-xs"
       >
         <template #append>
           <q-icon name="search" />
         </template>
       </q-input>
-      <q-btn :loading="loading" icon="refresh" @click="fetchProjects" />
-      <q-btn icon="add" @click="showAddDialog = true" />
+      <q-btn flat :loading="loading" icon="refresh" @click="fetchProjects" />
+      <q-btn flat icon="add" @click="showAddDialog = true" />
     </div>
     <q-scroll-area class="tw-h-[95%]" visible>
       <q-list class="q-pa-md">

@@ -30,9 +30,9 @@
           <q-icon name="search" />
         </template>
       </q-input>
-      <q-btn :loading="loading" icon="refresh" @click="fetchTasks" />
-      <q-btn :to="{ name: 'create_task' }" icon="add" />
-      <q-btn icon="delete" @click="showDeleteConfirm = true" />
+      <q-btn flat :loading="loading" icon="refresh" @click="fetchTasks" />
+      <q-btn flat :to="{ name: 'create_task' }" icon="add" />
+      <q-btn flat icon="delete" @click="showDeleteConfirm = true" />
     </div>
     <q-scroll-area class="tw-h-[95%]" visible>
       <q-list class="q-pa-md">

@@ -1,6 +1,9 @@
 <template>
   <div
-    :class="'xl:tw-basis-1/6 tw-basis-1/4 tw-h-full tw-w-full ' + visibilyClass"
+    :class="
+      'xl:tw-basis-1/6 tw-basis-1/4 tw-h-full tw-w-full tw-bg-[#1E1E1E] ' +
+      visibilyClass
+    "
   >
     <TaskList :project-id="props.projectId" />
   </div>
