@@ -30,6 +30,7 @@
           <q-icon name="search" />
         </template>
       </q-input>
+      <q-btn :loading="loading" icon="refresh" @click="fetchTasks" />
       <q-btn :to="{ name: 'create_task' }" icon="add" />
       <q-btn icon="delete" @click="showDeleteConfirm = true" />
     </div>
@@ -100,9 +101,13 @@
   });
 
   const store = useStore();
-  watchEffect(() => {
-    store.dispatch('fetchTasks', { ...props });
+  const loading = computed(() => store.state.loadingTasks);
+  watchEffect(async () => {
+    await store.dispatch('fetchTasks', { ...props });
   });
+  async function fetchTasks() {
+    await store.dispatch('fetchTasks', { ...props });
+  }
 
   const filter = ref('');
   const tasks = computed(() =>

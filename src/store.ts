@@ -28,6 +28,7 @@ export interface State {
 
   projects: Project[];
   tasks: Task[];
+  loadingTasks: boolean;
 
   recentLogCountRecords: RecentLogCount[];
 
@@ -47,6 +48,7 @@ export const store = createStore<State>({
       logined: false,
       projects: [],
       tasks: [],
+      loadingTasks: false,
       recentLogCountRecords: [],
     };
   },
@@ -107,6 +109,12 @@ export const store = createStore<State>({
     setProjects(state, { projects }) {
       state.projects = projects;
     },
+    loadingTasks(state) {
+      state.loadingTasks = true;
+    },
+    unloadingTasks(state) {
+      state.loadingTasks = false;
+    },
     setTasks(state, { tasks }) {
       state.tasks = tasks;
     },
@@ -159,6 +167,7 @@ export const store = createStore<State>({
       }
     },
     async fetchTasks({ commit }, { projectId }) {
+      commit('loadingTasks');
       const api = this.getters.apiv1;
       try {
         const tasks = await taskList(api, projectId);
@@ -166,6 +175,7 @@ export const store = createStore<State>({
       } catch (e) {
         commit('error', { error: e });
       }
+      commit('unloadingTasks');
     },
     async saveTask({ commit }, { task }) {
       const api = this.getters.apiv1;
