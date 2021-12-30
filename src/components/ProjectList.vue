@@ -39,7 +39,7 @@
       <q-btn icon="add" @click="showAddDialog = true" />
     </div>
     <q-scroll-area class="tw-h-[95%]" visible>
-      <q-list class="q-pa-xs">
+      <q-list class="q-pa-md">
         <router-link
           v-for="project in projects"
           :key="project.id"

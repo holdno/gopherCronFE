@@ -35,47 +35,51 @@
     </div>
     <q-scroll-area class="tw-h-[95%]" visible>
       <q-list class="q-pa-md">
-        <q-item
+        <router-link
           v-for="task in tasks"
           :key="task.id"
-          active-class="tw-bg-primary tw-text-black"
-          :class="
-            (!actived(task) ? 'tw-bg-[#27272a] ' : '') +
-            'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-[10px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
-          "
           :to="{ name: 'task', params: { taskId: task.id } }"
         >
-          <div :class="'task__status' + task.status">
-            {{ task.status == 1 ? '调度中' : '已暂停' }}
-          </div>
           <div
             :class="
-              (actived(task) ? 'active ' : '') +
-              'task__title tw-inline-flex tw-items-center'
+              (!actived(task)
+                ? 'tw-bg-[#27272a] '
+                : 'tw-bg-primary tw-text-black ') +
+              'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-[10px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
             "
           >
-            <div class="task__cron">
-              <q-icon name="schedule" />
-              {{ task.cronExpr }}
+            <div :class="'task__status' + task.status">
+              {{ task.status == 1 ? '调度中' : '已暂停' }}
             </div>
-            <q-icon name="numbers" />
-            {{ task.name }}
-          </div>
-          <div class="task__remark">
-            {{ task.remark || '-' }}
-          </div>
-          <div class="task__bottom-box">
-            <div class="task__bottom-time">
-              {{ formatTimestamp(task.createTime * 1000) }}
+            <div
+              :class="
+                (actived(task) ? 'active ' : '') +
+                'task__title tw-inline-flex tw-items-center'
+              "
+            >
+              <div class="task__cron">
+                <q-icon name="schedule" />
+                {{ task.cronExpr }}
+              </div>
+              <q-icon name="numbers" />
+              {{ task.name }}
             </div>
-            <!-- <div
+            <div class="task__remark">
+              {{ task.remark || '-' }}
+            </div>
+            <div class="task__bottom-box">
+              <div class="task__bottom-time">
+                {{ formatTimestamp(task.createTime * 1000) }}
+              </div>
+              <!-- <div
               class="task__bottom-button"
               @click.stop="shutdown($event, item)"
             >
               {{ task.isRunning == 1 ? '结束进程' : '等待执行' }}
             </div> -->
+            </div>
           </div>
-        </q-item>
+        </router-link>
       </q-list>
     </q-scroll-area>
   </div>
