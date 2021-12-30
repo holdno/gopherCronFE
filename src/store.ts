@@ -94,8 +94,9 @@ export const store = createStore<State>({
       if (q)
         q.notify({
           message: error.message,
+          color: 'red',
           icon: 'announcement',
-          position: 'top-right',
+          position: 'top',
         });
       else throw error;
     },

@@ -22,7 +22,7 @@
           active-class="tw-bg-primary tw-text-black"
           :class="
             (!actived(task) ? 'tw-bg-[#27272a] ' : '') +
-            'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-[10px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary'
+            'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-[10px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
           "
           :to="{ name: 'task', params: { taskId: task.id } }"
         >
