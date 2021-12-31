@@ -14,7 +14,13 @@
         {{ project.remark }}
       </div>
     </div>
-    <q-tabs v-model="tab">
+    <q-tabs
+      v-model="tab"
+      active-color="primary"
+      dense
+      align="left"
+      narrow-indicator
+    >
       <q-route-tab
         name="detail"
         label="详情"
