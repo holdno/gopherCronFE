@@ -15,6 +15,8 @@ import {
   RecentLogCount,
   createProject,
   deleteProject,
+  TaskLog,
+  fetchLogs,
 } from './request';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
@@ -32,6 +34,10 @@ export interface State {
   loadingTasks: boolean;
 
   recentLogCountRecords: RecentLogCount[];
+
+  taskLogs: TaskLog[];
+  taskLogsTotal: number;
+  loadingTaskLogs: boolean;
 
   currentError?: Error;
 }
@@ -52,6 +58,9 @@ export const store = createStore<State>({
       tasks: [],
       loadingTasks: false,
       recentLogCountRecords: [],
+      taskLogs: [],
+      taskLogsTotal: 0,
+      loadingTaskLogs: false,
     };
   },
   getters: {
@@ -135,6 +144,10 @@ export const store = createStore<State>({
     },
     setRecentLogCount(state, { records }) {
       state.recentLogCountRecords = records;
+    },
+    saveLogs(state, { logs, total }) {
+      state.taskLogs = logs;
+      state.taskLogsTotal = total;
     },
   },
   actions: {
@@ -220,6 +233,24 @@ export const store = createStore<State>({
       try {
         await deleteProject(api, projectId);
         await dispatch('fetchProjects');
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async fetchTaskLogs(
+      { dispatch, commit },
+      { projectId, taskId, page, pageSize },
+    ) {
+      const api = this.getters.apiv1;
+      try {
+        const [logs, total] = await fetchLogs(
+          api,
+          projectId,
+          taskId,
+          page,
+          pageSize,
+        );
+        commit('saveLogs', { logs, total });
       } catch (e) {
         commit('error', { error: e });
       }

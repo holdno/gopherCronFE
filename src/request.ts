@@ -232,3 +232,58 @@ export async function deleteProject(api: AxiosInstance, projectId: number) {
     throw new Error(data.meta.msg);
   }
 }
+
+export interface TaskLog {
+  id: number;
+  taskId: string;
+  projectId: number;
+  project: string;
+  name: string;
+  result: string;
+  startTime: number;
+  endTime: number;
+  command: string;
+  withError: number;
+  clientIp: string;
+  tmpId: string;
+}
+
+export async function fetchLogs(
+  api: AxiosInstance,
+  projectId: number,
+  taskId: string,
+  page: number,
+  pageSize: number,
+): Promise<[TaskLog[], number]> {
+  const resp = await api.get('/log/list', {
+    params: {
+      project_id: projectId,
+      task_id: taskId,
+      page: page,
+      pagesize: pageSize,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    const r = data.response;
+    return [
+      r.list.map((v: any) => ({
+        id: v.id,
+        taskId: v.task_id,
+        projectId: v.project_id,
+        project: v.project,
+        name: v.name,
+        result: v.result,
+        startTime: v.start_time,
+        endTime: v.end_time,
+        command: v.command,
+        withError: v.with_error,
+        clientIp: v.client_ip,
+        tmpId: v.tmp_id,
+      })),
+      r.total,
+    ];
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}
