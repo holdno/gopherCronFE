@@ -8,6 +8,7 @@
     :loading="loading"
     row-key="id"
     color="primary"
+    flat
     @request="updatePagination"
   />
 </template>
