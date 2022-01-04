@@ -61,9 +61,9 @@ const routes = [
         ],
       },
       {
-        name: 'taskflow',
-        path: 'taskflow',
-        component: () => import('./pages/TaskflowList.vue'),
+        name: 'workflows',
+        path: 'workflows',
+        component: () => import('./pages/WorkflowList.vue'),
       },
       {
         name: 'projects-admin',

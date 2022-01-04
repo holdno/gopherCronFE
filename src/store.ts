@@ -17,6 +17,8 @@ import {
   deleteProject,
   TaskLog,
   fetchLogs,
+  Workflow,
+  fetchWorkflows,
 } from './request';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
@@ -38,6 +40,10 @@ export interface State {
   taskLogs: TaskLog[];
   taskLogsTotal: number;
   loadingTaskLogs: boolean;
+
+  workflows: Workflow[];
+  workflowsTotal: number;
+  loadingWorkflows: boolean;
 
   currentError?: Error;
 }
@@ -61,6 +67,9 @@ export const store = createStore<State>({
       taskLogs: [],
       taskLogsTotal: 0,
       loadingTaskLogs: false,
+      workflows: [],
+      workflowsTotal: 0,
+      loadingWorkflows: false,
     };
   },
   getters: {
@@ -156,9 +165,19 @@ export const store = createStore<State>({
     unloadingLogs(state) {
       state.loadingTaskLogs = false;
     },
-    saveLogs(state, { logs, total }) {
+    setLogs(state, { logs, total }) {
       state.taskLogs = logs;
       state.taskLogsTotal = total;
+    },
+    loadingWorkflows(state) {
+      state.loadingWorkflows = true;
+    },
+    unloadingWorkflows(state) {
+      state.loadingWorkflows = false;
+    },
+    setWorkflows(state, { workflows, total }) {
+      state.workflows = workflows;
+      state.workflowsTotal = total;
     },
   },
   actions: {
@@ -259,11 +278,22 @@ export const store = createStore<State>({
           page,
           pageSize,
         );
-        commit('saveLogs', { logs, total });
+        commit('setLogs', { logs, total });
       } catch (e) {
         commit('error', { error: e });
       }
       commit('unloadingLogs');
+    },
+    async fetchWorkflows({ commit }, { page, pageSize }) {
+      commit('loadingWorkflows');
+      const api = this.getters.apiv1;
+      try {
+        const [workflows, total] = await fetchWorkflows(api, page, pageSize);
+        commit('setWorkflows', { workflows, total });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+      commit('unloadingWorkflows');
     },
   },
 });

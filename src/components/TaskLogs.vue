@@ -22,6 +22,7 @@
   import { onMounted, computed, ref, watchEffect } from 'vue';
   import { useStore } from '../store';
   import { formatTimestamp } from '../utils/datetime';
+  import { Pagination, TableRequestProp } from '../utils/qusar';
   const props = defineProps({
     id: {
       type: String,
@@ -60,14 +61,6 @@
   ];
   const total = computed(() => store.state.taskLogsTotal);
   const loading = computed(() => store.state.loadingTaskLogs);
-
-  interface Pagination {
-    sortBy: string;
-    descending: boolean;
-    page: number;
-    rowsPerPage: number;
-    rowsNumber?: number;
-  }
   const pagination = ref<Pagination>({
     sortBy: '',
     descending: false,
@@ -75,12 +68,10 @@
     rowsPerPage: 10,
     rowsNumber: 0,
   });
-  interface RequestProp {
-    pagination: Pagination;
-  }
+
   function updatePagination({
     pagination: { page, rowsPerPage },
-  }: RequestProp) {
+  }: TableRequestProp) {
     const p = pagination.value;
     p.page = page;
     p.rowsPerPage = rowsPerPage;

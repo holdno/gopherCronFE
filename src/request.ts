@@ -287,3 +287,42 @@ export async function fetchLogs(
     throw new Error(data.meta.msg);
   }
 }
+
+export interface Workflow {
+  id: number;
+  title: string;
+  remark: string;
+  status: number;
+  createTime: number;
+  cronExpr: string;
+}
+
+export async function fetchWorkflows(
+  api: AxiosInstance,
+  page: number,
+  pageSize: number,
+): Promise<[Workflow[], number]> {
+  const resp = await api.get('/workflow/list', {
+    params: {
+      page: page,
+      pagesize: pageSize,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    const r = data.response;
+    return [
+      r.list.map((v: any) => ({
+        id: v.id,
+        title: v.title,
+        remark: v.remark,
+        status: v.status,
+        createTime: v.create_time,
+        cronExpr: v.cron,
+      })),
+      r.total,
+    ];
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}
