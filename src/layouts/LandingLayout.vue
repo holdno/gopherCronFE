@@ -48,6 +48,7 @@
           <q-separator class="tw-bg-stone-800" />
 
           <q-expansion-item
+            v-if="store.getters.isAdmin"
             v-model="adminMenuExpanded"
             label="Admin"
             icon="admin_panel_settings"
@@ -87,9 +88,11 @@
 <script setup lang="ts">
   import { ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
+  import { useStore } from '../store';
   const drawer = ref(false);
   const miniState = ref(true);
   const adminMenuExpanded = ref(false);
+  const store = useStore();
   const route = useRoute();
   watchEffect(() => {
     if (!route.name) return;

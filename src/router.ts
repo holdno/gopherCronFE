@@ -69,6 +69,7 @@ const routes = [
         name: 'projects-admin',
         path: 'admin/projects',
         component: () => import('./pages/ProjectListAdmin.vue'),
+        meta: { requiresAdmin: true },
       },
     ],
   },
@@ -82,6 +83,23 @@ const routes = [
     path: '/logout',
     redirect: '/login',
   },
+  {
+    name: 'forbidden',
+    path: '/error/forbidden',
+    component: () => import('./pages/HTTPStatus.vue'),
+    props: {
+      code: 403,
+    },
+  },
+  {
+    name: 'notfound',
+    path: '/error/notfound',
+    component: () => import('./pages/HTTPStatus.vue'),
+    props: {
+      code: 404,
+    },
+  },
+  { path: '/:pathMatch(.*)*', redirect: { name: 'notfound' } },
 ];
 
 const Router = createRouter({
@@ -96,9 +114,15 @@ Router.beforeEach(async (to, from) => {
     // 此路由需要授权，请检查是否已登录
     // 如果没有，则重定向到登录页面
     return {
-      path: '/login',
+      name: 'login',
       // 保存我们所在的位置，以便以后再来
       query: { redirect: to.fullPath },
+    };
+  }
+
+  if (to.meta.requiresAdmin && !store.getters.isAdmin) {
+    return {
+      name: 'forbidden',
     };
   }
 });

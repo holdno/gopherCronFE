@@ -78,6 +78,11 @@ export const store = createStore<State>({
       }
       return q;
     },
+    isAdmin(state): boolean {
+      return (
+        state.user !== undefined && state.user.permissions.includes('admin')
+      );
+    },
   },
   mutations: {
     setApi(state, { apiv1 }) {
