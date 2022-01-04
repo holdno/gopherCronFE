@@ -15,7 +15,7 @@
       </div>
     </div>
     <q-tabs
-      v-model="tab"
+      :model-value="tab"
       active-color="primary"
       align="left"
       class="lg:tw-hidden tw-display"
@@ -35,7 +35,7 @@
     </q-tabs>
     <div class="tw-flex tw-w-full tw-h-full">
       <q-tab-panels
-        v-model="tab"
+        :model-value="tab"
         animated
         :vertical="width >= 1024"
         class="tw-w-full tw-max-h-[90%]"
@@ -49,7 +49,7 @@
       </q-tab-panels>
       <div class="tw-hidden lg:tw-block">
         <q-tabs
-          v-model="tab"
+          :model-value="tab"
           active-color="primary"
           vertical
           switch-indicator
