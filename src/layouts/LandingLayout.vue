@@ -13,7 +13,7 @@
     <q-drawer
       v-model="drawer"
       show-if-above
-      :mini="miniState"
+      :mini="miniState && !adminMenuExpanded"
       :width="200"
       :breakpoint="500"
       @mouseover="miniState = false"
@@ -47,6 +47,26 @@
 
           <q-separator class="tw-bg-stone-800" />
 
+          <q-expansion-item
+            v-model="adminMenuExpanded"
+            label="Admin"
+            icon="admin_panel_settings"
+          >
+            <q-item
+              v-ripple
+              clickable
+              :header-inset-level="2"
+              :to="{ name: 'projects-admin' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="view_list" />
+              </q-item-section>
+
+              <q-item-section>Projects</q-item-section>
+            </q-item>
+          </q-expansion-item>
+          <q-separator class="tw-bg-stone-800" />
+
           <q-item v-ripple clickable :to="{ name: 'logout' }">
             <q-item-section avatar>
               <q-icon name="logout" />
@@ -64,15 +84,18 @@
   </q-layout>
 </template>
 
-<script lang="ts">
-  import { defineComponent, ref } from 'vue';
-  const Component = defineComponent({
-    setup() {
-      return {
-        drawer: ref(false),
-        miniState: ref(true),
-      };
-    },
+<script setup lang="ts">
+  import { ref, watchEffect } from 'vue';
+  import { useRoute } from 'vue-router';
+  const drawer = ref(false);
+  const miniState = ref(true);
+  const adminMenuExpanded = ref(false);
+  const route = useRoute();
+  watchEffect(() => {
+    if (!route.name) return;
+    const adminMenuItemRouteNames = ['projects-admin'];
+    adminMenuExpanded.value = adminMenuItemRouteNames.includes(
+      route.name.toString(),
+    );
   });
-  export default Component;
 </script>
