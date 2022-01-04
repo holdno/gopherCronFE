@@ -145,6 +145,12 @@ export const store = createStore<State>({
     setRecentLogCount(state, { records }) {
       state.recentLogCountRecords = records;
     },
+    loadingLogs(state) {
+      state.loadingTaskLogs = true;
+    },
+    unloadingLogs(state) {
+      state.loadingTaskLogs = false;
+    },
     saveLogs(state, { logs, total }) {
       state.taskLogs = logs;
       state.taskLogsTotal = total;
@@ -237,10 +243,8 @@ export const store = createStore<State>({
         commit('error', { error: e });
       }
     },
-    async fetchTaskLogs(
-      { dispatch, commit },
-      { projectId, taskId, page, pageSize },
-    ) {
+    async fetchTaskLogs({ commit }, { projectId, taskId, page, pageSize }) {
+      commit('loadingLogs');
       const api = this.getters.apiv1;
       try {
         const [logs, total] = await fetchLogs(
@@ -254,6 +258,7 @@ export const store = createStore<State>({
       } catch (e) {
         commit('error', { error: e });
       }
+      commit('unloadingLogs');
     },
   },
 });

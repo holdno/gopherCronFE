@@ -11,7 +11,11 @@
     color="primary"
     flat
     @request="updatePagination"
-  />
+  >
+    <template #loading>
+      <q-inner-loading showing color="primary" />
+    </template>
+  </q-table>
 </template>
 
 <script setup lang="ts">
