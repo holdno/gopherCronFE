@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md tw-w-full">
+  <div class="q-pa-md tw-w-full tw-h-full">
     <div class="tw-text-[#7e7e7e] tw-mb-4">
       <div
         class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg tw-mb-4"
@@ -33,12 +33,12 @@
         replace
       />
     </q-tabs>
-    <div class="tw-flex tw-w-full">
+    <div class="tw-flex tw-w-full tw-h-full">
       <q-tab-panels
         v-model="tab"
         animated
         :vertical="width >= 1024"
-        class="tw-w-full"
+        class="tw-w-full tw-max-h-[90%]"
       >
         <q-tab-panel name="detail">
           <TaskDetail :id="props.id" :project-id="props.projectId" />

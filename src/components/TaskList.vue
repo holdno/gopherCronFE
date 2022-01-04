@@ -34,7 +34,7 @@
       <q-btn flat :to="{ name: 'create_task' }" icon="add" />
       <q-btn flat icon="delete" @click="showDeleteConfirm = true" />
     </div>
-    <q-scroll-area class="tw-h-[95%]" visible>
+    <q-scroll-area class="tw-h-full" visible>
       <q-list class="q-pa-xs">
         <router-link
           v-for="task in tasks"

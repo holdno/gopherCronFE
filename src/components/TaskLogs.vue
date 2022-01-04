@@ -1,6 +1,7 @@
 <template>
   <q-table
     v-model:pagination="pagination"
+    class="tw-w-full tw-h-full"
     :rows-per-page-options="[10, 20, 30]"
     title="任务执行日志"
     :rows="logs"
