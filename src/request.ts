@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { App, inject, InjectionKey } from 'vue';
+import { Task as KahnTask } from './types';
 
 export const apiv1 = axios.create({
   baseURL: import.meta.env.VITE_API_V1_BASE_URL,
@@ -322,6 +323,64 @@ export async function fetchWorkflows(
       })),
       r.total,
     ];
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export interface WorkflowEdge {
+  id: number;
+  projectId: number;
+  taskId: string;
+  workflowId: number;
+  createTime: number;
+
+  dependencyProjectId: number;
+  dependencyTaskId: string;
+}
+
+export function workflowEdgesTokahnTasks(edges: WorkflowEdge[]): KahnTask[] {
+  const childMapParents = new Map<string, string[]>();
+  edges.forEach((e: WorkflowEdge) => {
+    const key = `${e.projectId}_${e.taskId}`;
+    if (!childMapParents.has(key)) {
+      childMapParents.set(key, []);
+    }
+    if (e.dependencyProjectId > 0 && e.dependencyTaskId !== '') {
+      const parentKey = `${e.dependencyProjectId}_${e.dependencyTaskId}`;
+      const parents = childMapParents.get(key);
+      parents !== undefined &&
+        childMapParents.set(key, [...parents, parentKey]);
+    }
+  });
+
+  return Array.from(childMapParents.keys()).map((value) => ({
+    id: value,
+    deps: childMapParents.get(value),
+  }));
+}
+
+export async function fetchWorkflowEdges(
+  api: AxiosInstance,
+  workflowId: number,
+): Promise<WorkflowEdge[]> {
+  const resp = await api.get('/workflow/task/list', {
+    params: {
+      workflow_id: workflowId,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    return data.response.map((v: any) => ({
+      id: v.id,
+      projectId: v.project_id,
+      taskId: v.task_id,
+      workflowId: v.workflowId,
+      createTime: v.create_time,
+
+      dependencyProjectId: v.dependency_project_id,
+      dependencyTaskId: v.dependency_task_id,
+    }));
   } else {
     throw new Error(data.meta.msg);
   }
