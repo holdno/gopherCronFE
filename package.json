@@ -20,6 +20,7 @@
     "v-network-graph": "^0.3.10",
     "vue": "^3.2.25",
     "vue-router": "^4.0.12",
+    "vue-window-size": "^1.1.2",
     "vuex": "^4.0.2"
   },
   "devDependencies": {

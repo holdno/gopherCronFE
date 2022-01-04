@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md tw-w-full">
     <div class="tw-text-[#7e7e7e] tw-mb-4">
       <div
         class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg tw-mb-4"
@@ -17,9 +17,8 @@
     <q-tabs
       v-model="tab"
       active-color="primary"
-      dense
       align="left"
-      narrow-indicator
+      class="lg:tw-hidden tw-display"
     >
       <q-route-tab
         name="detail"
@@ -34,14 +33,43 @@
         replace
       />
     </q-tabs>
-    <q-tab-panels v-model="tab" animated>
-      <q-tab-panel name="detail">
-        <TaskDetail :id="props.id" :project-id="props.projectId" />
-      </q-tab-panel>
-      <q-tab-panel name="logs">
-        <TaskLogs :id="props.id" :project-id="props.projectId" />
-      </q-tab-panel>
-    </q-tab-panels>
+    <div class="tw-flex tw-w-full">
+      <q-tab-panels
+        v-model="tab"
+        animated
+        :vertical="width >= 1024"
+        class="tw-w-full"
+      >
+        <q-tab-panel name="detail">
+          <TaskDetail :id="props.id" :project-id="props.projectId" />
+        </q-tab-panel>
+        <q-tab-panel name="logs">
+          <TaskLogs :id="props.id" :project-id="props.projectId" />
+        </q-tab-panel>
+      </q-tab-panels>
+      <div class="tw-hidden lg:tw-block">
+        <q-tabs
+          v-model="tab"
+          active-color="primary"
+          vertical
+          switch-indicator
+          align="left"
+        >
+          <q-route-tab
+            name="detail"
+            label="详情"
+            :to="{ name: 'task', params: { taskId: props.id } }"
+            replace
+          />
+          <q-route-tab
+            name="logs"
+            label="日志"
+            :to="{ name: 'task_logs', params: { taskId: props.id } }"
+            replace
+          />
+        </q-tabs>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -51,6 +79,7 @@
   import TaskDetail from '../components/TaskDetail.vue';
   import TaskLogs from '../components/TaskLogs.vue';
   import { useRoute } from 'vue-router';
+  import { useWindowSize } from 'vue-window-size';
 
   const props = defineProps({
     id: {
@@ -74,4 +103,6 @@
     else if (route.name === 'task_logs') return 'logs';
     else throw new Error(`Unknown route name ${route.name?.toString}`);
   });
+
+  const { width } = useWindowSize();
 </script>
