@@ -355,6 +355,7 @@ export function workflowEdgesTokahnTasks(edges: WorkflowEdge[]): KahnTask[] {
   });
 
   return Array.from(childMapParents.keys()).map((value) => ({
+    name: value, // FIXME: fetch task name
     id: value,
     deps: childMapParents.get(value),
   }));

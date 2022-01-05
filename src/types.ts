@@ -1,4 +1,5 @@
 export interface Task {
+  name: string;
   id: string;
   deps?: string[];
 }
