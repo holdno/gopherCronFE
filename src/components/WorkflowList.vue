@@ -65,6 +65,22 @@
     >
       <template #top>
         <q-btn flat icon="add" @click="showAddDialog = true" />
+        <q-btn flat :loading="loading" icon="refresh" @click="refresh" />
+      </template>
+      <template #body-cell-state="props">
+        <q-td key="state">
+          <q-spinner-gears
+            v-if="props.value && props.value.status === 'running'"
+            color="primary"
+            size="2em"
+          />
+          <q-icon
+            v-if="!props.value"
+            name="check_circle"
+            color="primary"
+            size="2em"
+          />
+        </q-td>
       </template>
       <template #body-cell-status="props">
         <td key="status">
@@ -112,7 +128,6 @@
       name: 'state',
       field: 'state',
       label: '运行状态',
-      format: (v: any) => JSON.stringify(v),
     },
     { name: 'operation', field: () => null, label: '操作' },
   ];

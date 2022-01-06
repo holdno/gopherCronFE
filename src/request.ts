@@ -392,7 +392,8 @@ export async function fetchWorkflowEdges(
   });
   const data = resp.data;
   if (data.meta.code === 0) {
-    return data.response.map((v: any) => ({
+    if (!data.response) return [];
+    return data.response.map(({ task: v, state }: any) => ({
       id: v.id,
       projectId: v.project_id,
       taskId: v.task_id,
