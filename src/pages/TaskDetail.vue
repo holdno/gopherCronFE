@@ -15,6 +15,7 @@
       </div>
     </div>
     <q-tabs
+      v-if="!isCreateMode"
       :model-value="tab"
       active-color="primary"
       align="left"
@@ -49,6 +50,7 @@
       </q-tab-panels>
       <div class="tw-hidden lg:tw-block">
         <q-tabs
+          v-if="!isCreateMode"
           :model-value="tab"
           active-color="primary"
           vertical
@@ -98,10 +100,20 @@
   );
 
   const route = useRoute();
+
+  const isCreateMode = computed(
+    () => route.name && route.name.toString() === 'create_task',
+  );
   const tab = computed(() => {
-    if (route.name === 'task') return 'detail';
-    else if (route.name === 'task_logs') return 'logs';
-    else throw new Error(`Unknown route name ${route.name?.toString}`);
+    if (isCreateMode.value) {
+      return 'detail';
+    }
+    if (route.name) {
+      const routeName = route.name.toString();
+      if (routeName === 'task') return 'detail';
+      else if (routeName === 'task_logs') return 'logs';
+    }
+    throw new Error(`Unknown route name ${route.name?.toString()}`);
   });
 
   const { width } = useWindowSize();
