@@ -1,43 +1,99 @@
 <template>
-  <q-table
-    v-model:pagination="pagination"
-    class="tw-w-full tw-h-full"
-    :rows-per-page-options="[10, 20, 30]"
-    title="任务编排"
-    :rows="workflows"
-    :columns="columns"
-    :loading="loading"
-    row-key="id"
-    color="primary"
-    flat
-    @request="updatePagination"
-  >
-    <template #body-cell-status="props">
-      <td key="status">
-        <q-toggle
-          color="primary"
-          :model-value="props.value !== 2"
-          @update:model-value="(v) => updateStatus(props.row, v)"
-        />
-      </td>
-    </template>
-    <template #body-cell-operation="props">
-      <td key="operation" class="tw-grid tw-gap-4">
-        <q-btn
-          :to="{ name: 'workflow', params: { workflowId: props.row.id } }"
-          dense
-          flat
-          color="primary"
-          >详情
-        </q-btn>
-      </td>
-    </template>
-  </q-table>
+  <div class="q-pa-md tw-h-full tw-w-full">
+    <q-dialog v-model="showAddDialog" :no-backdrop-dismiss="!canDismiss">
+      <q-card class="tw-w-96 q-pa-sm">
+        <q-form @submit="onSubmit">
+          <q-card-section>
+            <div class="text-h6">创建任务编排</div>
+          </q-card-section>
+          <q-card-section>
+            <q-input
+              v-model="newWorkflow.title"
+              type="text"
+              label="名称"
+              square
+              filled
+              class="tw-mb-4"
+            />
+            <q-input
+              key="cron"
+              v-model="newWorkflow.cronExpr"
+              label="调度计划 (*秒 *分 *时 *日 *月 *周 *年)"
+              square
+              filled
+              class="tw-mb-4"
+            />
+            <q-input
+              v-model="newWorkflow.remark"
+              type="textarea"
+              label="备注"
+              square
+              filled
+            />
+          </q-card-section>
+          <q-card-actions align="around">
+            <q-btn
+              color="primary"
+              text-color="black"
+              type="submit"
+              label="创建"
+              :disable="!canSubmit"
+              class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
+            />
+            <q-btn
+              v-close-popup
+              flat
+              label="取消"
+              class="lg:tw-w-24 tw-w-full"
+            />
+          </q-card-actions>
+        </q-form>
+      </q-card>
+    </q-dialog>
+    <q-table
+      v-model:pagination="pagination"
+      class="tw-w-full tw-h-full"
+      :rows-per-page-options="[10, 20, 30]"
+      title="任务编排"
+      :rows="workflows"
+      :columns="columns"
+      :loading="loading"
+      row-key="id"
+      color="primary"
+      flat
+      @request="updatePagination"
+    >
+      <template #top>
+        <q-btn flat icon="add" @click="showAddDialog = true" />
+      </template>
+      <template #body-cell-status="props">
+        <td key="status">
+          <q-toggle
+            color="primary"
+            :model-value="props.value !== 2"
+            @update:model-value="(v) => updateStatus(props.row, v)"
+          />
+        </td>
+      </template>
+      <template #body-cell-operation="props">
+        <td key="operation">
+          <div class="text-right tw-grid tw-gap-4">
+            <q-btn
+              :to="{ name: 'workflow', params: { workflowId: props.row.id } }"
+              dense
+              flat
+              color="primary"
+              >详情
+            </q-btn>
+          </div>
+        </td>
+      </template>
+    </q-table>
+  </div>
 </template>
 
 <script setup lang="ts">
   import { onMounted, watchEffect, ref, computed } from 'vue';
-  import { Workflow } from '../request';
   import { useStore } from '../store';
   import { Pagination, TableRequestProp } from '../utils/qusar';
 
@@ -76,7 +132,7 @@
     p.rowsPerPage = rowsPerPage;
   }
 
-  function updateStatus(workflow: Workflow, enable: boolean) {
+  function updateStatus(workflow: any, enable: boolean) {
     store
       .dispatch('updateWorkflow', {
         workflow: { ...workflow, status: enable ? 1 : 2 },
@@ -101,4 +157,38 @@
       refresh();
     });
   });
+
+  const defaultWorkflow = {
+    title: '',
+    remark: '',
+    cronExpr: '0 0 0 * * * *',
+  };
+  const showAddDialog = ref(false);
+  const newWorkflow = ref(Object.assign({}, defaultWorkflow));
+  const canDismiss = computed(() => {
+    const p = newWorkflow.value;
+    return p.title.trim() === '' && p.remark.trim() === '';
+  });
+  const canSubmit = computed(() => {
+    const p = newWorkflow.value;
+    return p.title.trim() !== '' && p.cronExpr.trim() !== '';
+  });
+  watchEffect(() => {
+    if (!showAddDialog.value) {
+      newWorkflow.value = Object.assign({}, defaultWorkflow);
+    }
+  });
+  async function onSubmit() {
+    const p = newWorkflow.value;
+    store.commit('clearError');
+    await store.dispatch('createWorkflow', {
+      title: p.title.trim(),
+      remark: p.remark.trim(),
+      cronExpr: p.cronExpr.trim(),
+    });
+    if (store.state.currentError === undefined) {
+      showAddDialog.value = false;
+      refresh();
+    }
+  }
 </script>

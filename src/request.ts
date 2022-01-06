@@ -329,6 +329,28 @@ export async function fetchWorkflows(
   }
 }
 
+export async function createWorkflow(
+  api: AxiosInstance,
+  title: string,
+  remark: string,
+  cronExpr: string,
+) {
+  const payload = JSON.stringify({
+    title: title,
+    remark: remark,
+    cron: cronExpr,
+  });
+  const resp = await api.post('/workflow/create', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
 export async function updateWorkflow(api: AxiosInstance, workflow: Workflow) {
   const payload = JSON.stringify({
     id: workflow.id,
