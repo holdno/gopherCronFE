@@ -16,51 +16,41 @@
       <q-item key="add-task" v-close-popup clickable>
         <q-item-section>添加</q-item-section>
       </q-item>
-      <template v-if="canAddEdge">
-        <q-item
-          key="add-edge"
-          v-close-popup
-          clickable
-          @click="() => addEdge(selectedNodes[0], selectedNodes[1])"
-        >
-          <q-item-section
-            >添加指向：{{ edgeName(selectedNodes.reverse()) }}</q-item-section
-          >
-        </q-item>
-      </template>
-      <template v-if="selectedEdges.length > 0">
-        <q-item
-          key="remove-edge"
-          v-close-popup
-          clickable
-          @click="() => removeEdges(selectedEdges)"
-        >
-          <q-item-section
-            >删除指向：{{ selectedEdges.join(', ') }}</q-item-section
-          >
-        </q-item>
-      </template>
-      <template v-if="selectedNodes.length > 0">
-        <q-item
-          key="remove-task"
-          v-close-popup
-          clickable
-          @click="() => removeNodes(selectedNodes)"
-        >
-          <q-item-section
-            >删除节点：{{ selectedNodes.join(', ') }}</q-item-section
-          >
-        </q-item>
-      </template>
-      <q-separator />
-      <!-- <q-item
-        key="reset-view"
+      <q-item
+        v-if="canAddEdge"
+        key="add-edge"
         v-close-popup
         clickable
-        @click="() => updateLayouts(taskLayouts)"
+        @click="() => addEdge(selectedNodes[0], selectedNodes[1])"
       >
+        <q-item-section>添加指向：{{ edgeName(selectedNodes) }}</q-item-section>
+      </q-item>
+      <q-item
+        v-if="selectedEdges.length > 0"
+        key="remove-edge"
+        v-close-popup
+        clickable
+        @click="() => removeEdges(selectedEdges)"
+      >
+        <q-item-section
+          >删除指向：{{ selectedEdges.join(', ') }}</q-item-section
+        >
+      </q-item>
+      <q-item
+        v-if="selectedNodes.length > 0"
+        key="remove-task"
+        v-close-popup
+        clickable
+        @click="() => removeNodes(selectedNodes)"
+      >
+        <q-item-section
+          >删除节点：{{ selectedNodes.join(', ') }}</q-item-section
+        >
+      </q-item>
+      <q-separator />
+      <q-item key="reset-view" v-close-popup clickable @click="resetView">
         <q-item-section>重置视图</q-item-section>
-      </q-item> -->
+      </q-item>
       <q-item key="reset" v-close-popup clickable @click="reset">
         <q-item-section>重置</q-item-section>
       </q-item>
@@ -90,11 +80,11 @@
     VNetworkGraphInstance,
   } from 'v-network-graph';
   import { ForceLayout } from 'v-network-graph/force-layout';
-  import { cloneTask, Task } from '../types';
+  import { cloneTask, Task as KahnTask } from '../types';
   import { TaskInLevels } from '../utils/kahn';
   import { QMenu } from 'quasar';
 
-  const graph = ref<VNetworkGraphInstance>(null);
+  const graph = ref<VNetworkGraphInstance>();
   const viewMenu = ref<QMenu>();
   const selectedNodes = ref<string[]>([]);
   const selectedEdges = ref<string[]>([]);
@@ -174,12 +164,12 @@
 
   const props = defineProps({
     tasks: {
-      type: Object as PropType<Task[]>,
+      type: Object as PropType<KahnTask[]>,
       required: true,
     },
     modelValue: {
-      type: Object as PropType<Task[]>,
-      default: new Array<Task[]>(0),
+      type: Object as PropType<KahnTask[]>,
+      default: new Array<KahnTask[]>(0),
     },
   });
   const emits = defineEmits(['update:modelValue']);
@@ -190,7 +180,7 @@
     };
     const showViewContextMenu = (params: ViewEvent<MouseEvent>) => {
       const { event } = params;
-      // Disable brawser's default context menu
+      // Disable browser's default context menu
       event.stopPropagation();
       event.preventDefault();
       const menu = viewMenu.value;
@@ -287,7 +277,13 @@
     }
   }
 
-  function removeNode(current: Task[], node: string) {
+  function resetView() {
+    updateNodes(taskNodes.value);
+    updateEdges(taskEdges.value);
+    updateLayouts(taskLayouts.value);
+  }
+
+  function removeNode(current: KahnTask[], node: string) {
     let index = 0;
     let deleted = false;
     for (const task of current) {
@@ -335,7 +331,7 @@
     throw new Error(`Can not add edge: ${edgeName([source, target])}`);
   }
 
-  function removeEdge(current: Task[], source: string, target: string) {
+  function removeEdge(current: KahnTask[], source: string, target: string) {
     for (const task of current) {
       if (task.id === target && task.deps !== undefined) {
         const index = task.deps.indexOf(source, 0);
@@ -373,8 +369,8 @@
     const nodes = selectedNodes.value;
     if (nodes.length === 2) {
       return (
-        edges.value[edgeName(nodes)] === undefined &&
-        edges.value[edgeName(nodes.reverse())] === undefined
+        edges[edgeName(nodes)] === undefined &&
+        edges[edgeName(Array.from(nodes).reverse())] === undefined
       );
     }
     return false;
@@ -383,7 +379,7 @@
   onMounted(() => {
     watch(
       () => props.tasks,
-      (newValues, prevValues) => {
+      (current, previous) => {
         reset();
       },
     );
@@ -394,7 +390,7 @@
         updateNodes(taskNodes.value);
         if (toRaw(current) === props.tasks) {
           updateLayouts(taskLayouts.value);
-          graph.value.panToCenter();
+          graph.value?.panToCenter();
         }
       },
     );
