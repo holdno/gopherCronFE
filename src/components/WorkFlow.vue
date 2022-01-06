@@ -51,7 +51,9 @@
         @click="() => removeEdges(selectedEdges)"
       >
         <q-item-section
-          >删除指向：{{ selectedEdges.join(', ') }}</q-item-section
+          >删除指向：{{
+            selectedEdges.map(edgeParts).map(edgeName).join(', ')
+          }}</q-item-section
         >
       </q-item>
       <q-item
@@ -62,7 +64,9 @@
         @click="() => removeNodes(selectedNodes)"
       >
         <q-item-section
-          >删除节点：{{ selectedNodes.join(', ') }}</q-item-section
+          >删除节点：{{
+            selectedNodes.map(nodeName).join(', ')
+          }}</q-item-section
         >
       </q-item>
       <q-separator />
@@ -98,7 +102,7 @@
     VNetworkGraphInstance,
   } from 'v-network-graph';
   import { ForceLayout } from 'v-network-graph/force-layout';
-  import { cloneTask, Task as KahnTask } from '../types';
+  import { cloneTask, KahnTask } from '../types';
   import { TaskInLevels } from '../utils/kahn';
   import { QMenu } from 'quasar';
   import SelectProject from './SelectProject.vue';
@@ -110,8 +114,16 @@
   const selectedNodes = ref<string[]>([]);
   const selectedEdges = ref<string[]>([]);
 
-  const edgeName = (nodes: string[]): string => {
-    return nodes.join(' -> ');
+  const nodeName = (nodeKey: string): string => {
+    return nodes[nodeKey].name || nodeKey;
+  };
+
+  const edgeKey = (nodeKeys: string[]): string => {
+    return nodeKeys.join(' -> ');
+  };
+
+  const edgeName = (nodeKeys: string[]): string => {
+    return nodeKeys.map((k) => nodes[k].name).join(' -> ');
   };
 
   const edgeParts = (edge: string): [string, string] => {
@@ -249,7 +261,7 @@
         continue;
       }
       for (const parentId of task.deps) {
-        edges[edgeName([parentId, task.id])] = {
+        edges[edgeKey([parentId, task.id])] = {
           source: parentId,
           target: task.id,
         };
@@ -349,7 +361,7 @@
         return;
       }
     }
-    throw new Error(`Can not add edge: ${edgeName([source, target])}`);
+    throw new Error(`Can not add edge: ${edgeKey([source, target])}`);
   }
 
   function removeEdge(current: KahnTask[], source: string, target: string) {
@@ -365,7 +377,7 @@
         }
       }
     }
-    throw new Error(`Can not remove edge: ${edgeName([source, target])}`);
+    throw new Error(`Can not remove edge: ${edgeKey([source, target])}`);
   }
 
   function removeEdges(edges: string[]) {
@@ -390,8 +402,8 @@
     const nodes = selectedNodes.value;
     if (nodes.length === 2) {
       return (
-        edges[edgeName(nodes)] === undefined &&
-        edges[edgeName(Array.from(nodes).reverse())] === undefined
+        edges[edgeKey(nodes)] === undefined &&
+        edges[edgeKey(Array.from(nodes).reverse())] === undefined
       );
     }
     return false;

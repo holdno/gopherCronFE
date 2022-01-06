@@ -19,7 +19,7 @@ import {
   fetchLogs,
   Workflow,
   fetchWorkflows,
-  WorkflowEdge,
+  WorkFlowEdge,
   fetchWorkflowEdges,
 } from './request';
 import { AxiosInstance } from 'axios';
@@ -36,6 +36,7 @@ export interface State {
   loadingProjects: boolean;
   tasks: Task[];
   loadingTasks: boolean;
+  fetchTasksCache: Map<number, Task[]>;
 
   recentLogCountRecords: RecentLogCount[];
 
@@ -47,7 +48,7 @@ export interface State {
   workflowsTotal: number;
   loadingWorkflows: boolean;
 
-  workflowEdges: WorkflowEdge[];
+  workflowEdges: WorkFlowEdge[];
   loadingWorkflowEdges: boolean;
 
   currentError?: Error;
@@ -68,6 +69,7 @@ export const store = createStore<State>({
       loadingProjects: false,
       tasks: [],
       loadingTasks: false,
+      fetchTasksCache: new Map(),
       recentLogCountRecords: [],
       taskLogs: [],
       taskLogsTotal: 0,
@@ -153,7 +155,15 @@ export const store = createStore<State>({
     unloadingTasks(state) {
       state.loadingTasks = false;
     },
-    setTasks(state, { tasks }) {
+    setTasks(state, { projectId, tasks }) {
+      state.fetchTasksCache.set(projectId, tasks);
+      state.tasks = tasks;
+    },
+    setTasksByCache(state, { projectId }) {
+      const tasks = state.fetchTasksCache.get(projectId);
+      if (tasks === undefined) {
+        throw new Error(`fetchTasks Cache missing projectId=${projectId}`);
+      }
       state.tasks = tasks;
     },
     updateTask(state, { task }) {
@@ -235,12 +245,16 @@ export const store = createStore<State>({
       }
       commit('unloadingProjects');
     },
-    async fetchTasks({ commit }, { projectId }) {
+    async fetchTasks({ commit, state }, { projectId, cached = false }) {
       commit('loadingTasks');
       const api = this.getters.apiv1;
       try {
-        const tasks = await taskList(api, projectId);
-        commit('setTasks', { tasks });
+        if (!cached || !state.fetchTasksCache.has(projectId)) {
+          const tasks = await taskList(api, projectId);
+          commit('setTasks', { tasks, projectId });
+        } else {
+          commit('setTasksByCache', { projectId });
+        }
       } catch (e) {
         commit('error', { error: e });
       }
