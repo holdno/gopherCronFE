@@ -11,9 +11,27 @@
       :event-handlers="eventHandlers"
     />
   </div>
+  <q-dialog v-model="showAddNodeDialog" class="tw-w-screen tw-h-screen">
+    <div
+      class="tw-w-1/2 tw-h-1/2 tw-text-primary tw-flex tw-flex-row tw-gap-4 q-pa-md"
+    >
+      <SelectProject v-model="project" />
+      <SelectTask
+        v-if="project !== undefined"
+        v-model="task"
+        :project-id="project.id"
+      />
+      <q-btn @click="addTaskNode">添加</q-btn>
+    </div>
+  </q-dialog>
   <q-menu ref="viewMenu" touch-position context-menu>
     <q-list dense>
-      <q-item key="add-task" v-close-popup clickable>
+      <q-item
+        key="add-task"
+        v-close-popup
+        clickable
+        @click="() => (showAddNodeDialog = true)"
+      >
         <q-item-section>添加</q-item-section>
       </q-item>
       <q-item
@@ -83,6 +101,9 @@
   import { cloneTask, Task as KahnTask } from '../types';
   import { TaskInLevels } from '../utils/kahn';
   import { QMenu } from 'quasar';
+  import SelectProject from './SelectProject.vue';
+  import SelectTask from './SelectTask.vue';
+  import { Project, Task } from '../request';
 
   const graph = ref<VNetworkGraphInstance>();
   const viewMenu = ref<QMenu>();
@@ -375,6 +396,23 @@
     }
     return false;
   });
+
+  const showAddNodeDialog = ref(false);
+  const project = ref<Project>();
+  const task = ref<Task>();
+
+  function addTaskNode() {
+    emits('update:modelValue', [
+      ...props.modelValue,
+      {
+        name: task.value?.name,
+        id: `${project.value?.id}_${task.value?.id}`,
+      },
+    ]);
+    project.value = undefined;
+    task.value = undefined;
+    showAddNodeDialog.value = false;
+  }
 
   onMounted(() => {
     watch(
