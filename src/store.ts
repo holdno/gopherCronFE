@@ -156,7 +156,7 @@ export const store = createStore<State>({
       state.loadingTasks = false;
     },
     setTasks(state, { projectId, tasks }) {
-      state.fetchTasksCache.set(projectId, tasks);
+      if (projectId !== undefined) state.fetchTasksCache.set(projectId, tasks);
       state.tasks = tasks;
     },
     setTasksByCache(state, { projectId }) {

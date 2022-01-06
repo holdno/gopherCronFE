@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
   import { QSelect } from 'quasar';
-  import { computed, PropType, ref } from 'vue';
+  import { computed, onMounted, PropType, ref, watch } from 'vue';
   import { Task } from '../request';
   import { useStore } from '../store';
 
@@ -62,4 +62,14 @@
       doneFn(update);
     }
   };
+
+  onMounted(() => {
+    store.commit('setTasks', { tasks: [] });
+    watch(
+      () => props.projectId,
+      (current, previous) => {
+        store.commit('setTasks', { tasks: [] });
+      },
+    );
+  });
 </script>
