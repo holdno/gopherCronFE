@@ -363,3 +363,52 @@ export async function fetchWorkflowEdges(
     throw new Error(data.meta.msg);
   }
 }
+
+export async function updateWorkflowEdges(
+  api: AxiosInstance,
+  workflowId: number,
+  edges: WorkFlowEdge[],
+) {
+  /* eslint-disable camelcase */
+  interface Task {
+    task_id: string;
+    project_id: number;
+  }
+  const tasks = new Map<string, Task>();
+  const taskDeps = new Map<string, Task[]>();
+  for (const edge of edges) {
+    const key = `${edge.projectId}_${edge.taskId}`;
+    if (!tasks.has(key)) {
+      tasks.set(key, { task_id: edge.taskId, project_id: edge.projectId });
+    }
+    if (edge.dependencyProjectId === 0 || edge.dependencyTaskId === '') {
+      continue;
+    }
+    const deps = taskDeps.get(key);
+    const task = {
+      task_id: edge.dependencyTaskId,
+      project_id: edge.dependencyProjectId,
+    };
+    if (deps === undefined) {
+      taskDeps.set(key, [task]);
+    } else {
+      taskDeps.set(key, [...deps, task]);
+    }
+  }
+  const payload = JSON.stringify({
+    workflow_id: workflowId,
+    tasks: Array.from(tasks.keys()).map((k) => ({
+      task: tasks.get(k),
+      dependencies: taskDeps.get(k) || [],
+    })),
+  });
+  const resp = await api.post('/workflow/task/create', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}

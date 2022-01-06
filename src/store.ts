@@ -21,6 +21,7 @@ import {
   fetchWorkflows,
   WorkFlowEdge,
   fetchWorkflowEdges,
+  updateWorkflowEdges,
 } from './request';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
@@ -335,6 +336,15 @@ export const store = createStore<State>({
         commit('error', { error: e });
       }
       commit('unloadingWorkflowEdges');
+    },
+    async updateWorkFlow({ dispatch, commit }, { workflowId, edges }) {
+      const api = this.getters.apiv1;
+      try {
+        await updateWorkflowEdges(api, workflowId, edges);
+        await dispatch('fetchWorkflowEdges', { workflowId });
+      } catch (e) {
+        commit('error', { error: e });
+      }
     },
   },
 });

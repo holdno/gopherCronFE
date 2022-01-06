@@ -1,11 +1,12 @@
 <template>
   <div class="tw-w-full tw-h-full">
     <WorkFlow v-model="current" :tasks="tasks" />
+    <q-btn :disable="!canUpdate" @click="updateWorkFlow">保存</q-btn>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import WorkFlow from '../components/WorkFlow.vue';
   import { Task, WorkFlowEdge } from '../request';
   import { useStore } from '../store';
@@ -17,6 +18,8 @@
       required: true,
     },
   });
+  const tasks = ref<KahnTask[]>([]);
+  const current = ref<KahnTask[]>([]);
   const store = useStore();
 
   async function workflowEdgesToKahnTasks(
@@ -63,8 +66,48 @@
       };
     });
   }
-  const tasks = ref<KahnTask[]>([]);
-  const current = ref<KahnTask[]>([]);
+
+  function kahnTasksToWorkFlowEdges(tasks: KahnTask[]): WorkFlowEdge[] {
+    const edges = [];
+    const id2task = new Map<string, Task>();
+    console.log(tasks);
+    for (const task of tasks) {
+      id2task.set(task.id, task.origin);
+    }
+
+    for (const task of tasks) {
+      if (task.deps !== undefined && task.deps.length > 0) {
+        for (const dep of task.deps) {
+          const depTask = id2task.get(dep);
+          if (depTask === undefined) {
+            throw new Error('original task object missing');
+          }
+          edges.push({
+            id: 0,
+            workflowId: 0,
+            createTime: 0,
+
+            projectId: task.origin.projectId,
+            taskId: task.origin.id,
+            dependencyProjectId: depTask.projectId,
+            dependencyTaskId: depTask.id,
+          });
+        }
+      } else {
+        edges.push({
+          id: 0,
+          workflowId: 0,
+          createTime: 0,
+
+          projectId: task.origin.projectId,
+          taskId: task.origin.id,
+          dependencyProjectId: 0,
+          dependencyTaskId: '',
+        });
+      }
+    }
+    return edges;
+  }
   onMounted(() => {
     watchEffect(async () => {
       await store.dispatch('fetchWorkflowEdges', {
@@ -73,4 +116,14 @@
       tasks.value = await workflowEdgesToKahnTasks(store.state.workflowEdges);
     });
   });
+
+  const canUpdate = computed(
+    () => JSON.stringify(tasks.value) !== JSON.stringify(current.value),
+  );
+  function updateWorkFlow() {
+    store.dispatch('updateWorkFlow', {
+      workflowId: props.id,
+      edges: kahnTasksToWorkFlowEdges(current.value),
+    });
+  }
 </script>
