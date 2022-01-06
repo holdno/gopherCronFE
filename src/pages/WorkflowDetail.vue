@@ -121,7 +121,7 @@
     () => JSON.stringify(tasks.value) !== JSON.stringify(current.value),
   );
   function updateWorkFlow() {
-    store.dispatch('updateWorkFlow', {
+    store.dispatch('updateWorkFlowEdges', {
       workflowId: props.id,
       edges: kahnTasksToWorkFlowEdges(current.value),
     });

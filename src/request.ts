@@ -293,6 +293,7 @@ export interface Workflow {
   title: string;
   remark: string;
   status: number;
+  state: Object;
   createTime: number;
   cronExpr: string;
 }
@@ -317,12 +318,32 @@ export async function fetchWorkflows(
         title: v.title,
         remark: v.remark,
         status: v.status,
+        state: v.state,
         createTime: v.create_time,
         cronExpr: v.cron,
       })),
       r.total,
     ];
   } else {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export async function updateWorkflow(api: AxiosInstance, workflow: Workflow) {
+  const payload = JSON.stringify({
+    id: workflow.id,
+    title: workflow.title,
+    remark: workflow.remark,
+    cron: workflow.cronExpr,
+    status: workflow.status,
+  });
+  const resp = await api.post('/workflow/update', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
     throw new Error(data.meta.msg);
   }
 }

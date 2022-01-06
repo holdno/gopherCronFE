@@ -1,5 +1,5 @@
 <template>
-  <div class="tw-w-1/2 tw-h-full">
+  <div class="tw-w-full tw-h-full">
     <v-network-graph
       ref="graph"
       v-model:selected-nodes="selectedNodes"
