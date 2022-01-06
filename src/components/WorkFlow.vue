@@ -419,6 +419,7 @@
       {
         name: task.value?.name,
         id: `${project.value?.id}_${task.value?.id}`,
+        origin: task.value,
       },
     ]);
     project.value = undefined;
