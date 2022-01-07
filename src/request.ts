@@ -525,3 +525,44 @@ export async function killWorkflow(api: AxiosInstance, workflowId: number) {
     throw new Error(data.meta.msg);
   }
 }
+
+export interface WorkFlowLog {
+  id: number;
+  workflowId: number;
+  createTime: number;
+  startTime: number;
+  endTime: number;
+  result: string;
+}
+
+export async function fetchWorkFlowLogs(
+  api: AxiosInstance,
+  workflowId: number,
+  page: number,
+  pageSize: number,
+): Promise<[WorkFlowLog[], number]> {
+  const resp = await api.get('/workflow/log/list', {
+    params: {
+      workflow_id: workflowId,
+      page: page,
+      pagesize: pageSize,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    const r = data.response;
+    return [
+      r.list.map((v: any) => ({
+        id: v.id,
+        workflowId: v.workflow_id,
+        createTime: v.create_time,
+        startTime: v.start_time,
+        endTime: v.end_time,
+        result: v.result,
+      })),
+      r.total,
+    ];
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}

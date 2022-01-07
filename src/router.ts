@@ -73,6 +73,14 @@ const routes = [
               id: Number(route.params.workflowId),
             }),
           },
+          {
+            name: 'workflow_logs',
+            path: ':workflowId(\\d+)/logs',
+            component: () => import('./pages/WorkFlowLogs.vue'),
+            props: (route: RouteLocationNormalizedLoaded) => ({
+              id: Number(route.params.workflowId),
+            }),
+          },
         ],
       },
       {
