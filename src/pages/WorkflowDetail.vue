@@ -1,7 +1,10 @@
 <template>
   <div class="tw-w-full tw-h-full">
     <WorkFlow v-model="current" :tasks="tasks" />
-    <q-btn :disable="!canUpdate" @click="updateWorkFlow">保存</q-btn>
+    <div class="tw-flex tw-flex-row tw-gap-4">
+      <q-btn :disable="!canUpdate" @click="updateWorkFlow">保存</q-btn>
+      <q-btn flat icon="refresh" @click="refresh" />
+    </div>
   </div>
 </template>
 
@@ -111,20 +114,26 @@
     }
     return edges;
   }
+
+  async function refresh() {
+    await store.dispatch('fetchWorkflowEdges', {
+      workflowId: props.id,
+    });
+    tasks.value = await workflowEdgesToKahnTasks(store.state.workflowEdges);
+  }
+
   onMounted(() => {
     watchEffect(async () => {
-      await store.dispatch('fetchWorkflowEdges', {
-        workflowId: props.id,
-      });
-      tasks.value = await workflowEdgesToKahnTasks(store.state.workflowEdges);
+      await refresh();
     });
   });
 
   const canUpdate = computed(
     () => JSON.stringify(tasks.value) !== JSON.stringify(current.value),
   );
-  function updateWorkFlow() {
-    store.dispatch('updateWorkFlowEdges', {
+
+  async function updateWorkFlow() {
+    await store.dispatch('updateWorkFlowEdges', {
       workflowId: props.id,
       edges: kahnTasksToWorkFlowEdges(current.value),
     });
