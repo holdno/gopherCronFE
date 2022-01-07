@@ -89,22 +89,18 @@
         </q-td>
       </template>
       <template #body-cell-state="props">
-        <q-td key="state">
+        <q-td key="state" class="text-right">
           <q-spinner-gears
             v-if="isRunning(props.row)"
             color="primary"
             size="2em"
+            style="margin-left: auto; margin-right: 0"
           />
-          <q-icon
-            v-if="!isRunning(props.row)"
-            name="check_circle"
-            color="primary"
-            size="2em"
-          />
+          <q-icon v-else name="check_circle" color="primary" size="2em" />
         </q-td>
       </template>
       <template #body-cell-status="props">
-        <td key="status">
+        <td key="status" class="text-right">
           <q-toggle
             color="primary"
             :model-value="props.value !== 2"
