@@ -1,10 +1,11 @@
-import { Task } from './request';
+import { Task, WorkflowTaskState } from './request';
 
 export interface KahnTask {
   name: string;
   id: string;
   deps?: string[];
   origin: Task;
+  state?: WorkflowTaskState;
 }
 
 export function cloneTask(t: KahnTask): KahnTask {

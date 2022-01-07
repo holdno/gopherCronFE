@@ -24,6 +24,7 @@ import {
   updateWorkflowEdges,
   updateWorkflow,
   createWorkflow,
+  WorkflowTaskState,
 } from './request';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
@@ -52,6 +53,7 @@ export interface State {
   loadingWorkflows: boolean;
 
   workflowEdges: WorkFlowEdge[];
+  workflowTaskStates: WorkflowTaskState[];
   loadingWorkflowEdges: boolean;
 
   currentError?: Error;
@@ -81,6 +83,7 @@ export const store = createStore<State>({
       workflowsTotal: 0,
       loadingWorkflows: false,
       workflowEdges: [],
+      workflowTaskStates: [],
       loadingWorkflowEdges: false,
     };
   },
@@ -205,8 +208,9 @@ export const store = createStore<State>({
     unloadingWorkflowEdges(state) {
       state.loadingWorkflowEdges = false;
     },
-    setWorkflowEdges(state, { edges }) {
+    setWorkflowEdges(state, { edges, states }) {
       state.workflowEdges = edges;
+      state.workflowTaskStates = states;
     },
   },
   actions: {
@@ -332,8 +336,8 @@ export const store = createStore<State>({
       commit('loadingWorkflowEdges');
       const api = this.getters.apiv1;
       try {
-        const edges = await fetchWorkflowEdges(api, workflowId);
-        commit('setWorkflowEdges', { edges });
+        const [edges, states] = await fetchWorkflowEdges(api, workflowId);
+        commit('setWorkflowEdges', { edges, states });
       } catch (e) {
         commit('error', { error: e });
       }

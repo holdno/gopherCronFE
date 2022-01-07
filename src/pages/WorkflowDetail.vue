@@ -63,6 +63,9 @@
         id: key,
         deps: childMapParents.get(key),
         origin: task,
+        state: store.state.workflowTaskStates.find(
+          (s) => s.projectId === task.projectId && s.taskId === task.id,
+        ),
       };
     });
   }

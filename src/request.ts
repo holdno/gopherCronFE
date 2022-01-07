@@ -381,10 +381,27 @@ export interface WorkFlowEdge {
   dependencyTaskId: string;
 }
 
+export interface ScheduleRecord {
+  tmpId: string;
+  status: string;
+  result: string;
+  eventTime: number;
+}
+
+export interface WorkflowTaskState {
+  workflowId: number;
+  projectId: number;
+  taskId: string;
+  currentStatus: string;
+  scheduleCount: number;
+  scheduleRecords: ScheduleRecord[];
+  startTime: number;
+}
+
 export async function fetchWorkflowEdges(
   api: AxiosInstance,
   workflowId: number,
-): Promise<WorkFlowEdge[]> {
+): Promise<[WorkFlowEdge[], WorkflowTaskState[]]> {
   const resp = await api.get('/workflow/task/list', {
     params: {
       workflow_id: workflowId,
@@ -392,17 +409,39 @@ export async function fetchWorkflowEdges(
   });
   const data = resp.data;
   if (data.meta.code === 0) {
-    if (!data.response) return [];
-    return data.response.map(({ task: v, state }: any) => ({
-      id: v.id,
-      projectId: v.project_id,
-      taskId: v.task_id,
-      workflowId: v.workflowId,
-      createTime: v.create_time,
+    if (!data.response) return [[], []];
+    const edges = [];
+    const stateMap = new Map<string, WorkflowTaskState>();
+    for (const { task: v, state: s } of data.response) {
+      edges.push({
+        id: v.id,
+        projectId: v.project_id,
+        taskId: v.task_id,
+        workflowId: v.workflowId,
+        createTime: v.create_time,
 
-      dependencyProjectId: v.dependency_project_id,
-      dependencyTaskId: v.dependency_task_id,
-    }));
+        dependencyProjectId: v.dependency_project_id,
+        dependencyTaskId: v.dependency_task_id,
+      });
+      if (!s) continue;
+      const key = `${s.project_id}_${s.task_id}`;
+      if (stateMap.has(key)) continue;
+      stateMap.set(key, {
+        workflowId: s.workflow_id,
+        projectId: s.project_id,
+        taskId: s.task_id,
+        currentStatus: s.current_status,
+        scheduleCount: s.schedule_count,
+        scheduleRecords: s.schedule_records.map((r: any) => ({
+          tmpId: r.tmp_id,
+          status: r.status,
+          result: r.result,
+          eventTime: r.event_time,
+        })),
+        startTime: s.start_time,
+      });
+    }
+    return [edges, Array.from(stateMap.values())];
   } else {
     throw new Error(data.meta.msg);
   }

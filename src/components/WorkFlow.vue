@@ -1,6 +1,7 @@
 <template>
   <div class="tw-w-full tw-h-full">
     <v-network-graph
+      v-if="show"
       ref="graph"
       v-model:selected-nodes="selectedNodes"
       v-model:selected-edges="selectedEdges"
@@ -81,15 +82,7 @@
 </template>
 
 <script setup lang="ts">
-  import {
-    PropType,
-    ref,
-    computed,
-    watch,
-    onMounted,
-    toRaw,
-    reactive,
-  } from 'vue';
+  import { PropType, ref, computed, watch, onMounted, reactive } from 'vue';
   import {
     Nodes,
     Edges,
@@ -109,6 +102,7 @@
   import SelectTask from './SelectTask.vue';
   import { Project, Task } from '../request';
 
+  const show = ref(false);
   const graph = ref<VNetworkGraphInstance>();
   const viewMenu = ref<QMenu>();
   const selectedNodes = ref<string[]>([]);
@@ -149,10 +143,10 @@
         color: COLOR_PRIMARY,
       },
       normal: {
-        color: COLOR_PRIMARY,
+        color: (node) => node.color,
       },
       hover: {
-        color: COLOR_PRIMARY,
+        color: (node) => node.color,
       },
       focusring: {
         color: COLOR_PRIMARY,
@@ -161,13 +155,13 @@
     edge: {
       selectable: true,
       normal: {
-        color: COLOR_PRIMARY,
+        color: (edge) => edge.color,
       },
       hover: {
-        color: COLOR_PRIMARY,
+        color: (edge) => edge.color,
       },
       selected: {
-        color: COLOR_PRIMARY,
+        color: (edge) => edge.color,
         width: 4,
         dasharray: '10',
         linecap: 'round',
@@ -235,10 +229,24 @@
 
   const nodes = reactive<Nodes>({});
 
+  const ColorNode = (task: KahnTask): string => {
+    const status = task.state?.currentStatus;
+    if (status === 'done') {
+      return COLOR_PRIMARY;
+    } else if (status === 'running') {
+      return 'green';
+    } else if (status === 'failed') {
+      return 'red';
+    } else if (status === 'starting') {
+      return 'white';
+    }
+    return 'gray';
+  };
+
   const taskNodes = computed<Nodes>(() => {
     const nodes: Nodes = {};
     for (const task of props.modelValue) {
-      nodes[task.id] = { id: task.id, name: task.name };
+      nodes[task.id] = { id: task.id, name: task.name, color: ColorNode(task) };
     }
     return nodes;
   });
@@ -264,6 +272,7 @@
         edges[edgeKey([parentId, task.id])] = {
           source: parentId,
           target: task.id,
+          color: ColorNode(task),
         };
       }
     }
@@ -431,6 +440,7 @@
     watch(
       () => props.tasks,
       (current, previous) => {
+        show.value = false;
         reset();
       },
     );
@@ -439,10 +449,12 @@
       (current, previous) => {
         updateEdges(taskEdges.value);
         updateNodes(taskNodes.value);
-        if (toRaw(current) === props.tasks) {
+        if (JSON.stringify(current) === JSON.stringify(props.tasks)) {
           updateLayouts(taskLayouts.value);
+          graph.value?.fitToContents();
           graph.value?.panToCenter();
         }
+        show.value = true;
       },
     );
   });
