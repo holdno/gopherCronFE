@@ -6,6 +6,7 @@
       v-model:selected-nodes="selectedNodes"
       v-model:selected-edges="selectedEdges"
       v-model:layouts="layouts"
+      :class="visual ? '' : 'tw-opacity-0'"
       :nodes="nodes"
       :edges="edges"
       :configs="configs"
@@ -103,6 +104,7 @@
   import { Project, Task } from '../request';
 
   const show = ref(false);
+  const visual = ref(false);
   const graph = ref<VNetworkGraphInstance>();
   const viewMenu = ref<QMenu>();
   const selectedNodes = ref<string[]>([]);
@@ -134,6 +136,7 @@
   const configs: UserConfigs = {
     view: {
       layoutHandler: layoutHandler,
+      scalingObjects: false,
       fit: true,
     },
     node: {
@@ -293,13 +296,15 @@
   const taskLayouts = computed<Layouts>(() => {
     const nodes: NodePositions = {};
     const levels = TaskInLevels(props.modelValue);
+    const xOffset = 100;
+    const yOffset = 100;
     let y = 0;
     for (const level of levels) {
       let x = 0;
       for (const node of level) {
         nodes[node] = {
-          x: x * 100 + y * 50,
-          y: y * 100,
+          x: x * xOffset + (y * xOffset) / 2,
+          y: y * yOffset,
           fixed: false,
         };
         x++;
@@ -441,6 +446,7 @@
       () => props.tasks,
       (current, previous) => {
         show.value = false;
+        visual.value = false;
         reset();
       },
     );
@@ -451,11 +457,18 @@
         updateNodes(taskNodes.value);
         if (JSON.stringify(current) === JSON.stringify(props.tasks)) {
           updateLayouts(taskLayouts.value);
-          graph.value?.fitToContents();
-          graph.value?.panToCenter();
         }
         show.value = true;
       },
     );
+    watch([graph, show], ([graph, show]) => {
+      if (graph && show) {
+        setTimeout(() => {
+          graph.fitToContents();
+          graph.panToCenter();
+          visual.value = true;
+        }, 1000);
+      }
+    });
   });
 </script>

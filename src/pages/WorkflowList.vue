@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md tw-flex tw-flex-row tw-gap-4 tw-h-[95%] tw-w-full">
-    <div :class="'xl:tw-basis-1/3 tw-basis-1/4 ' + visibilyClass">
+    <div :class="'xl:tw-basis-1/3 tw-basis-1/4 tw-shrink-0 ' + visibilyClass">
       <WorkflowList />
     </div>
     <div class="tw-basis-auto tw-overflow-auto">

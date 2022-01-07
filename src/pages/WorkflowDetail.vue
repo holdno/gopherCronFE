@@ -1,10 +1,10 @@
 <template>
-  <div class="tw-w-full tw-h-full">
-    <WorkFlow v-model="current" :tasks="tasks" />
-    <div class="tw-flex tw-flex-row tw-gap-4">
+  <div class="tw-w-full tw-h-full tw-flex tw-flex-row">
+    <div class="tw-flex tw-flex-col tw-gap-4">
       <q-btn :disable="!canUpdate" @click="updateWorkFlow">保存</q-btn>
       <q-btn flat icon="refresh" @click="refresh" />
     </div>
+    <WorkFlow v-model="current" :tasks="tasks" />
   </div>
 </template>
 
