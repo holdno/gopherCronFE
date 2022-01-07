@@ -122,6 +122,17 @@
               color="primary"
               >详情
             </q-btn>
+            <q-btn
+              :disable="isRunning(props.row)"
+              dense
+              flat
+              color="primary"
+              @click="
+                () =>
+                  startWorkflow(store.getters.apiv1, props.row.id).then(refresh)
+              "
+              >运行</q-btn
+            >
           </div>
         </td>
       </template>
@@ -133,6 +144,7 @@
   import { onMounted, watchEffect, ref, computed } from 'vue';
   import { useStore } from '../store';
   import { Pagination, TableRequestProp } from '../utils/qusar';
+  import { startWorkflow } from '../request';
 
   const store = useStore();
 

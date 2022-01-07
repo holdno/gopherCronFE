@@ -456,3 +456,18 @@ export async function updateWorkflowEdges(
     throw new Error(data.meta.msg);
   }
 }
+
+export async function startWorkflow(api: AxiosInstance, workflowId: number) {
+  const payload = JSON.stringify({
+    workflow_id: workflowId,
+  });
+  const resp = await api.post('/workflow/start', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
