@@ -67,15 +67,36 @@
         <q-btn flat icon="add" @click="showAddDialog = true" />
         <q-btn flat :loading="loading" icon="refresh" @click="refresh" />
       </template>
+      <template #body-cell-cron="props">
+        <q-td key="cron" class="text-right">
+          {{ props.value }}
+          <q-popup-edit
+            v-slot="scope"
+            fit
+            title="调度计划"
+            :model-value="props.value"
+            buttons
+            @save="(value: string) => updateCron(props.row, value)"
+          >
+            <q-input
+              v-model="scope.value"
+              dense
+              autofocus
+              hint="秒 分 时 日 月 周 年"
+              @keyup.enter="scope.set"
+            />
+          </q-popup-edit>
+        </q-td>
+      </template>
       <template #body-cell-state="props">
         <q-td key="state">
           <q-spinner-gears
-            v-if="props.value && props.value.status === 'running'"
+            v-if="isRunning(props.row)"
             color="primary"
             size="2em"
           />
           <q-icon
-            v-if="!props.value"
+            v-if="!isRunning(props.row)"
             name="check_circle"
             color="primary"
             size="2em"
@@ -122,7 +143,7 @@
     { name: 'id', field: 'id', label: 'ID' },
     { name: 'title', field: 'title', label: '名称' },
     { name: 'remark', field: 'remark', label: '备注' },
-    { name: 'cronExpr', field: 'cronExpr', label: '计划任务' },
+    { name: 'cron', field: 'cronExpr', label: '调度计划' },
     { name: 'status', field: 'status', label: '启用状态' },
     {
       name: 'state',
@@ -147,10 +168,22 @@
     p.rowsPerPage = rowsPerPage;
   }
 
+  function isRunning(workflow: any): boolean {
+    return workflow.state && workflow.state.status === 'running';
+  }
+
   function updateStatus(workflow: any, enable: boolean) {
     store
       .dispatch('updateWorkflow', {
         workflow: { ...workflow, status: enable ? 1 : 2 },
+      })
+      .then(refresh);
+  }
+
+  function updateCron(workflow: any, cronExpr: string) {
+    store
+      .dispatch('updateWorkflow', {
+        workflow: { ...workflow, cronExpr },
       })
       .then(refresh);
   }
