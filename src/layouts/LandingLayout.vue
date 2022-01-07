@@ -1,7 +1,7 @@
 <template>
   <q-layout
     view="hHh Lpr lff"
-    class="rounded-borders tw-flex tw-flex-no-wrap tw-h-full"
+    class="rounded-borders tw-flex tw-flex-no-wrap tw-h-full tw-w-full"
   >
     <q-header elevated class="bg-black">
       <q-toolbar>

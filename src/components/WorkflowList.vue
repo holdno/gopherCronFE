@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md tw-h-full tw-w-full">
+  <div class="tw-h-full tw-w-full">
     <q-dialog v-model="showAddDialog" :no-backdrop-dismiss="!canDismiss">
       <q-card class="tw-w-96 q-pa-sm">
         <q-form @submit="onSubmit">
@@ -145,6 +145,15 @@
             >
               Kill
             </q-btn>
+            <q-btn
+              dense
+              flat
+              :to="{
+                name: 'workflow_logs',
+                params: { workflowId: props.row.id },
+              }"
+              >日志</q-btn
+            >
           </div>
         </td>
       </template>

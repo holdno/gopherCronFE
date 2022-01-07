@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="tw-w-full tw-h-full">
     <WorkFlowLogs :id="props.id" />
   </div>
 </template>
