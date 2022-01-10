@@ -1,5 +1,5 @@
 <template>
-  <div class="tw-w-full tw-h-full">
+  <div class="tw-w-full tw-h-full tw-overflow-hidden">
     <v-network-graph
       v-if="show"
       ref="graph"
@@ -45,7 +45,7 @@
         key="add-edge"
         v-close-popup
         clickable
-        @click="() => addEdge(selectedNodes[0], selectedNodes[1])"
+        @click="() => AddEdge(selectedNodes[0], selectedNodes[1])"
       >
         <q-item-section>添加指向：{{ edgeName(selectedNodes) }}</q-item-section>
       </q-item>
@@ -76,7 +76,7 @@
         >
       </q-item>
       <q-separator />
-      <q-item key="reset-view" v-close-popup clickable @click="resetView">
+      <q-item key="reset-view" v-close-popup clickable @click="ResetView">
         <q-item-section>重置视图</q-item-section>
       </q-item>
       <q-item key="reset" v-close-popup clickable @click="reset">
@@ -95,6 +95,7 @@
     onMounted,
     reactive,
     toRaw,
+    watchEffect,
   } from 'vue';
   import {
     Nodes,
@@ -114,6 +115,7 @@
   import SelectProject from './SelectProject.vue';
   import SelectTask from './SelectTask.vue';
   import { Project, Task } from '../request';
+  import WorkflowListVue from './WorkflowList.vue';
 
   const show = ref(false);
   const visual = ref(false);
@@ -341,7 +343,7 @@
     }
   }
 
-  function resetView() {
+  function ResetView() {
     updateNodes(taskNodes.value);
     updateEdges(taskEdges.value);
     updateLayouts(taskLayouts.value);
@@ -381,7 +383,7 @@
     emits('update:modelValue', current);
   }
 
-  function addEdge(source: string, target: string) {
+  function AddEdge(source: string, target: string) {
     const current = props.modelValue.map(cloneTask);
     for (const task of current) {
       if (task.id === target) {
@@ -429,13 +431,15 @@
     emits('update:modelValue', props.tasks);
   }
 
+  const CanAddEdge = (source: string, target: string) =>
+    edges[edgeKey([source, target])] === undefined &&
+    edges[edgeKey([target, source])] === undefined;
+
   const canAddEdge = computed(() => {
     const nodes = selectedNodes.value;
     if (nodes.length === 2) {
-      return (
-        edges[edgeKey(nodes)] === undefined &&
-        edges[edgeKey(Array.from(nodes).reverse())] === undefined
-      );
+      const [source, target] = nodes;
+      return CanAddEdge(source, target);
     }
     return false;
   });
@@ -530,11 +534,25 @@
     removeEdges(selectedEdges.value);
   }
 
+  function SetAddEdgeMode() {
+    const [source] = selectedNodes.value;
+    const cancel = watchEffect(() => {
+      if (selectedNodes.value.length !== 1) return;
+      const [target] = selectedNodes.value;
+      if (source === target || !CanAddEdge(source, target)) return;
+      AddEdge(source, target);
+      cancel();
+    });
+  }
+
   defineExpose({
     ShowAddNodeDialog,
     RemoveSelectedNodes,
     SelectedNodes: selectedNodes,
     RemoveSelectedEdges,
     SelectedEdges: selectedEdges,
+    ResetView,
+    AddEdge,
+    SetAddEdgeMode,
   });
 </script>

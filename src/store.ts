@@ -148,7 +148,7 @@ export const store = createStore<State>({
           message: error.message,
           color: 'red',
           icon: 'announcement',
-          position: 'top',
+          position: 'top-right',
         });
       else throw error;
     },

@@ -1,16 +1,26 @@
 <template>
-  <div class="tw-w-full tw-h-full tw-flex tw-flex-row">
-    <div class="tw-flex tw-flex-col tw-gap-4">
-      <q-btn flat type="primary" :disable="!canUpdate" @click="updateWorkFlow"
-        >保存</q-btn
+  <div class="tw-w-full tw-h-full tw-flex tw-flex-col">
+    <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap">
+      <q-btn flat type="primary" :disable="!canUpdate" @click="updateWorkFlow">
+        保存
+      </q-btn>
+      <q-btn flat icon="refresh" title="刷新" @click="refresh"> 刷新 </q-btn>
+      <q-btn
+        flat
+        icon="restart_alt"
+        title="重置视图"
+        @click="() => workflow.ResetView()"
       >
-      <q-btn flat icon="refresh" title="刷新" @click="refresh" />
+        重置视图
+      </q-btn>
       <q-btn
         flat
         icon="add"
         title="添加新任务节点"
         @click="() => workflow.ShowAddNodeDialog()"
-      />
+      >
+        添加新任务节点
+      </q-btn>
       <q-btn
         flat
         icon="delete"
@@ -22,7 +32,27 @@
             workflow.SelectedEdges.length > 0 && workflow.RemoveSelectedEdges();
           }
         "
-      />
+      >
+        删除节点（关系）
+      </q-btn>
+      <q-btn
+        flat
+        icon="north_east"
+        title="关联节点"
+        :disable="!workflow || workflow.SelectedNodes.length !== 1"
+        @click="
+          () => {
+            workflow.SetAddEdgeMode();
+            store.getters.$q.notify({
+              type: 'info',
+              message: '请选择有效的下游节点',
+              icon: 'tips_and_updates',
+              position: 'top-right',
+            });
+          }
+        "
+        >关联节点</q-btn
+      >
     </div>
     <WorkFlow ref="workflow" v-model="current" :tasks="tasks" />
   </div>
