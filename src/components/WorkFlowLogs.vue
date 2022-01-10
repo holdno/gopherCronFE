@@ -5,6 +5,7 @@
     :rows-per-page-options="[10, 20, 30]"
     title="执行日志"
     :rows="logs"
+    :columns="columns"
     :loading="loading"
     row-key="id"
     color="primary"
@@ -14,6 +15,16 @@
     <template #loading>
       <q-inner-loading showing color="primary" />
     </template>
+    <template #body-cell-result="props">
+      <q-td key="result">
+        <!-- <pre>{{ JSON.stringify(JSON.parse(props.value), null, 2) }}</pre> -->
+        <pre
+          :innerHTML="
+            syntaxHighlight(JSON.stringify(JSON.parse(props.value), null, 2))
+          "
+        />
+      </q-td>
+    </template>
   </q-table>
 </template>
 
@@ -21,6 +32,32 @@
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useStore } from '../store';
   import { Pagination, TableRequestProp } from '../utils/qusar';
+  import { formatTimestamp } from '../utils/datetime';
+
+  function syntaxHighlight(json: string) {
+    json = json
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return json.replace(
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+      function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+          if (/:$/.test(match)) {
+            cls = 'key';
+          } else {
+            cls = 'string';
+          }
+        } else if (/true|false/.test(match)) {
+          cls = 'boolean';
+        } else if (/null/.test(match)) {
+          cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+      },
+    );
+  }
 
   const props = defineProps({
     id: {
@@ -29,6 +66,31 @@
     },
   });
   const store = useStore();
+  const columns = [
+    {
+      name: 'startTime',
+      label: '开始时间',
+      field: 'startTime',
+      format: (val: number) => formatTimestamp(val * 1000),
+    },
+    {
+      name: 'endTime',
+      label: '结束时间',
+      field: 'endTime',
+      format: (val: number) => formatTimestamp(val * 1000),
+    },
+    {
+      name: 'createTime',
+      label: '创建时间',
+      field: 'createTime',
+      format: (val: number) => formatTimestamp(val * 1000),
+    },
+    {
+      name: 'result',
+      label: '结果',
+      field: 'result',
+    },
+  ];
   const logs = computed(() => store.state.workflowLogs);
   const total = computed(() => store.state.workflowLogsTotal);
   const loading = computed(() => store.state.loadingWorkflowLogs);
@@ -62,3 +124,26 @@
     });
   });
 </script>
+
+<style>
+  pre {
+    /* outline: 1px solid #ccc; */
+    padding: 5px;
+    margin: 5px;
+  }
+  .string {
+    color: green;
+  }
+  .number {
+    color: darkorange;
+  }
+  .boolean {
+    color: blue;
+  }
+  .null {
+    color: magenta;
+  }
+  .key {
+    color: red;
+  }
+</style>

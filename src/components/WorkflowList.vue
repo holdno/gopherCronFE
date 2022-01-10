@@ -100,16 +100,16 @@
         </q-td>
       </template>
       <template #body-cell-status="props">
-        <td key="status" class="text-right">
+        <q-td key="status" class="text-right">
           <q-toggle
             color="primary"
             :model-value="props.value !== 2"
             @update:model-value="(v) => updateStatus(props.row, v)"
           />
-        </td>
+        </q-td>
       </template>
       <template #body-cell-operation="props">
-        <td key="operation">
+        <q-td key="operation">
           <div class="text-right tw-grid tw-gap-4">
             <q-btn
               :to="{ name: 'workflow', params: { workflowId: props.row.id } }"
@@ -151,7 +151,7 @@
               >日志</q-btn
             >
           </div>
-        </td>
+        </q-td>
       </template>
     </q-table>
   </div>
