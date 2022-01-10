@@ -145,6 +145,9 @@
   const COLOR_PRIMARY = '#99F6e4';
   const layoutHandler = new ForceLayout();
 
+  const NodeColor = (node: any) => (node ? node.color : COLOR_PRIMARY);
+  const EdgeColor = (edge: any) => (edge ? edge.color : COLOR_PRIMARY);
+
   const configs: UserConfigs = {
     view: {
       layoutHandler: layoutHandler,
@@ -155,13 +158,13 @@
       selectable: true,
       label: {
         direction: NodeLabelDirection.NORTH,
-        color: COLOR_PRIMARY,
+        color: NodeColor,
       },
       normal: {
-        color: (node) => node.color,
+        color: NodeColor,
       },
       hover: {
-        color: (node) => node.color,
+        color: NodeColor,
       },
       focusring: {
         color: COLOR_PRIMARY,
@@ -170,13 +173,13 @@
     edge: {
       selectable: true,
       normal: {
-        color: (edge) => edge.color,
+        color: EdgeColor,
       },
       hover: {
-        color: (edge) => edge.color,
+        color: EdgeColor,
       },
       selected: {
-        color: (edge) => edge.color,
+        color: EdgeColor,
         width: 4,
         dasharray: '10',
         linecap: 'round',
@@ -273,6 +276,7 @@
     for (const key of Object.keys(current)) {
       nodes[key] = Object.assign({}, current[key]);
     }
+    selectedNodes.value = [];
   }
 
   const edges = reactive<Edges>({});
@@ -301,6 +305,7 @@
     for (const key of Object.keys(current)) {
       edges[key] = Object.assign({}, current[key]);
     }
+    selectedEdges.value = [];
   }
 
   const layouts = reactive<Layouts>({ nodes: {} });
@@ -472,7 +477,7 @@
     );
     watch(
       () => props.modelValue,
-      (current, previous) => {
+      (current) => {
         updateEdges(taskEdges.value);
         updateNodes(taskNodes.value);
         if (JSON.stringify(current) === JSON.stringify(props.tasks)) {
@@ -516,7 +521,20 @@
       { deep: true },
     );
   });
+
+  function RemoveSelectedNodes() {
+    removeNodes(selectedNodes.value);
+  }
+
+  function RemoveSelectedEdges() {
+    removeEdges(selectedEdges.value);
+  }
+
   defineExpose({
     ShowAddNodeDialog,
+    RemoveSelectedNodes,
+    SelectedNodes: selectedNodes,
+    RemoveSelectedEdges,
+    SelectedEdges: selectedEdges,
   });
 </script>

@@ -1,9 +1,28 @@
 <template>
   <div class="tw-w-full tw-h-full tw-flex tw-flex-row">
     <div class="tw-flex tw-flex-col tw-gap-4">
-      <q-btn :disable="!canUpdate" @click="updateWorkFlow">保存</q-btn>
-      <q-btn flat icon="refresh" @click="refresh" />
-      <q-btn flat icon="add" @click="() => workflow.ShowAddNodeDialog()" />
+      <q-btn flat type="primary" :disable="!canUpdate" @click="updateWorkFlow"
+        >保存</q-btn
+      >
+      <q-btn flat icon="refresh" title="刷新" @click="refresh" />
+      <q-btn
+        flat
+        icon="add"
+        title="添加新任务节点"
+        @click="() => workflow.ShowAddNodeDialog()"
+      />
+      <q-btn
+        flat
+        icon="delete"
+        title="删除已选的节点及节点关联关系"
+        :disable="canRemoveNodes"
+        @click="
+          () => {
+            workflow.SelectedNodes.length > 0 && workflow.RemoveSelectedNodes();
+            workflow.SelectedEdges.length > 0 && workflow.RemoveSelectedEdges();
+          }
+        "
+      />
     </div>
     <WorkFlow ref="workflow" v-model="current" :tasks="tasks" />
   </div>
@@ -17,6 +36,12 @@
   import { KahnTask } from '../types';
 
   const workflow = ref();
+  const canRemoveNodes = computed(
+    () =>
+      workflow.value === undefined ||
+      (workflow.value.SelectedNodes.length === 0 &&
+        workflow.value.SelectedEdges.length === 0),
+  );
 
   const props = defineProps({
     id: {
@@ -140,5 +165,6 @@
       workflowId: props.id,
       edges: kahnTasksToWorkFlowEdges(current.value),
     });
+    await refresh();
   }
 </script>
