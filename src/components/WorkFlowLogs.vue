@@ -35,13 +35,7 @@
         <q-separator />
 
         <q-card-section>
-          <pre
-            :innerHTML="
-              syntaxHighlight(
-                JSON.stringify(JSON.parse(scope.row.result), null, 2),
-              )
-            "
-          />
+          <JSONViewer :json="scope.row.result" />
         </q-card-section>
       </q-card>
     </template>
@@ -53,31 +47,7 @@
   import { useStore } from '../store';
   import { Pagination, TableRequestProp } from '../utils/qusar';
   import { formatTimestamp } from '../utils/datetime';
-
-  function syntaxHighlight(json: string) {
-    json = json
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-    return json.replace(
-      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-      function (match) {
-        let cls = 'number';
-        if (/^"/.test(match)) {
-          if (/:$/.test(match)) {
-            cls = 'key';
-          } else {
-            cls = 'string';
-          }
-        } else if (/true|false/.test(match)) {
-          cls = 'boolean';
-        } else if (/null/.test(match)) {
-          cls = 'null';
-        }
-        return '<span class="' + cls + '">' + match + '</span>';
-      },
-    );
-  }
+  import JSONViewer from './JSONViewer.vue';
 
   const props = defineProps({
     id: {
@@ -119,26 +89,3 @@
     });
   });
 </script>
-
-<style>
-  pre {
-    /* outline: 1px solid #ccc; */
-    padding: 5px;
-    margin: 5px;
-  }
-  .string {
-    color: green;
-  }
-  .number {
-    color: darkorange;
-  }
-  .boolean {
-    color: blue;
-  }
-  .null {
-    color: magenta;
-  }
-  .key {
-    color: red;
-  }
-</style>

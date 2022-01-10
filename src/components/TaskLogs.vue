@@ -2,18 +2,48 @@
   <q-table
     v-model:pagination="pagination"
     class="tw-w-full tw-h-full"
-    :rows-per-page-options="[10, 20, 30]"
+    :rows-per-page-options="[5, 10, 15]"
     title="任务执行日志"
     :rows="logs"
-    :columns="columns"
     :loading="loading"
     row-key="id"
     color="primary"
     flat
+    hide-header
     @request="updatePagination"
   >
     <template #loading>
       <q-inner-loading showing color="primary" />
+    </template>
+    <template #body="scope">
+      <q-card class="tw-my-8 tw-mx-4" flat bordered>
+        <q-item>
+          <q-item-section>
+            <q-item-label overline>节点 IP</q-item-label>
+            <q-item-label>
+              {{ scope.row.clientIp }}
+            </q-item-label>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label overline>开始时间</q-item-label>
+            <q-item-label>
+              {{ formatTimestamp(scope.row.startTime * 1000) }}
+            </q-item-label>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label overline>结束时间</q-item-label>
+            <q-item-label>
+              {{ formatTimestamp(scope.row.endTime * 1000) }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-separator />
+
+        <q-card-section>
+          <JSONViewer :json="scope.row.result" />
+        </q-card-section>
+      </q-card>
     </template>
   </q-table>
 </template>
@@ -23,6 +53,7 @@
   import { useStore } from '../store';
   import { formatTimestamp } from '../utils/datetime';
   import { Pagination, TableRequestProp } from '../utils/qusar';
+  import JSONViewer from './JSONViewer.vue';
   const props = defineProps({
     id: {
       type: String,
@@ -35,37 +66,13 @@
   });
   const store = useStore();
   const logs = computed(() => store.state.taskLogs);
-  const columns = [
-    {
-      name: 'startTime',
-      label: '开始时间',
-      field: 'startTime',
-      format: (val: number) => formatTimestamp(val * 1000),
-    },
-    {
-      name: 'endTime',
-      label: '结束时间',
-      field: 'endTime',
-      format: (val: number) => formatTimestamp(val * 1000),
-    },
-    {
-      name: 'clientIp',
-      label: '节点 IP',
-      field: 'clientIp',
-    },
-    {
-      name: 'result',
-      label: '结果',
-      field: 'result',
-    },
-  ];
   const total = computed(() => store.state.taskLogsTotal);
   const loading = computed(() => store.state.loadingTaskLogs);
   const pagination = ref<Pagination>({
     sortBy: '',
     descending: false,
     page: 1,
-    rowsPerPage: 10,
+    rowsPerPage: 5,
     rowsNumber: 0,
   });
 
