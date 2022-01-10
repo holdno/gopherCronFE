@@ -1,10 +1,10 @@
 <template>
   <q-select
     v-model="task"
-    class="tw-w-96"
     label="任务列表"
     map-options
     emit-value
+    :disable="props.disabled"
     :options="
       tasks.map((t) => ({
         label: t.name,
@@ -29,6 +29,10 @@
     projectId: {
       type: Number,
       required: true,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   });
   const emits = defineEmits(['update:modelValue']);
@@ -68,6 +72,7 @@
     watch(
       () => props.projectId,
       (current, previous) => {
+        emits('update:modelValue', undefined);
         store.commit('setTasks', { tasks: [] });
       },
     );

@@ -3,8 +3,9 @@
     <div class="tw-flex tw-flex-col tw-gap-4">
       <q-btn :disable="!canUpdate" @click="updateWorkFlow">保存</q-btn>
       <q-btn flat icon="refresh" @click="refresh" />
+      <q-btn flat icon="add" @click="() => workflow.ShowAddNodeDialog()" />
     </div>
-    <WorkFlow v-model="current" :tasks="tasks" />
+    <WorkFlow ref="workflow" v-model="current" :tasks="tasks" />
   </div>
 </template>
 
@@ -14,6 +15,8 @@
   import { Task, WorkFlowEdge } from '../request';
   import { useStore } from '../store';
   import { KahnTask } from '../types';
+
+  const workflow = ref();
 
   const props = defineProps({
     id: {

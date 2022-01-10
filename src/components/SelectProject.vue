@@ -1,7 +1,6 @@
 <template>
   <q-select
     v-model="project"
-    class="tw-w-96"
     label="项目列表"
     map-options
     emit-value

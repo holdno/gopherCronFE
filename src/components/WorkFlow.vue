@@ -13,27 +13,31 @@
       :event-handlers="eventHandlers"
     />
   </div>
-  <q-dialog v-model="showAddNodeDialog" class="tw-w-screen tw-h-screen">
-    <div
-      class="tw-w-1/2 tw-h-1/2 tw-text-primary tw-flex tw-flex-row tw-gap-4 q-pa-md"
-    >
-      <SelectProject v-model="project" />
-      <SelectTask
-        v-if="project !== undefined"
-        v-model="task"
-        :project-id="project.id"
-      />
-      <q-btn @click="addTaskNode">添加</q-btn>
-    </div>
+  <q-dialog
+    v-model="addNodeDialogVisibility"
+    class="tw-w-screen tw-h-screen"
+    @hide="HideAddNodeDialog"
+  >
+    <q-card class="tw-w-96 q-pa-sm">
+      <q-card-section>
+        <div class="text-h6">添加新的任务节点</div>
+      </q-card-section>
+      <q-card-section>
+        <SelectProject v-model="project" />
+        <SelectTask
+          v-model="task"
+          :disabled="project === undefined"
+          :project-id="project ? project.id : 0"
+        />
+      </q-card-section>
+      <q-card-actions align="around">
+        <q-btn flat type="primary" @click="addTaskNode">添加</q-btn>
+      </q-card-actions>
+    </q-card>
   </q-dialog>
   <q-menu ref="viewMenu" touch-position context-menu>
     <q-list dense>
-      <q-item
-        key="add-task"
-        v-close-popup
-        clickable
-        @click="() => (showAddNodeDialog = true)"
-      >
+      <q-item key="add-task" v-close-popup clickable @click="ShowAddNodeDialog">
         <q-item-section>添加</q-item-section>
       </q-item>
       <q-item
@@ -431,9 +435,19 @@
     return false;
   });
 
-  const showAddNodeDialog = ref(false);
+  const addNodeDialogVisibility = ref(false);
   const project = ref<Project>();
   const task = ref<Task>();
+
+  function ShowAddNodeDialog() {
+    addNodeDialogVisibility.value = true;
+  }
+
+  function HideAddNodeDialog() {
+    project.value = undefined;
+    task.value = undefined;
+    addNodeDialogVisibility.value = false;
+  }
 
   function addTaskNode() {
     emits('update:modelValue', [
@@ -444,9 +458,7 @@
         origin: task.value,
       },
     ]);
-    project.value = undefined;
-    task.value = undefined;
-    showAddNodeDialog.value = false;
+    HideAddNodeDialog();
   }
 
   onMounted(() => {
@@ -503,5 +515,8 @@
       },
       { deep: true },
     );
+  });
+  defineExpose({
+    ShowAddNodeDialog,
   });
 </script>
