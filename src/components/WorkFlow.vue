@@ -83,7 +83,15 @@
 </template>
 
 <script setup lang="ts">
-  import { PropType, ref, computed, watch, onMounted, reactive } from 'vue';
+  import {
+    PropType,
+    ref,
+    computed,
+    watch,
+    onMounted,
+    reactive,
+    toRaw,
+  } from 'vue';
   import {
     Nodes,
     Edges,
@@ -461,14 +469,39 @@
         show.value = true;
       },
     );
-    watch([graph, show], ([graph, show]) => {
-      if (graph && show) {
-        setTimeout(() => {
-          graph.fitToContents();
-          graph.panToCenter();
-          visual.value = true;
-        }, 1000);
+
+    function similarLayout(A: NodePositions, B: NodePositions): boolean {
+      for (const key of Object.keys(A)) {
+        const nodeA = A[key];
+        const nodeB = B[key];
+        if (
+          Math.abs(nodeA.x - nodeB.x) > 0.5 ||
+          Math.abs(nodeA.y - nodeB.y) > 0.5
+        )
+          return false;
       }
-    });
+      return true;
+    }
+
+    const previousNodes = ref();
+    watch(
+      () => layouts.nodes,
+      (currentNodes) => {
+        if (
+          !visual.value &&
+          graph.value &&
+          show.value &&
+          currentNodes &&
+          previousNodes.value &&
+          similarLayout(currentNodes, previousNodes.value)
+        ) {
+          graph.value.panToCenter();
+          setTimeout(() => (visual.value = true), 100);
+        }
+
+        previousNodes.value = JSON.parse(JSON.stringify(toRaw(layouts.nodes)));
+      },
+      { deep: true },
+    );
   });
 </script>
