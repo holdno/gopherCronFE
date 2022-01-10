@@ -61,11 +61,23 @@
       row-key="id"
       color="primary"
       flat
+      selection="single"
+      :selected="
+        workflows.filter((f) => f.id === Number($route.params.workflowId))
+      "
       @request="updatePagination"
     >
       <template #top>
         <q-btn flat icon="add" @click="showAddDialog = true" />
         <q-btn flat :loading="loading" icon="refresh" @click="refresh" />
+      </template>
+      <template #body-selection="scope">
+        <q-icon
+          name="check"
+          color="primary"
+          size="2em"
+          :class="scope.selected ? '' : 'tw-opacity-0'"
+        />
       </template>
       <template #body-cell-cron="props">
         <q-td key="cron" class="text-right">
