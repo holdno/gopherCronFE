@@ -2,28 +2,48 @@
   <q-table
     v-model:pagination="pagination"
     class="tw-w-full tw-h-full"
-    :rows-per-page-options="[10, 20, 30]"
+    :rows-per-page-options="[5, 10, 15]"
     title="执行日志"
     :rows="logs"
-    :columns="columns"
     :loading="loading"
     row-key="id"
     color="primary"
     flat
+    hide-header
     @request="updatePagination"
   >
     <template #loading>
       <q-inner-loading showing color="primary" />
     </template>
-    <template #body-cell-result="props">
-      <q-td key="result">
-        <!-- <pre>{{ JSON.stringify(JSON.parse(props.value), null, 2) }}</pre> -->
-        <pre
-          :innerHTML="
-            syntaxHighlight(JSON.stringify(JSON.parse(props.value), null, 2))
-          "
-        />
-      </q-td>
+    <template #body="scope">
+      <q-card class="tw-my-8 tw-mx-4" flat bordered>
+        <q-item>
+          <q-item-section>
+            <q-item-label overline>开始时间</q-item-label>
+            <q-item-label>
+              {{ formatTimestamp(scope.row.startTime * 1000) }}
+            </q-item-label>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label overline>结束时间</q-item-label>
+            <q-item-label>
+              {{ formatTimestamp(scope.row.endTime * 1000) }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-separator />
+
+        <q-card-section>
+          <pre
+            :innerHTML="
+              syntaxHighlight(
+                JSON.stringify(JSON.parse(scope.row.result), null, 2),
+              )
+            "
+          />
+        </q-card-section>
+      </q-card>
     </template>
   </q-table>
 </template>
@@ -42,7 +62,7 @@
     return json.replace(
       /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
       function (match) {
-        var cls = 'number';
+        let cls = 'number';
         if (/^"/.test(match)) {
           if (/:$/.test(match)) {
             cls = 'key';
@@ -66,31 +86,6 @@
     },
   });
   const store = useStore();
-  const columns = [
-    {
-      name: 'startTime',
-      label: '开始时间',
-      field: 'startTime',
-      format: (val: number) => formatTimestamp(val * 1000),
-    },
-    {
-      name: 'endTime',
-      label: '结束时间',
-      field: 'endTime',
-      format: (val: number) => formatTimestamp(val * 1000),
-    },
-    {
-      name: 'createTime',
-      label: '创建时间',
-      field: 'createTime',
-      format: (val: number) => formatTimestamp(val * 1000),
-    },
-    {
-      name: 'result',
-      label: '结果',
-      field: 'result',
-    },
-  ];
   const logs = computed(() => store.state.workflowLogs);
   const total = computed(() => store.state.workflowLogsTotal);
   const loading = computed(() => store.state.loadingWorkflowLogs);
@@ -98,7 +93,7 @@
     sortBy: '',
     descending: false,
     page: 1,
-    rowsPerPage: 10,
+    rowsPerPage: 5,
     rowsNumber: 0,
   });
   function updatePagination({
