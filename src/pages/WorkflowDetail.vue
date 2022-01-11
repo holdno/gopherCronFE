@@ -51,8 +51,39 @@
             });
           }
         "
-        >关联节点</q-btn
       >
+        关联节点
+      </q-btn>
+      <q-btn
+        v-if="selectedTask !== undefined"
+        key="jump_task_detail"
+        icon="task_alt"
+        flat
+        :to="{
+          name: 'task',
+          params: {
+            projectId: selectedTask.origin.projectId,
+            taskId: selectedTask.origin.id,
+          },
+        }"
+      >
+        任务详情
+      </q-btn>
+      <q-btn
+        v-if="selectedTask !== undefined"
+        key="jump_task_logs"
+        icon="view_timeline"
+        flat
+        :to="{
+          name: 'task_logs',
+          params: {
+            projectId: selectedTask.origin.projectId,
+            taskId: selectedTask.origin.id,
+          },
+        }"
+      >
+        任务日志
+      </q-btn>
     </div>
     <WorkFlow ref="workflow" v-model="current" :tasks="tasks" />
   </div>
@@ -72,6 +103,15 @@
       (workflow.value.SelectedNodes.length === 0 &&
         workflow.value.SelectedEdges.length === 0),
   );
+  const selectedTask = computed(() => {
+    if (!workflow.value || workflow.value.SelectedNodes.length !== 1) {
+      return undefined;
+    }
+    const selectedNodes = workflow.value.SelectedNodes;
+    const map = workflow.value.NodeMapTask;
+    const task = map.get(selectedNodes[selectedNodes.length - 1]);
+    return task;
+  });
 
   const props = defineProps({
     id: {

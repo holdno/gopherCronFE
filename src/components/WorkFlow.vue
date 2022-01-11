@@ -271,6 +271,14 @@
     return nodes;
   });
 
+  const NodeMapTask = computed<Map<String, KahnTask>>(() => {
+    const map = new Map();
+    for (const task of props.modelValue) {
+      map.set(task.id, task);
+    }
+    return map;
+  });
+
   function updateNodes(current: Nodes) {
     for (const key of Object.keys(nodes)) {
       delete nodes[key];
@@ -554,5 +562,6 @@
     ResetView,
     AddEdge,
     SetAddEdgeMode,
+    NodeMapTask,
   });
 </script>
