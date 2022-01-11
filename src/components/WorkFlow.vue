@@ -115,7 +115,6 @@
   import SelectProject from './SelectProject.vue';
   import SelectTask from './SelectTask.vue';
   import { Project, Task } from '../request';
-  import WorkflowListVue from './WorkflowList.vue';
 
   const show = ref(false);
   const visual = ref(false);

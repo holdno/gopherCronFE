@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watchEffect, watch } from 'vue';
   import WorkFlow from '../components/WorkFlow.vue';
   import { Task, WorkFlowEdge } from '../request';
   import { useStore } from '../store';
@@ -213,17 +213,28 @@
     return edges;
   }
 
-  async function refresh() {
+  async function refresh(soft = false) {
     await store.dispatch('fetchWorkflowEdges', {
       workflowId: props.id,
     });
-    tasks.value = await workflowEdgesToKahnTasks(store.state.workflowEdges);
+    const kahnTasks = await workflowEdgesToKahnTasks(store.state.workflowEdges);
+    if (!soft) {
+      tasks.value = kahnTasks;
+    } else {
+      current.value = kahnTasks;
+    }
   }
 
   onMounted(() => {
     watchEffect(async () => {
       await refresh();
     });
+    watch(
+      () => [store.state.eventWorkFlowTask, store.state.eventWorkFlow],
+      (current) => {
+        refresh(true);
+      },
+    );
   });
 
   const canUpdate = computed(

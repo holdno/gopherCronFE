@@ -28,8 +28,28 @@ import {
   WorkFlowLog,
   fetchWorkFlowLogs,
 } from './request';
+import { FireTowerPlugin } from './utils/FireTower';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
+
+export interface EventTask {
+  status: string;
+  taskId: string;
+  projectId: number;
+}
+
+export interface EventWorkFlow {
+  status: string;
+  workFlowId: number;
+}
+
+export interface EventWorkFlowTask {
+  status: string;
+  workFlowId: number;
+  taskId: string;
+  projectId: number;
+}
+
 // 为 store state 声明类型
 export interface State {
   logined: boolean;
@@ -62,15 +82,17 @@ export interface State {
   workflowLogsTotal: number;
   loadingWorkflowLogs: boolean;
 
+  eventTask?: EventTask;
+  eventWorkFlow?: EventWorkFlow;
+  eventWorkFlowTask?: EventWorkFlowTask;
+
   currentError?: Error;
 }
-
-// 定义 injection key
-export const key: InjectionKey<Store<State>> = Symbol('Vuex Store');
 
 // 创建一个新的 store 实例
 export const COOKIE_TOKEN = 'access-token';
 export const store = createStore<State>({
+  plugins: [FireTowerPlugin],
   devtools: import.meta.env.DEV,
   strict: import.meta.env.DEV,
   state() {
@@ -230,6 +252,15 @@ export const store = createStore<State>({
     setWorkflowLogs(state, { logs, total }) {
       state.workflowLogs = logs;
       state.workflowLogsTotal = total;
+    },
+    emitEventTask(state, { event }) {
+      state.eventTask = event;
+    },
+    emitEventWorkFlow(state, { event }) {
+      state.eventWorkFlow = event;
+    },
+    emitEventWorkFlowTask(state, { event }) {
+      state.eventWorkFlowTask = event;
     },
   },
   actions: {
@@ -408,6 +439,9 @@ export const store = createStore<State>({
     },
   },
 });
+
+// 定义 injection key
+export const key: InjectionKey<Store<State>> = Symbol('Vuex Store');
 
 // 定义自己的 `useStore` 组合式函数
 export function useStore() {

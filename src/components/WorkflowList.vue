@@ -170,7 +170,7 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, watchEffect, ref, computed } from 'vue';
+  import { onMounted, watchEffect, ref, computed, watch } from 'vue';
   import { useStore } from '../store';
   import { Pagination, TableRequestProp } from '../utils/qusar';
   import { startWorkflow, killWorkflow } from '../request';
@@ -245,6 +245,12 @@
     watchEffect(async () => {
       refresh();
     });
+    watch(
+      () => store.state.eventWorkFlow,
+      (current) => {
+        refresh();
+      },
+    );
   });
 
   const defaultWorkflow = {
