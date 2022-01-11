@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watchEffect, watch } from 'vue';
   import { useStore } from '../store';
   import { Task } from '../request';
   import { formatTimestamp } from '../utils/datetime';
@@ -102,8 +102,17 @@
 
   const store = useStore();
   const loading = computed(() => store.state.loadingTasks);
-  watchEffect(async () => {
-    await store.dispatch('fetchTasks', { ...props });
+
+  onMounted(() => {
+    watchEffect(async () => {
+      await fetchTasks();
+    });
+    watch(
+      () => [store.state.eventTask, store.state.eventWorkFlowTask],
+      (current) => {
+        fetchTasks();
+      },
+    );
   });
   async function fetchTasks() {
     await store.dispatch('fetchTasks', { ...props });

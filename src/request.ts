@@ -287,3 +287,282 @@ export async function fetchLogs(
     throw new Error(data.meta.msg);
   }
 }
+
+export interface Workflow {
+  id: number;
+  title: string;
+  remark: string;
+  status: number;
+  state: Object;
+  createTime: number;
+  cronExpr: string;
+}
+
+export async function fetchWorkflows(
+  api: AxiosInstance,
+  page: number,
+  pageSize: number,
+): Promise<[Workflow[], number]> {
+  const resp = await api.get('/workflow/list', {
+    params: {
+      page: page,
+      pagesize: pageSize,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    const r = data.response;
+    return [
+      r.list.map((v: any) => ({
+        id: v.id,
+        title: v.title,
+        remark: v.remark,
+        status: v.status,
+        state: v.state,
+        createTime: v.create_time,
+        cronExpr: v.cron,
+      })),
+      r.total,
+    ];
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export async function createWorkflow(
+  api: AxiosInstance,
+  title: string,
+  remark: string,
+  cronExpr: string,
+) {
+  const payload = JSON.stringify({
+    title: title,
+    remark: remark,
+    cron: cronExpr,
+  });
+  const resp = await api.post('/workflow/create', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export async function updateWorkflow(api: AxiosInstance, workflow: Workflow) {
+  const payload = JSON.stringify({
+    id: workflow.id,
+    title: workflow.title,
+    remark: workflow.remark,
+    cron: workflow.cronExpr,
+    status: workflow.status,
+  });
+  const resp = await api.post('/workflow/update', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export interface WorkFlowEdge {
+  id: number;
+  projectId: number;
+  taskId: string;
+  workflowId: number;
+  createTime: number;
+
+  dependencyProjectId: number;
+  dependencyTaskId: string;
+}
+
+export interface ScheduleRecord {
+  tmpId: string;
+  status: string;
+  result: string;
+  eventTime: number;
+}
+
+export interface WorkflowTaskState {
+  workflowId: number;
+  projectId: number;
+  taskId: string;
+  currentStatus: string;
+  scheduleCount: number;
+  scheduleRecords: ScheduleRecord[];
+  startTime: number;
+}
+
+export async function fetchWorkflowEdges(
+  api: AxiosInstance,
+  workflowId: number,
+): Promise<[WorkFlowEdge[], WorkflowTaskState[]]> {
+  const resp = await api.get('/workflow/task/list', {
+    params: {
+      workflow_id: workflowId,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    if (!data.response) return [[], []];
+    const edges = [];
+    const stateMap = new Map<string, WorkflowTaskState>();
+    for (const { task: v, state: s } of data.response) {
+      edges.push({
+        id: v.id,
+        projectId: v.project_id,
+        taskId: v.task_id,
+        workflowId: v.workflowId,
+        createTime: v.create_time,
+
+        dependencyProjectId: v.dependency_project_id,
+        dependencyTaskId: v.dependency_task_id,
+      });
+      if (!s) continue;
+      const key = `${s.project_id}_${s.task_id}`;
+      if (stateMap.has(key)) continue;
+      stateMap.set(key, {
+        workflowId: s.workflow_id,
+        projectId: s.project_id,
+        taskId: s.task_id,
+        currentStatus: s.current_status,
+        scheduleCount: s.schedule_count,
+        scheduleRecords: s.schedule_records.map((r: any) => ({
+          tmpId: r.tmp_id,
+          status: r.status,
+          result: r.result,
+          eventTime: r.event_time,
+        })),
+        startTime: s.start_time,
+      });
+    }
+    return [edges, Array.from(stateMap.values())];
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export async function updateWorkflowEdges(
+  api: AxiosInstance,
+  workflowId: number,
+  edges: WorkFlowEdge[],
+) {
+  /* eslint-disable camelcase */
+  interface Task {
+    task_id: string;
+    project_id: number;
+  }
+  const tasks = new Map<string, Task>();
+  const taskDeps = new Map<string, Task[]>();
+  for (const edge of edges) {
+    const key = `${edge.projectId}_${edge.taskId}`;
+    if (!tasks.has(key)) {
+      tasks.set(key, { task_id: edge.taskId, project_id: edge.projectId });
+    }
+    if (edge.dependencyProjectId === 0 || edge.dependencyTaskId === '') {
+      continue;
+    }
+    const deps = taskDeps.get(key);
+    const task = {
+      task_id: edge.dependencyTaskId,
+      project_id: edge.dependencyProjectId,
+    };
+    if (deps === undefined) {
+      taskDeps.set(key, [task]);
+    } else {
+      taskDeps.set(key, [...deps, task]);
+    }
+  }
+  const payload = JSON.stringify({
+    workflow_id: workflowId,
+    tasks: Array.from(tasks.keys()).map((k) => ({
+      task: tasks.get(k),
+      dependencies: taskDeps.get(k) || [],
+    })),
+  });
+  const resp = await api.post('/workflow/task/create', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export async function startWorkflow(api: AxiosInstance, workflowId: number) {
+  const payload = JSON.stringify({
+    workflow_id: workflowId,
+  });
+  const resp = await api.post('/workflow/start', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export async function killWorkflow(api: AxiosInstance, workflowId: number) {
+  const payload = JSON.stringify({
+    workflow_id: workflowId,
+  });
+  const resp = await api.post('/workflow/kill', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export interface WorkFlowLog {
+  id: number;
+  workflowId: number;
+  createTime: number;
+  startTime: number;
+  endTime: number;
+  result: string;
+}
+
+export async function fetchWorkFlowLogs(
+  api: AxiosInstance,
+  workflowId: number,
+  page: number,
+  pageSize: number,
+): Promise<[WorkFlowLog[], number]> {
+  const resp = await api.get('/workflow/log/list', {
+    params: {
+      workflow_id: workflowId,
+      page: page,
+      pagesize: pageSize,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    const r = data.response;
+    return [
+      r.list.map((v: any) => ({
+        id: v.id,
+        workflowId: v.workflow_id,
+        createTime: v.create_time,
+        startTime: v.start_time,
+        endTime: v.end_time,
+        result: v.result,
+      })),
+      r.total,
+    ];
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}

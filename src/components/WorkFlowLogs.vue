@@ -3,7 +3,7 @@
     v-model:pagination="pagination"
     class="tw-w-full tw-h-full"
     :rows-per-page-options="[5, 10, 15]"
-    title="任务执行日志"
+    title="执行日志"
     :rows="logs"
     :loading="loading"
     row-key="id"
@@ -18,12 +18,6 @@
     <template #body="scope">
       <q-card class="tw-my-8 tw-mx-4" flat bordered>
         <q-item>
-          <q-item-section>
-            <q-item-label overline>节点 IP</q-item-label>
-            <q-item-label>
-              {{ scope.row.clientIp }}
-            </q-item-label>
-          </q-item-section>
           <q-item-section>
             <q-item-label overline>开始时间</q-item-label>
             <q-item-label>
@@ -49,25 +43,22 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, computed, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useStore } from '../store';
-  import { formatTimestamp } from '../utils/datetime';
   import { Pagination, TableRequestProp } from '../utils/qusar';
+  import { formatTimestamp } from '../utils/datetime';
   import JSONViewer from './JSONViewer.vue';
+
   const props = defineProps({
     id: {
-      type: String,
-      required: true,
-    },
-    projectId: {
       type: Number,
       required: true,
     },
   });
   const store = useStore();
-  const logs = computed(() => store.state.taskLogs);
-  const total = computed(() => store.state.taskLogsTotal);
-  const loading = computed(() => store.state.loadingTaskLogs);
+  const logs = computed(() => store.state.workflowLogs);
+  const total = computed(() => store.state.workflowLogsTotal);
+  const loading = computed(() => store.state.loadingWorkflowLogs);
   const pagination = ref<Pagination>({
     sortBy: '',
     descending: false,
@@ -75,7 +66,6 @@
     rowsPerPage: 5,
     rowsNumber: 0,
   });
-
   function updatePagination({
     pagination: { page, rowsPerPage },
   }: TableRequestProp) {
@@ -91,9 +81,8 @@
   onMounted(async () => {
     watchEffect(async () => {
       const p = pagination.value;
-      await store.dispatch('fetchTaskLogs', {
-        projectId: props.projectId,
-        taskId: props.id,
+      await store.dispatch('fetchWorkFlowLogs', {
+        workflowId: props.id,
         page: p.page,
         pageSize: p.rowsPerPage,
       });

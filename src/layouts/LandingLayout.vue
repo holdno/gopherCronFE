@@ -1,7 +1,7 @@
 <template>
   <q-layout
     view="hHh Lpr lff"
-    class="rounded-borders tw-flex tw-flex-no-wrap tw-h-full"
+    class="rounded-borders tw-flex tw-flex-no-wrap tw-h-full tw-w-full"
   >
     <q-header elevated class="bg-black">
       <q-toolbar>
@@ -37,12 +37,12 @@
             <q-item-section>Projects</q-item-section>
           </q-item>
 
-          <q-item v-ripple clickable :to="{ name: 'taskflow' }">
+          <q-item v-ripple clickable :to="{ name: 'workflows' }">
             <q-item-section avatar>
               <q-icon name="mediation" />
             </q-item-section>
 
-            <q-item-section>Taskflows</q-item-section>
+            <q-item-section>Workflows</q-item-section>
           </q-item>
 
           <q-separator class="tw-bg-stone-800" />

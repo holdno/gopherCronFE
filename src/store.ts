@@ -17,9 +17,39 @@ import {
   deleteProject,
   TaskLog,
   fetchLogs,
+  Workflow,
+  fetchWorkflows,
+  WorkFlowEdge,
+  fetchWorkflowEdges,
+  updateWorkflowEdges,
+  updateWorkflow,
+  createWorkflow,
+  WorkflowTaskState,
+  WorkFlowLog,
+  fetchWorkFlowLogs,
 } from './request';
+import { FireTowerPlugin } from './utils/FireTower';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
+
+export interface EventTask {
+  status: string;
+  taskId: string;
+  projectId: number;
+}
+
+export interface EventWorkFlow {
+  status: string;
+  workFlowId: number;
+}
+
+export interface EventWorkFlowTask {
+  status: string;
+  workFlowId: number;
+  taskId: string;
+  projectId: number;
+}
+
 // 为 store state 声明类型
 export interface State {
   logined: boolean;
@@ -32,6 +62,7 @@ export interface State {
   loadingProjects: boolean;
   tasks: Task[];
   loadingTasks: boolean;
+  fetchTasksCache: Map<number, Task[]>;
 
   recentLogCountRecords: RecentLogCount[];
 
@@ -39,15 +70,29 @@ export interface State {
   taskLogsTotal: number;
   loadingTaskLogs: boolean;
 
+  workflows: Workflow[];
+  workflowsTotal: number;
+  loadingWorkflows: boolean;
+
+  workflowEdges: WorkFlowEdge[];
+  workflowTaskStates: WorkflowTaskState[];
+  loadingWorkflowEdges: boolean;
+
+  workflowLogs: WorkFlowLog[];
+  workflowLogsTotal: number;
+  loadingWorkflowLogs: boolean;
+
+  eventTask?: EventTask;
+  eventWorkFlow?: EventWorkFlow;
+  eventWorkFlowTask?: EventWorkFlowTask;
+
   currentError?: Error;
 }
-
-// 定义 injection key
-export const key: InjectionKey<Store<State>> = Symbol('Vuex Store');
 
 // 创建一个新的 store 实例
 export const COOKIE_TOKEN = 'access-token';
 export const store = createStore<State>({
+  plugins: [FireTowerPlugin],
   devtools: import.meta.env.DEV,
   strict: import.meta.env.DEV,
   state() {
@@ -57,10 +102,20 @@ export const store = createStore<State>({
       loadingProjects: false,
       tasks: [],
       loadingTasks: false,
+      fetchTasksCache: new Map(),
       recentLogCountRecords: [],
       taskLogs: [],
       taskLogsTotal: 0,
       loadingTaskLogs: false,
+      workflows: [],
+      workflowsTotal: 0,
+      loadingWorkflows: false,
+      workflowEdges: [],
+      workflowTaskStates: [],
+      loadingWorkflowEdges: false,
+      workflowLogs: [],
+      workflowLogsTotal: 0,
+      loadingWorkflowLogs: false,
     };
   },
   getters: {
@@ -115,7 +170,7 @@ export const store = createStore<State>({
           message: error.message,
           color: 'red',
           icon: 'announcement',
-          position: 'top',
+          position: 'top-right',
         });
       else throw error;
     },
@@ -137,7 +192,15 @@ export const store = createStore<State>({
     unloadingTasks(state) {
       state.loadingTasks = false;
     },
-    setTasks(state, { tasks }) {
+    setTasks(state, { projectId, tasks }) {
+      if (projectId !== undefined) state.fetchTasksCache.set(projectId, tasks);
+      state.tasks = tasks;
+    },
+    setTasksByCache(state, { projectId }) {
+      const tasks = state.fetchTasksCache.get(projectId);
+      if (tasks === undefined) {
+        throw new Error(`fetchTasks Cache missing projectId=${projectId}`);
+      }
       state.tasks = tasks;
     },
     updateTask(state, { task }) {
@@ -156,9 +219,48 @@ export const store = createStore<State>({
     unloadingLogs(state) {
       state.loadingTaskLogs = false;
     },
-    saveLogs(state, { logs, total }) {
+    setLogs(state, { logs, total }) {
       state.taskLogs = logs;
       state.taskLogsTotal = total;
+    },
+    loadingWorkflows(state) {
+      state.loadingWorkflows = true;
+    },
+    unloadingWorkflows(state) {
+      state.loadingWorkflows = false;
+    },
+    setWorkflows(state, { workflows, total }) {
+      state.workflows = workflows;
+      state.workflowsTotal = total;
+    },
+    loadingWorkflowEdges(state) {
+      state.loadingWorkflowEdges = true;
+    },
+    unloadingWorkflowEdges(state) {
+      state.loadingWorkflowEdges = false;
+    },
+    setWorkflowEdges(state, { edges, states }) {
+      state.workflowEdges = edges;
+      state.workflowTaskStates = states;
+    },
+    loadingWorkflowLogs(state) {
+      state.loadingWorkflowLogs = true;
+    },
+    unloadingWorkflowLogs(state) {
+      state.loadingWorkflowLogs = false;
+    },
+    setWorkflowLogs(state, { logs, total }) {
+      state.workflowLogs = logs;
+      state.workflowLogsTotal = total;
+    },
+    emitEventTask(state, { event }) {
+      state.eventTask = event;
+    },
+    emitEventWorkFlow(state, { event }) {
+      state.eventWorkFlow = event;
+    },
+    emitEventWorkFlowTask(state, { event }) {
+      state.eventWorkFlowTask = event;
     },
   },
   actions: {
@@ -200,12 +302,16 @@ export const store = createStore<State>({
       }
       commit('unloadingProjects');
     },
-    async fetchTasks({ commit }, { projectId }) {
+    async fetchTasks({ commit, state }, { projectId, cached = false }) {
       commit('loadingTasks');
       const api = this.getters.apiv1;
       try {
-        const tasks = await taskList(api, projectId);
-        commit('setTasks', { tasks });
+        if (!cached || !state.fetchTasksCache.has(projectId)) {
+          const tasks = await taskList(api, projectId);
+          commit('setTasks', { tasks, projectId });
+        } else {
+          commit('setTasksByCache', { projectId });
+        }
       } catch (e) {
         commit('error', { error: e });
       }
@@ -259,14 +365,83 @@ export const store = createStore<State>({
           page,
           pageSize,
         );
-        commit('saveLogs', { logs, total });
+        commit('setLogs', { logs, total });
       } catch (e) {
         commit('error', { error: e });
       }
       commit('unloadingLogs');
     },
+    async fetchWorkflows({ commit }, { page, pageSize }) {
+      commit('loadingWorkflows');
+      const api = this.getters.apiv1;
+      try {
+        const [workflows, total] = await fetchWorkflows(api, page, pageSize);
+        commit('setWorkflows', { workflows, total });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+      commit('unloadingWorkflows');
+    },
+    async fetchWorkflowEdges({ commit }, { workflowId }) {
+      commit('loadingWorkflowEdges');
+      const api = this.getters.apiv1;
+      try {
+        const [edges, states] = await fetchWorkflowEdges(api, workflowId);
+        commit('setWorkflowEdges', { edges, states });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+      commit('unloadingWorkflowEdges');
+    },
+    async updateWorkflow(
+      { dispatch, commit },
+      { workflow }: { workflow: Workflow },
+    ) {
+      const api = this.getters.apiv1;
+      try {
+        await updateWorkflow(api, workflow);
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async updateWorkFlowEdges({ dispatch, commit }, { workflowId, edges }) {
+      const api = this.getters.apiv1;
+      try {
+        await updateWorkflowEdges(api, workflowId, edges);
+        await dispatch('fetchWorkflowEdges', { workflowId });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async createWorkflow({ dispatch, commit }, { title, remark, cronExpr }) {
+      const api = this.getters.apiv1;
+      try {
+        await createWorkflow(api, title, remark, cronExpr);
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async fetchWorkFlowLogs({ commit }, { workflowId, page, pageSize }) {
+      commit('loadingWorkflowLogs');
+      const api = this.getters.apiv1;
+      try {
+        const [logs, total] = await fetchWorkFlowLogs(
+          api,
+          workflowId,
+          page,
+          pageSize,
+        );
+        commit('setWorkflowLogs', { logs, total });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+      commit('unloadingWorkflowLogs');
+    },
   },
 });
+
+// 定义 injection key
+export const key: InjectionKey<Store<State>> = Symbol('Vuex Store');
 
 // 定义自己的 `useStore` 组合式函数
 export function useStore() {

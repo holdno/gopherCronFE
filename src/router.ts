@@ -61,9 +61,27 @@ const routes = [
         ],
       },
       {
-        name: 'taskflow',
-        path: 'taskflow',
-        component: () => import('./pages/TaskflowList.vue'),
+        name: 'workflows',
+        path: 'workflows',
+        component: () => import('./pages/WorkflowList.vue'),
+        children: [
+          {
+            name: 'workflow',
+            path: ':workflowId(\\d+)',
+            component: () => import('./pages/WorkflowDetail.vue'),
+            props: (route: RouteLocationNormalizedLoaded) => ({
+              id: Number(route.params.workflowId),
+            }),
+          },
+          {
+            name: 'workflow_logs',
+            path: ':workflowId(\\d+)/logs',
+            component: () => import('./pages/WorkFlowLogs.vue'),
+            props: (route: RouteLocationNormalizedLoaded) => ({
+              id: Number(route.params.workflowId),
+            }),
+          },
+        ],
       },
       {
         name: 'projects-admin',

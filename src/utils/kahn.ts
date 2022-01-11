@@ -1,6 +1,6 @@
-import { Task } from '../types';
+import { KahnTask } from '../types';
 
-export function TaskInLevels(tasks: Task[]): string[][] {
+export function TaskInLevels(tasks: KahnTask[]): string[][] {
   const igraph = new Map<string, string[]>();
   const graph = new Map<string, string[]>();
   for (const task of tasks) {
