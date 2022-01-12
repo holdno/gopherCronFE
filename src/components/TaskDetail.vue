@@ -23,7 +23,7 @@
   >
     <q-btn
       flat
-      class="tw-w-24 tw-text-red-300"
+      class="tw-w-24 tw-text-red-300 lg:tw-hidden"
       icon="delete"
       @click="showDeleteConfirm = true"
     />

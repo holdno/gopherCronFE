@@ -4,7 +4,7 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="delete" color="primary" text-color="white" />
-          <span class="q-ml-sm"> 是否要删除项目 {{ project?.title }}</span>
+          <span class="q-ml-sm"> 是否要删除任务 {{ selectedTask?.name }}</span>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -13,7 +13,11 @@
             flat
             label="删除"
             color="red"
-            @click="() => project && deleteProject(project.id)"
+            @click="
+              () =>
+                selectedTask &&
+                deleteTask(selectedTask.projectId, selectedTask.id)
+            "
           />
         </q-card-actions>
       </q-card>
@@ -34,8 +38,9 @@
       <q-btn flat :to="{ name: 'create_task' }" icon="add" />
       <q-btn
         flat
-        class="tw-text-red-300"
+        class="tw-text-red-300 lg:tw-flex tw-hidden"
         icon="delete"
+        :disable="!selectedTask"
         @click="showDeleteConfirm = true"
       />
     </div>
@@ -48,7 +53,7 @@
         >
           <div
             :class="
-              (!actived(task)
+              (!activated(task)
                 ? 'tw-bg-[#27272a] '
                 : 'tw-bg-primary tw-text-black ') +
               'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-4 tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
@@ -59,7 +64,7 @@
             </div>
             <div
               :class="
-                (actived(task) ? 'active ' : '') +
+                (activated(task) ? 'active ' : '') +
                 'task__title tw-inline-flex tw-items-center'
               "
             >
@@ -132,22 +137,26 @@
     ),
   );
 
-  function actived(task: Task): boolean {
+  function activated(task: Task): boolean {
     const route = useRoute();
     return route.params.taskId === task.id;
   }
 
-  const project = computed(() =>
-    store.state.projects.find((p) => p.id === props.projectId),
-  );
-  const showDeleteConfirm = ref(false);
+  const selectedTask = computed(() => tasks.value.filter(activated).pop());
   const router = useRouter();
-  async function deleteProject(projectId: number) {
+  const showDeleteConfirm = ref(false);
+  async function deleteTask(projectId: number, taskId: string) {
     store.commit('clearError');
-    await store.dispatch('deleteProject', { projectId });
+    await store.dispatch('deleteTask', { projectId, taskId });
     if (store.state.currentError === undefined) {
-      router.push({ name: 'projects' });
+      router.push({
+        name: 'project',
+        params: {
+          projectId: projectId,
+        },
+      });
       showDeleteConfirm.value = false;
+      await fetchTasks();
     }
   }
 </script>
