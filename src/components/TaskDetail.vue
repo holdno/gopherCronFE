@@ -1,4 +1,22 @@
 <template>
+  <q-dialog v-model="showDeleteConfirm">
+    <q-card>
+      <q-card-section class="row items-center">
+        <q-avatar icon="delete" color="primary" text-color="white" />
+        <span class="q-ml-sm"> 是否要删除任务 {{ task?.name }}</span>
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn v-close-popup flat label="取消" color="primary" />
+        <q-btn
+          flat
+          label="删除"
+          color="red"
+          @click="() => project && task && deleteTask(project.id, task.id)"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
   <q-form class="tw-w-full" @submit="onSumbit" @reset="onReset">
     <q-input
       v-if="task"
@@ -97,6 +115,12 @@
         :disable="!modified"
         class="lg:tw-w-24 tw-w-full"
       />
+      <q-btn
+        v-if="!isCreateMode"
+        flat
+        icon="delete"
+        @click="showDeleteConfirm = true"
+      />
     </div>
     <div class="q-pa-sm">
       <p>TODO: 展示在线节点信息</p>
@@ -107,7 +131,7 @@
 
 <script setup lang="ts">
   import { computed, ref, watchEffect } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import { useStore } from '../store';
 
   const props = defineProps({
@@ -175,4 +199,19 @@
   function onReset() {
     editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
   }
+
+  const showDeleteConfirm = ref(false);
+  async function deleteTask(projectId: number, taskId: string) {
+    store.commit('clearError');
+    await store.dispatch('deleteTask', { projectId, taskId });
+    if (store.state.currentError === undefined) {
+      router.push({ name: 'tasks' });
+      showDeleteConfirm.value = false;
+    }
+  }
+
+  const route = useRoute();
+  const isCreateMode = computed(
+    () => route.name && route.name.toString() === 'create_task',
+  );
 </script>

@@ -27,6 +27,7 @@ import {
   WorkflowTaskState,
   WorkFlowLog,
   fetchWorkFlowLogs,
+  deleteTask,
 } from './request';
 import { FireTowerPlugin } from './utils/FireTower';
 import { AxiosInstance } from 'axios';
@@ -323,6 +324,14 @@ export const store = createStore<State>({
         const oldOrNew = await saveTask(api, task);
         commit('updateTask', { task });
         return oldOrNew;
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async deleteTask({ dispatch, commit }, { projectId, taskId }) {
+      const api = this.getters.apiv1;
+      try {
+        await deleteTask(api, projectId, taskId);
       } catch (e) {
         commit('error', { error: e });
       }
