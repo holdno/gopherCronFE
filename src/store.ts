@@ -29,6 +29,7 @@ import {
   fetchWorkFlowLogs,
   deleteTask,
   fetchProjectClients,
+  deleteWorkflow,
 } from './request';
 import { FireTowerPlugin } from './utils/FireTower';
 import { AxiosInstance } from 'axios';
@@ -432,10 +433,15 @@ export const store = createStore<State>({
       }
       commit('unloadingWorkflowEdges');
     },
-    async updateWorkflow(
-      { dispatch, commit },
-      { workflow }: { workflow: Workflow },
-    ) {
+    async deleteWorkflow({ commit }, { workflowId }) {
+      const api = this.getters.apiv1;
+      try {
+        await deleteWorkflow(api, workflowId);
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async updateWorkflow({ commit }, { workflow }: { workflow: Workflow }) {
       const api = this.getters.apiv1;
       try {
         await updateWorkflow(api, workflow);

@@ -50,6 +50,26 @@
         </q-form>
       </q-card>
     </q-dialog>
+    <q-dialog v-model="showDeleteConfirm">
+      <q-card>
+        <q-card-section class="row items-center">
+          <q-avatar icon="delete" color="primary" text-color="white" />
+          <span class="q-ml-sm">
+            是否要删除该任务编排 {{ workflowToBeDeleted?.title }}</span
+          >
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn v-close-popup flat label="取消" color="primary" />
+          <q-btn
+            flat
+            label="删除"
+            color="red"
+            @click="() => deleteWorkflow(workflowToBeDeleted.id)"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <q-table
       v-model:pagination="pagination"
       class="tw-w-full tw-h-full"
@@ -122,7 +142,7 @@
       </template>
       <template #body-cell-operation="props">
         <q-td key="operation">
-          <div class="text-right tw-grid tw-gap-4">
+          <div class="xl:tw-flex tw-grid tw-gap-4 tw-justify-items-center">
             <q-btn
               :to="{ name: 'workflow', params: { workflowId: props.row.id } }"
               dense
@@ -160,8 +180,21 @@
                 name: 'workflow_logs',
                 params: { workflowId: props.row.id },
               }"
-              >日志</q-btn
             >
+              日志
+            </q-btn>
+            <q-btn
+              flat
+              class="tw-text-red-300"
+              icon="delete"
+              :disable="isRunning(props.row)"
+              @click="
+                () => {
+                  workflowToBeDeleted = props.row;
+                  showDeleteConfirm = true;
+                }
+              "
+            />
           </div>
         </q-td>
       </template>
@@ -174,6 +207,7 @@
   import { useStore } from '../store';
   import { Pagination, TableRequestProp } from '../utils/qusar';
   import { startWorkflow, killWorkflow } from '../request';
+  import { useRoute, useRouter } from 'vue-router';
 
   const store = useStore();
 
@@ -283,6 +317,20 @@
     });
     if (store.state.currentError === undefined) {
       showAddDialog.value = false;
+      refresh();
+    }
+  }
+
+  const router = useRouter();
+  const route = useRoute();
+  const showDeleteConfirm = ref(false);
+  const workflowToBeDeleted = ref();
+  async function deleteWorkflow(workflowId: number) {
+    store.commit('clearError');
+    await store.dispatch('deleteWorkflow', { workflowId });
+    if (store.state.currentError === undefined) {
+      if (route.name !== 'workflows') router.push({ name: 'workflows' });
+      showDeleteConfirm.value = false;
       refresh();
     }
   }

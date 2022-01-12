@@ -566,6 +566,22 @@ export async function killWorkflow(api: AxiosInstance, workflowId: number) {
   }
 }
 
+export async function deleteWorkflow(api: AxiosInstance, workflowId: number) {
+  const payload = JSON.stringify({
+    // workflow_id: workflowId,
+    id: workflowId,
+  });
+  const resp = await api.post('/workflow/delete', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
 export interface WorkFlowLog {
   id: number;
   workflowId: number;
