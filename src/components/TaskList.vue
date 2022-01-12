@@ -32,7 +32,12 @@
       </q-input>
       <q-btn flat :loading="loading" icon="refresh" @click="fetchTasks" />
       <q-btn flat :to="{ name: 'create_task' }" icon="add" />
-      <q-btn flat icon="delete" @click="showDeleteConfirm = true" />
+      <q-btn
+        flat
+        class="tw-text-red-300"
+        icon="delete"
+        @click="showDeleteConfirm = true"
+      />
     </div>
     <q-scroll-area class="tw-h-full tw-grow" visible>
       <q-list class="q-pa-xs">

@@ -17,6 +17,26 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+  <div
+    v-if="!isCreateMode"
+    class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-1"
+  >
+    <q-btn
+      flat
+      class="tw-w-24 tw-text-red-300"
+      icon="delete"
+      @click="showDeleteConfirm = true"
+    />
+    <q-btn
+      color="primary"
+      text-color="black"
+      :disable="modified"
+      class="tw-w-24"
+      @click="() => task && execute(projectId, task.id)"
+    >
+      执行
+    </q-btn>
+  </div>
   <q-form class="tw-w-full" @submit="onSubmit" @reset="onReset">
     <q-input
       v-if="task"
@@ -115,19 +135,6 @@
         :disable="!modified"
         class="lg:tw-w-24 tw-w-full"
       />
-      <q-btn
-        v-if="!isCreateMode"
-        flat
-        icon="delete"
-        @click="showDeleteConfirm = true"
-      />
-      <q-btn
-        v-if="!isCreateMode"
-        flat
-        @click="() => task && execute(projectId, task.id)"
-      >
-        执行
-      </q-btn>
     </div>
   </q-form>
 </template>
