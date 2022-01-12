@@ -123,7 +123,6 @@
       />
     </div>
     <div class="q-pa-sm">
-      <p>TODO: 展示在线节点信息</p>
       <p>TODO: 执行按钮</p>
     </div>
   </q-form>

@@ -586,3 +586,21 @@ export async function fetchWorkFlowLogs(
     throw new Error(data.meta.msg);
   }
 }
+
+export async function fetchProjectClients(
+  api: AxiosInstance,
+  projectId: number,
+): Promise<string[]> {
+  const resp = await api.get('/crontab/client_list', {
+    params: {
+      project_id: projectId,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    const r = data.response;
+    return r.list;
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}

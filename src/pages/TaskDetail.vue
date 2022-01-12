@@ -13,6 +13,17 @@
       <div v-if="project && project.remark.trim() !== ''" class="tw-pb-4">
         {{ project.remark }}
       </div>
+      <div>
+        <div class="tw-pb-4">
+          <q-icon name="hive" />
+          在线节点： {{ projectClients.length }}
+        </div>
+        <div class="tw-flex tw-flex-wrap tw-gap-1 tw-pa-1">
+          <div v-for="client of projectClients" :key="client">
+            {{ client }}
+          </div>
+        </div>
+      </div>
     </div>
     <q-tabs
       v-if="!isCreateMode"
@@ -76,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, onMounted } from 'vue';
   import { useStore } from '../store';
   import TaskDetail from '../components/TaskDetail.vue';
   import TaskLogs from '../components/TaskLogs.vue';
@@ -117,4 +128,9 @@
   });
 
   const { width } = useWindowSize();
+
+  onMounted(() => {
+    store.dispatch('fetchProjectClients', { projectId: props.projectId });
+  });
+  const projectClients = computed(() => store.state.projectClients);
 </script>

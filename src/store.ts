@@ -28,6 +28,7 @@ import {
   WorkFlowLog,
   fetchWorkFlowLogs,
   deleteTask,
+  fetchProjectClients,
 } from './request';
 import { FireTowerPlugin } from './utils/FireTower';
 import { AxiosInstance } from 'axios';
@@ -61,6 +62,10 @@ export interface State {
 
   projects: Project[];
   loadingProjects: boolean;
+
+  projectClients: string[];
+  loadingProjectClients: boolean;
+
   tasks: Task[];
   loadingTasks: boolean;
   fetchTasksCache: Map<number, Task[]>;
@@ -101,8 +106,13 @@ export const store = createStore<State>({
       logined: false,
       projects: [],
       loadingProjects: false,
+
+      projectClients: [],
+      loadingProjectClients: false,
+
       tasks: [],
       loadingTasks: false,
+
       fetchTasksCache: new Map(),
       recentLogCountRecords: [],
       taskLogs: [],
@@ -186,6 +196,15 @@ export const store = createStore<State>({
     },
     setProjects(state, { projects }) {
       state.projects = projects;
+    },
+    loadingProjectClients(state) {
+      state.loadingProjectClients = true;
+    },
+    unloadingProjectClients(state) {
+      state.loadingProjectClients = false;
+    },
+    setProjectClients(state, { clients }) {
+      state.projectClients = clients;
     },
     loadingTasks(state) {
       state.loadingTasks = true;
@@ -302,6 +321,17 @@ export const store = createStore<State>({
         commit('error', { error: e });
       }
       commit('unloadingProjects');
+    },
+    async fetchProjectClients({ commit }, { projectId }) {
+      commit('loadingProjectClients');
+      const api = this.getters.apiv1;
+      try {
+        const clients = await fetchProjectClients(api, projectId);
+        commit('setProjectClients', { clients });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+      commit('unloadingProjectClients');
     },
     async fetchTasks({ commit, state }, { projectId, cached = false }) {
       commit('loadingTasks');
