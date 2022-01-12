@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vue-tsc --noEmit --skipLibCheck && vite build",
     "preview": "vite preview",
     "lint": "eslint --fix --ext .ts,.js,.vue src",
     "pretty": "prettier --write ."

@@ -4,7 +4,9 @@
       <q-btn flat type="primary" :disable="!canUpdate" @click="updateWorkFlow">
         保存
       </q-btn>
-      <q-btn flat icon="refresh" title="刷新" @click="refresh"> 刷新 </q-btn>
+      <q-btn flat icon="refresh" title="刷新" @click="() => refresh()">
+        刷新
+      </q-btn>
       <q-btn
         flat
         icon="restart_alt"
