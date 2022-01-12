@@ -1,9 +1,11 @@
 <template>
-  <div class="q-pa-md tw-flex tw-flex-row tw-gap-4 tw-h-[95%] tw-w-full">
+  <div class="q-pa-md tw-flex tw-flex-row tw-gap-4 tw-h-full tw-w-full">
     <div :class="'xl:tw-basis-1/3 tw-basis-1/4 tw-shrink-0 ' + visibilyClass">
       <WorkflowList />
     </div>
-    <div class="xl:tw-basis-2/3 tw-basis-3/4 tw-grow tw-overflow-auto">
+    <div
+      class="xl:tw-basis-2/3 tw-basis-3/4 tw-h-full tw-grow tw-overflow-hidden"
+    >
       <router-view />
     </div>
   </div>

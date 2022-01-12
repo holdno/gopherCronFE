@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md tw-h-full tw-w-full">
+  <div class="q-pa-md tw-h-full tw-w-full tw-flex tw-flex-col">
     <q-dialog v-model="showDeleteConfirm">
       <q-card>
         <q-card-section class="row items-center">
@@ -34,7 +34,7 @@
       <q-btn flat :to="{ name: 'create_task' }" icon="add" />
       <q-btn flat icon="delete" @click="showDeleteConfirm = true" />
     </div>
-    <q-scroll-area class="tw-h-full" visible>
+    <q-scroll-area class="tw-h-full tw-grow" visible>
       <q-list class="q-pa-xs">
         <router-link
           v-for="task in tasks"

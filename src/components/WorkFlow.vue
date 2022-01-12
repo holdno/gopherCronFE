@@ -1,18 +1,16 @@
 <template>
-  <div class="tw-w-full tw-h-full tw-overflow-hidden">
-    <v-network-graph
-      v-if="show"
-      ref="graph"
-      v-model:selected-nodes="selectedNodes"
-      v-model:selected-edges="selectedEdges"
-      v-model:layouts="layouts"
-      :class="visual ? '' : 'tw-opacity-0'"
-      :nodes="nodes"
-      :edges="edges"
-      :configs="configs"
-      :event-handlers="eventHandlers"
-    />
-  </div>
+  <v-network-graph
+    v-if="show"
+    ref="graph"
+    v-model:selected-nodes="selectedNodes"
+    v-model:selected-edges="selectedEdges"
+    v-model:layouts="layouts"
+    :class="visual ? '' : 'tw-opacity-0'"
+    :nodes="nodes"
+    :edges="edges"
+    :configs="configs"
+    :event-handlers="eventHandlers"
+  />
   <q-dialog
     v-model="addNodeDialogVisibility"
     class="tw-w-screen tw-h-screen"

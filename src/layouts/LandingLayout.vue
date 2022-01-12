@@ -79,7 +79,7 @@
       </q-scroll-area>
     </q-drawer>
 
-    <q-page-container class="tw-w-full tw-h-screen">
+    <q-page-container class="tw-w-full tw-h-full tw-box-border">
       <router-view />
     </q-page-container>
   </q-layout>

@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md tw-h-full tw-w-full">
+  <div class="q-pa-md tw-h-full tw-w-full tw-flex tw-flex-col">
     <q-dialog v-model="showAddDialog" :no-backdrop-dismiss="!canDismiss">
       <q-card class="tw-w-96 q-pa-sm">
         <q-form @submit="onSubmit">
@@ -57,7 +57,7 @@
       <q-btn flat :loading="loading" icon="refresh" @click="fetchProjects" />
       <q-btn flat icon="add" @click="showAddDialog = true" />
     </div>
-    <q-scroll-area class="tw-h-full" visible>
+    <q-scroll-area class="tw-grow" visible>
       <q-list class="q-pa-xs">
         <router-link
           v-for="project in projects"
