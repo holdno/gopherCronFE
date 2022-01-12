@@ -121,9 +121,13 @@
         icon="delete"
         @click="showDeleteConfirm = true"
       />
-    </div>
-    <div class="q-pa-sm">
-      <p>TODO: 执行按钮</p>
+      <q-btn
+        v-if="!isCreateMode"
+        flat
+        @click="() => task && execute(projectId, task.id)"
+      >
+        执行
+      </q-btn>
     </div>
   </q-form>
 </template>
@@ -131,6 +135,7 @@
 <script setup lang="ts">
   import { computed, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+  import { startTask } from '../request';
   import { useStore } from '../store';
 
   const props = defineProps({
@@ -213,4 +218,8 @@
   const isCreateMode = computed(
     () => route.name && route.name.toString() === 'create_task',
   );
+
+  async function execute(projectId: number, taskId: string) {
+    await startTask(store.getters.apiv1, projectId, taskId);
+  }
 </script>

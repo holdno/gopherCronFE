@@ -177,6 +177,26 @@ export async function saveTask(api: AxiosInstance, task: Task) {
   }
 }
 
+export async function startTask(
+  api: AxiosInstance,
+  projectId: number,
+  taskId: string,
+) {
+  const payload = JSON.stringify({
+    project_id: projectId,
+    task_id: taskId,
+  });
+  const resp = await api.post('/crontab/execute', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
 export async function deleteTask(
   api: AxiosInstance,
   projectId: number,
