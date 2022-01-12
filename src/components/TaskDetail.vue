@@ -17,7 +17,7 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
-  <q-form class="tw-w-full" @submit="onSumbit" @reset="onReset">
+  <q-form class="tw-w-full" @submit="onSubmit" @reset="onReset">
     <q-input
       v-if="task"
       key="id"
@@ -182,7 +182,7 @@
   });
 
   const router = useRouter();
-  async function onSumbit() {
+  async function onSubmit() {
     const newTask = await store.dispatch('saveTask', {
       task: editable.value,
     });
