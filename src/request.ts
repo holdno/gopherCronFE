@@ -1,5 +1,7 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance } from 'axios';
 import { App, inject, InjectionKey } from 'vue';
+import { Store } from 'vuex';
+import { State, ErrHandled } from '@/store';
 
 export const apiv1 = axios.create({
   baseURL: import.meta.env.VITE_API_V1_BASE_URL,
@@ -9,9 +11,29 @@ export const keyApiv1: InjectionKey<AxiosInstance> = Symbol(
   'ApiV1 Axio Instance',
 );
 
-export function installApiv1(app: App) {
+export function installApiv1(app: App, { store }: { store: Store<State> }) {
   app.provide(keyApiv1, apiv1);
   app.config.globalProperties.$apiv1 = apiv1;
+  apiv1.interceptors.response.use(
+    function (response) {
+      // Any status code that lie within the range of 2xx cause this function to trigger
+      // Do something with response data
+      const data = response.data;
+      if (data.meta.code !== 0) {
+        const e = new Error(data.meta.msg);
+        store.commit('error', { error: e });
+        throw ErrHandled;
+      }
+      return response;
+    },
+    function (error: AxiosError) {
+      // Any status codes that falls outside the range of 2xx cause this function to trigger
+      // Do something with response error
+      const e = new Error(error.message);
+      store.commit('error', { error: e });
+      throw ErrHandled;
+    },
+  );
 }
 
 export function useApiv1(): AxiosInstance {
@@ -38,26 +60,18 @@ export async function login(
     password: password,
   });
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return [
-      { id: r.id, name: r.name, permissions: r.permission.split(',') },
-      r.token,
-    ];
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return [
+    { id: r.id, name: r.name, permissions: r.permission.split(',') },
+    r.token,
+  ];
 }
 
 export async function userInfo(api: AxiosInstance): Promise<User> {
   const resp = await api.get('/user/info');
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return { id: r.id, name: r.name, permissions: r.permission.split(',') };
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return { id: r.id, name: r.name, permissions: r.permission.split(',') };
 }
 
 export interface Project {
@@ -71,18 +85,14 @@ export interface Project {
 export async function projectList(api: AxiosInstance): Promise<Project[]> {
   const resp = await api.get('/project/list');
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return r.list.map((p: any) => ({
-      id: p.project_id,
-      remark: p.remark,
-      taskCount: p.task_count,
-      title: p.title,
-      uid: p.uid,
-    }));
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return r.list.map((p: any) => ({
+    id: p.project_id,
+    remark: p.remark,
+    taskCount: p.task_count,
+    title: p.title,
+    uid: p.uid,
+  }));
 }
 
 export interface Task {
@@ -112,27 +122,23 @@ export async function taskList(
     },
   });
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return r.list.map((v: any) => ({
-      id: v.task_id,
-      name: v.name,
-      projectId: v.project_id,
-      command: v.command,
-      cronExpr: v.cron,
-      remark: v.remark,
-      timeout: v.timeout,
-      createTime: v.create_time,
-      status: v.status,
-      isRunning: v.is_running,
-      noseize: v.noseize,
-      exclusion: v.exclusion,
-      clientIp: v.client_ip,
-      tmpId: v.tmp_id,
-    }));
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return r.list.map((v: any) => ({
+    id: v.task_id,
+    name: v.name,
+    projectId: v.project_id,
+    command: v.command,
+    cronExpr: v.cron,
+    remark: v.remark,
+    timeout: v.timeout,
+    createTime: v.create_time,
+    status: v.status,
+    isRunning: v.is_running,
+    noseize: v.noseize,
+    exclusion: v.exclusion,
+    clientIp: v.client_ip,
+    tmpId: v.tmp_id,
+  }));
 }
 
 export async function saveTask(api: AxiosInstance, task: Task) {
@@ -154,27 +160,23 @@ export async function saveTask(api: AxiosInstance, task: Task) {
     },
   });
   const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  } else {
-    const v = data.response;
-    return {
-      id: v.task_id,
-      name: v.name,
-      projectId: v.project_id,
-      command: v.command,
-      cronExpr: v.cron,
-      remark: v.remark,
-      timout: v.timout,
-      createTime: v.create_time,
-      status: v.status,
-      isRunning: v.is_running,
-      noseize: v.noseize,
-      exclusion: v.exclusion,
-      clientIp: v.client_ip,
-      tmpId: v.tmp_id,
-    };
-  }
+  const v = data.response;
+  return {
+    id: v.task_id,
+    name: v.name,
+    projectId: v.project_id,
+    command: v.command,
+    cronExpr: v.cron,
+    remark: v.remark,
+    timout: v.timout,
+    createTime: v.create_time,
+    status: v.status,
+    isRunning: v.is_running,
+    noseize: v.noseize,
+    exclusion: v.exclusion,
+    clientIp: v.client_ip,
+    tmpId: v.tmp_id,
+  };
 }
 
 export async function startTask(
@@ -186,15 +188,11 @@ export async function startTask(
     project_id: projectId,
     task_id: taskId,
   });
-  const resp = await api.post('/crontab/execute', payload, {
+  return await api.post('/crontab/execute', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export async function deleteTask(
@@ -206,15 +204,11 @@ export async function deleteTask(
     project_id: projectId,
     task_id: taskId,
   });
-  const resp = await api.post('/crontab/delete', payload, {
+  return await api.post('/crontab/delete', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export interface RecentLogCount {
@@ -226,16 +220,12 @@ export interface RecentLogCount {
 export async function recentLog(api: AxiosInstance): Promise<RecentLogCount[]> {
   const resp = await api.get('/log/recent');
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return r.map((v: any) => ({
-      success: v.success_count,
-      error: v.error_count,
-      date: v.date,
-    }));
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return r.map((v: any) => ({
+    success: v.success_count,
+    error: v.error_count,
+    date: v.date,
+  }));
 }
 
 export async function createProject(
@@ -247,30 +237,22 @@ export async function createProject(
     title: title,
     remark: remark,
   });
-  const resp = await api.post('/project/create', payload, {
+  return await api.post('/project/create', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export async function deleteProject(api: AxiosInstance, projectId: number) {
   const payload = JSON.stringify({
     project_id: projectId,
   });
-  const resp = await api.post('/project/delete', payload, {
+  return await api.post('/project/delete', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export interface TaskLog {
@@ -304,28 +286,24 @@ export async function fetchLogs(
     },
   });
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return [
-      r.list.map((v: any) => ({
-        id: v.id,
-        taskId: v.task_id,
-        projectId: v.project_id,
-        project: v.project,
-        name: v.name,
-        result: v.result,
-        startTime: v.start_time,
-        endTime: v.end_time,
-        command: v.command,
-        withError: v.with_error,
-        clientIp: v.client_ip,
-        tmpId: v.tmp_id,
-      })),
-      r.total,
-    ];
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return [
+    r.list.map((v: any) => ({
+      id: v.id,
+      taskId: v.task_id,
+      projectId: v.project_id,
+      project: v.project,
+      name: v.name,
+      result: v.result,
+      startTime: v.start_time,
+      endTime: v.end_time,
+      command: v.command,
+      withError: v.with_error,
+      clientIp: v.client_ip,
+      tmpId: v.tmp_id,
+    })),
+    r.total,
+  ];
 }
 
 export interface Workflow {
@@ -350,23 +328,19 @@ export async function fetchWorkflows(
     },
   });
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return [
-      r.list.map((v: any) => ({
-        id: v.id,
-        title: v.title,
-        remark: v.remark,
-        status: v.status,
-        state: v.state,
-        createTime: v.create_time,
-        cronExpr: v.cron,
-      })),
-      r.total,
-    ];
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return [
+    r.list.map((v: any) => ({
+      id: v.id,
+      title: v.title,
+      remark: v.remark,
+      status: v.status,
+      state: v.state,
+      createTime: v.create_time,
+      cronExpr: v.cron,
+    })),
+    r.total,
+  ];
 }
 
 export async function createWorkflow(
@@ -380,15 +354,11 @@ export async function createWorkflow(
     remark: remark,
     cron: cronExpr,
   });
-  const resp = await api.post('/workflow/create', payload, {
+  return await api.post('/workflow/create', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export async function updateWorkflow(api: AxiosInstance, workflow: Workflow) {
@@ -399,15 +369,11 @@ export async function updateWorkflow(api: AxiosInstance, workflow: Workflow) {
     cron: workflow.cronExpr,
     status: workflow.status,
   });
-  const resp = await api.post('/workflow/update', payload, {
+  return await api.post('/workflow/update', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export interface WorkFlowEdge {
@@ -448,43 +414,39 @@ export async function fetchWorkflowEdges(
     },
   });
   const data = resp.data;
-  if (data.meta.code === 0) {
-    if (!data.response) return [[], []];
-    const edges = [];
-    const stateMap = new Map<string, WorkflowTaskState>();
-    for (const { task: v, state: s } of data.response) {
-      edges.push({
-        id: v.id,
-        projectId: v.project_id,
-        taskId: v.task_id,
-        workflowId: v.workflowId,
-        createTime: v.create_time,
+  if (!data.response) return [[], []];
+  const edges = [];
+  const stateMap = new Map<string, WorkflowTaskState>();
+  for (const { task: v, state: s } of data.response) {
+    edges.push({
+      id: v.id,
+      projectId: v.project_id,
+      taskId: v.task_id,
+      workflowId: v.workflowId,
+      createTime: v.create_time,
 
-        dependencyProjectId: v.dependency_project_id,
-        dependencyTaskId: v.dependency_task_id,
-      });
-      if (!s) continue;
-      const key = `${s.project_id}_${s.task_id}`;
-      if (stateMap.has(key)) continue;
-      stateMap.set(key, {
-        workflowId: s.workflow_id,
-        projectId: s.project_id,
-        taskId: s.task_id,
-        currentStatus: s.current_status,
-        scheduleCount: s.schedule_count,
-        scheduleRecords: s.schedule_records.map((r: any) => ({
-          tmpId: r.tmp_id,
-          status: r.status,
-          result: r.result,
-          eventTime: r.event_time,
-        })),
-        startTime: s.start_time,
-      });
-    }
-    return [edges, Array.from(stateMap.values())];
-  } else {
-    throw new Error(data.meta.msg);
+      dependencyProjectId: v.dependency_project_id,
+      dependencyTaskId: v.dependency_task_id,
+    });
+    if (!s) continue;
+    const key = `${s.project_id}_${s.task_id}`;
+    if (stateMap.has(key)) continue;
+    stateMap.set(key, {
+      workflowId: s.workflow_id,
+      projectId: s.project_id,
+      taskId: s.task_id,
+      currentStatus: s.current_status,
+      scheduleCount: s.schedule_count,
+      scheduleRecords: s.schedule_records.map((r: any) => ({
+        tmpId: r.tmp_id,
+        status: r.status,
+        result: r.result,
+        eventTime: r.event_time,
+      })),
+      startTime: s.start_time,
+    });
   }
+  return [edges, Array.from(stateMap.values())];
 }
 
 export async function updateWorkflowEdges(
@@ -525,45 +487,33 @@ export async function updateWorkflowEdges(
       dependencies: taskDeps.get(k) || [],
     })),
   });
-  const resp = await api.post('/workflow/task/create', payload, {
+  return await api.post('/workflow/task/create', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export async function startWorkflow(api: AxiosInstance, workflowId: number) {
   const payload = JSON.stringify({
     workflow_id: workflowId,
   });
-  const resp = await api.post('/workflow/start', payload, {
+  return await api.post('/workflow/start', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export async function killWorkflow(api: AxiosInstance, workflowId: number) {
   const payload = JSON.stringify({
     workflow_id: workflowId,
   });
-  const resp = await api.post('/workflow/kill', payload, {
+  return await api.post('/workflow/kill', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export async function deleteWorkflow(api: AxiosInstance, workflowId: number) {
@@ -571,15 +521,11 @@ export async function deleteWorkflow(api: AxiosInstance, workflowId: number) {
     // workflow_id: workflowId,
     id: workflowId,
   });
-  const resp = await api.post('/workflow/delete', payload, {
+  return await api.post('/workflow/delete', payload, {
     headers: {
       'content-type': 'application/json',
     },
   });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
 }
 
 export interface WorkFlowLog {
@@ -605,22 +551,18 @@ export async function fetchWorkFlowLogs(
     },
   });
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return [
-      r.list.map((v: any) => ({
-        id: v.id,
-        workflowId: v.workflow_id,
-        createTime: v.create_time,
-        startTime: v.start_time,
-        endTime: v.end_time,
-        result: v.result,
-      })),
-      r.total,
-    ];
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return [
+    r.list.map((v: any) => ({
+      id: v.id,
+      workflowId: v.workflow_id,
+      createTime: v.create_time,
+      startTime: v.start_time,
+      endTime: v.end_time,
+      result: v.result,
+    })),
+    r.total,
+  ];
 }
 
 export async function fetchProjectClients(
@@ -633,10 +575,6 @@ export async function fetchProjectClients(
     },
   });
   const data = resp.data;
-  if (data.meta.code === 0) {
-    const r = data.response;
-    return r.list;
-  } else {
-    throw new Error(data.meta.msg);
-  }
+  const r = data.response;
+  return r.list;
 }

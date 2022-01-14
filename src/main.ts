@@ -49,7 +49,7 @@ app.use(Quasar, {
 });
 
 app.use(VNetworkGraph);
-app.use(installApiv1);
+app.use(installApiv1, { store });
 app.use(store, storeKey);
 store.commit('setQuasar', { $q: app.config.globalProperties.$q });
 store.commit('setApi', { apiv1: apiv1 });

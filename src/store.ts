@@ -96,6 +96,8 @@ export interface State {
   currentError?: Error;
 }
 
+export const ErrHandled = new Error('Handled');
+
 // 创建一个新的 store 实例
 export const COOKIE_TOKEN = 'access-token';
 export const store = createStore<State>({
@@ -175,6 +177,7 @@ export const store = createStore<State>({
       if (api) delete api.defaults.headers.common[COOKIE_TOKEN];
     },
     error(state, { error }) {
+      if (error === ErrHandled) return;
       state.currentError = error;
       const q = state.$q;
       if (q)
