@@ -3,7 +3,7 @@ import {
   createRouter,
   RouteLocationNormalizedLoaded,
 } from 'vue-router';
-import { store } from './store';
+import { store } from '@/store';
 
 const routes = [
   {

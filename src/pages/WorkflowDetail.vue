@@ -93,10 +93,10 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect, watch } from 'vue';
-  import WorkFlow from '../components/WorkFlow.vue';
-  import { Task, WorkFlowEdge } from '../request';
-  import { useStore } from '../store';
-  import { KahnTask } from '../types';
+  import WorkFlow from '@/components/WorkFlow.vue';
+  import { Task, WorkFlowEdge } from '@/request';
+  import { useStore } from '@/store';
+  import { KahnTask } from '@/types';
 
   const workflow = ref();
   const canRemoveNodes = computed(

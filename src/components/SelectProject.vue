@@ -23,8 +23,8 @@
 <script setup lang="ts">
   import { QSelect } from 'quasar';
   import { computed, PropType, ref } from 'vue';
-  import { Project } from '../request';
-  import { useStore } from '../store';
+  import { Project } from '@/request';
+  import { useStore } from '@/store';
 
   const props = defineProps({
     modelValue: {

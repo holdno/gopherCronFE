@@ -204,9 +204,9 @@
 
 <script setup lang="ts">
   import { onMounted, watchEffect, ref, computed, watch } from 'vue';
-  import { useStore } from '../store';
-  import { Pagination, TableRequestProp } from '../utils/qusar';
-  import { startWorkflow, killWorkflow } from '../request';
+  import { useStore } from '@/store';
+  import { Pagination, TableRequestProp } from '@/utils/quasar';
+  import { startWorkflow, killWorkflow } from '@/request';
   import { useRoute, useRouter } from 'vue-router';
 
   const store = useStore();

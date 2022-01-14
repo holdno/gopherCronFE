@@ -12,10 +12,10 @@
 </template>
 
 <script setup lang="ts">
-  import { useStore } from '../store';
-  import ProjectList from '../components/ProjectList.vue';
   import { computed, onBeforeMount } from 'vue';
   import { useRoute } from 'vue-router';
+  import { useStore } from '@/store';
+  import ProjectList from '@/components/ProjectList.vue';
 
   const store = useStore();
   onBeforeMount(() => store.commit('setTasks', { tasks: [] }));

@@ -88,9 +88,9 @@
 
 <script setup lang="ts">
   import { computed, onMounted } from 'vue';
-  import { useStore } from '../store';
-  import TaskDetail from '../components/TaskDetail.vue';
-  import TaskLogs from '../components/TaskLogs.vue';
+  import { useStore } from '@/store';
+  import TaskDetail from '@/components/TaskDetail.vue';
+  import TaskLogs from '@/components/TaskLogs.vue';
   import { useRoute } from 'vue-router';
   import { useWindowSize } from 'vue-window-size';
 

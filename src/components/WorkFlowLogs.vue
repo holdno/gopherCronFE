@@ -44,10 +44,10 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
-  import { useStore } from '../store';
-  import { Pagination, TableRequestProp } from '../utils/qusar';
-  import { formatTimestamp } from '../utils/datetime';
-  import JSONViewer from './JSONViewer.vue';
+  import { useStore } from '@/store';
+  import { Pagination, TableRequestProp } from '@/utils/quasar';
+  import { formatTimestamp } from '@/utils/datetime';
+  import JSONViewer from '@/components/JSONViewer.vue';
 
   const props = defineProps({
     id: {

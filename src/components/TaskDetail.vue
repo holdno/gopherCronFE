@@ -142,8 +142,8 @@
 <script setup lang="ts">
   import { computed, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { startTask } from '../request';
-  import { useStore } from '../store';
+  import { startTask } from '@/request';
+  import { useStore } from '@/store';
 
   const props = defineProps({
     id: {

@@ -107,12 +107,12 @@
     VNetworkGraphInstance,
   } from 'v-network-graph';
   import { ForceLayout } from 'v-network-graph/force-layout';
-  import { cloneTask, KahnTask } from '../types';
-  import { TaskInLevels } from '../utils/kahn';
+  import { cloneTask, KahnTask } from '@/types';
+  import { TaskInLevels } from '@/utils/kahn';
   import { QMenu } from 'quasar';
-  import SelectProject from './SelectProject.vue';
-  import SelectTask from './SelectTask.vue';
-  import { Project, Task } from '../request';
+  import SelectProject from '@/components/SelectProject.vue';
+  import SelectTask from '@/components/SelectTask.vue';
+  import { Project, Task } from '@/request';
 
   const show = ref(false);
   const visual = ref(false);

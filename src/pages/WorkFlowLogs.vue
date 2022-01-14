@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-  import WorkFlowLogs from '../components/WorkFlowLogs.vue';
+  import WorkFlowLogs from '@/components/WorkFlowLogs.vue';
 
   const props = defineProps({
     id: {

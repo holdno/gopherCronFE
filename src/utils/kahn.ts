@@ -1,4 +1,4 @@
-import { KahnTask } from '../types';
+import { KahnTask } from '@/types';
 
 export function TaskInLevels(tasks: KahnTask[]): string[][] {
   const igraph = new Map<string, string[]>();

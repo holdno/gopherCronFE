@@ -11,9 +11,9 @@
 
 <script setup lang="ts">
   import { computed, onMounted } from 'vue';
-  import RecentLogCountChart from '../components/RecentLogCountChart.vue';
-  import ProjectsPieChart from '../components/ProjectsPieChart.vue';
-  import { useStore } from '../store';
+  import RecentLogCountChart from '@/components/RecentLogCountChart.vue';
+  import ProjectsPieChart from '@/components/ProjectsPieChart.vue';
+  import { useStore } from '@/store';
 
   const store = useStore();
   const records = computed(() => store.state.recentLogCountRecords);

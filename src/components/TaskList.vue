@@ -98,9 +98,9 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect, watch } from 'vue';
-  import { useStore } from '../store';
-  import { Task } from '../request';
-  import { formatTimestamp } from '../utils/datetime';
+  import { useStore } from '@/store';
+  import { Task } from '@/request';
+  import { formatTimestamp } from '@/utils/datetime';
   import { useRoute, useRouter } from 'vue-router';
 
   const props = defineProps({

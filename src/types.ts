@@ -1,4 +1,4 @@
-import { Task, WorkflowTaskState } from './request';
+import { Task, WorkflowTaskState } from '@/request';
 
 export interface KahnTask {
   name: string;

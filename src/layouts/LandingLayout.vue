@@ -88,7 +88,7 @@
 <script setup lang="ts">
   import { ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
-  import { useStore } from '../store';
+  import { useStore } from '@/store';
   const drawer = ref(false);
   const miniState = ref(true);
   const adminMenuExpanded = ref(false);

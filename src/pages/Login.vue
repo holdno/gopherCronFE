@@ -62,7 +62,7 @@
 <script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { useStore } from '../store';
+  import { useStore } from '@/store';
 
   const username = ref('');
   const password = ref('');
