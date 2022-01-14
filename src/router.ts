@@ -109,9 +109,9 @@ const routes = [
         ],
       },
       {
-        name: 'projects-admin',
-        path: 'admin/projects',
-        component: () => import('./pages/ProjectListAdmin.vue'),
+        name: 'user-admin',
+        path: 'admin/user',
+        component: () => import('./pages/UserListAdmin/UserListAdmin.vue'),
         meta: { requiresAdmin: true },
       },
     ],

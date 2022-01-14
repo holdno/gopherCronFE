@@ -35,6 +35,10 @@ import {
   deleteWorkFlowTask,
   saveWorkFlowTask,
   createWorkFlowTask,
+  createUser,
+  CreateUserRequest,
+  userList,
+  GetUserListRequest,
 } from './request';
 import { FireTowerPlugin } from './utils/FireTower';
 import { AxiosInstance } from 'axios';
@@ -61,6 +65,8 @@ export interface EventWorkFlowTask {
 // 为 store state 声明类型
 export interface State {
   logined: boolean;
+  users?: User[];
+  userTotal?: number;
   user?: User;
   token?: string;
   apiv1?: AxiosInstance;
@@ -213,6 +219,10 @@ export const store = createStore<State>({
     },
     setProjects(state, { projects }) {
       state.projects = projects;
+    },
+    setUsers(state, { list, total }) {
+      state.users = list;
+      state.userTotal = total;
     },
     loadingProjectClients(state) {
       state.loadingProjectClients = true;
@@ -474,6 +484,24 @@ export const store = createStore<State>({
       try {
         await deleteProject(api, projectId);
         await dispatch('fetchProjects');
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async fetchUsers({ dispatch, commit }, req: GetUserListRequest) {
+      const api = this.getters.apiv1;
+      try {
+        const res = await userList(api, req);
+        commit('setUsers', { list: res.list, total: res.total });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async createUser({ dispatch, commit }, user: CreateUserRequest) {
+      const api = this.getters.apiv1;
+      try {
+        await createUser(api, user);
+        await dispatch('fetchUsers');
       } catch (e) {
         commit('error', { error: e });
       }

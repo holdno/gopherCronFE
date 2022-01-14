@@ -676,3 +676,65 @@ export async function saveWorkFlowTask(api: AxiosInstance, task: WorkFlowTask) {
     },
   });
 }
+export interface CreateUserRequest {
+  account: String;
+  password: String;
+  name: String;
+  permisssion: String[];
+}
+
+export async function createUser(api: AxiosInstance, args: CreateUserRequest) {
+  const resp = await api.post('/user/create', {
+    name: args.name,
+    account: args.account,
+    password: args.password,
+    permisssion: args.permisssion.join(','),
+  });
+  const data = resp.data;
+  if (data.meta.code !== 0) {
+    throw new Error(data.meta.msg);
+  }
+}
+
+export interface GetUserListRequest {
+  name?: String;
+  account?: String;
+  projectID?: Number;
+  page: Number;
+  pagesize: Number;
+}
+
+export interface GetUserListResponse {
+  total: Number;
+  list: User[];
+}
+
+export async function userList(
+  api: AxiosInstance,
+  args: GetUserListRequest,
+): Promise<GetUserListResponse> {
+  const resp = await api.get('/user/list', {
+    params: {
+      name: args.name,
+      account: args.account,
+      project_id: args.projectID,
+      page: args.page,
+      pagesize: args.pagesize,
+    },
+  });
+  const data = resp.data;
+  if (data.meta.code === 0) {
+    const list = data.response.list ? data.response.list : [];
+    const resList: User[] = [];
+    list.forEach((element: any, i: number) => {
+      resList.push({
+        id: element.id,
+        name: element.name,
+        permissions: element.permission.split(','),
+      });
+    });
+    return { total: data.response.total, list: resList };
+  } else {
+    throw new Error(data.meta.msg);
+  }
+}
