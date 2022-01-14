@@ -27,18 +27,25 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
       return response;
     },
     function (error: AxiosError) {
+      let e = new Error(error.message);
       // Any status codes that falls outside the range of 2xx cause this function to trigger
       // Do something with response error
-      try {
-        const data = error.response?.data;
-        if (data.meta.code !== 0) {
-          const e = new Error(data.meta.msg);
-          store.commit('error', { error: e });
+      if (!error.response) {
+        e = new Error('网络错误，请稍后再试');
+      } else {
+        switch (error.response.status) {
+          case 401:
+            store.commit('unauthed');
+            break;
+          default:
         }
-      } catch (_) {
-        const e = new Error(error.message);
-        store.commit('error', { error: e });
+        try {
+          e = new Error(error.response.data.meta.msg || '请求失败，请稍后再试');
+        } catch (_) {
+          e = new Error(error.message);
+        }
       }
+      store.commit('error', { error: e });
       throw ErrHandled;
     },
   );
