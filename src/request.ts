@@ -112,7 +112,7 @@ export interface Task {
   tmpId: string;
 }
 
-export async function taskList(
+export async function fetchTasks(
   api: AxiosInstance,
   projectId: number,
 ): Promise<Task[]> {
@@ -487,7 +487,7 @@ export async function updateWorkflowEdges(
       dependencies: taskDeps.get(k) || [],
     })),
   });
-  return await api.post('/workflow/task/create', payload, {
+  return await api.post('/workflow/task/schedule/create', payload, {
     headers: {
       'content-type': 'application/json',
     },
@@ -577,4 +577,94 @@ export async function fetchProjectClients(
   const data = resp.data;
   const r = data.response;
   return r.list;
+}
+
+export interface WorkFlowTask {
+  id: string;
+  name: string;
+  projectId: number;
+  workflowId: number;
+  command: string;
+  remark: string;
+  timeout: number;
+  createTime: number;
+  noseize: number;
+}
+
+export async function fetchWorkFlowTasks(
+  api: AxiosInstance,
+  projectId: number,
+): Promise<WorkFlowTask[]> {
+  const resp = await api.get('/project/workflow/task/list', {
+    params: {
+      project_id: projectId,
+    },
+  });
+  const data = resp.data;
+  const r = data.response;
+  return r.map((v: any) => ({
+    id: v.task_id,
+    name: v.task_name,
+    projectId: v.project_id,
+    workFlowId: v.workflow_id,
+    command: v.command,
+    remark: v.remark,
+    timeout: v.timeout,
+    createTime: v.create_time,
+    noseize: v.noseize,
+  }));
+}
+
+export async function createWorkFlowTask(
+  api: AxiosInstance,
+  projectId: number,
+  name: string,
+  command: string,
+  remark: string,
+  timeout: number,
+) {
+  const payload = JSON.stringify({
+    project_id: projectId,
+    task_name: name,
+    command: command,
+    remark: remark,
+    timeout: timeout,
+  });
+  return await api.post('/project/workflow/task/create', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
+
+export async function deleteWorkFlowTask(
+  api: AxiosInstance,
+  projectId: number,
+  taskId: string,
+) {
+  const payload = JSON.stringify({
+    project_id: projectId,
+    task_id: taskId,
+  });
+  return await api.post('/project/workflow/task/delete', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
+
+export async function saveWorkFlowTask(api: AxiosInstance, task: WorkFlowTask) {
+  const payload = JSON.stringify({
+    project_id: task.projectId,
+    task_id: task.id,
+    task_name: task.name,
+    command: task.command,
+    remark: task.remark,
+    timeout: task.timeout,
+  });
+  return await api.post('/project/workflow/task/update', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
 }

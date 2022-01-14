@@ -9,7 +9,7 @@ import {
   User,
   userInfo,
   Task,
-  taskList,
+  fetchTasks,
   saveTask,
   recentLog,
   RecentLogCount,
@@ -30,6 +30,11 @@ import {
   deleteTask,
   fetchProjectClients,
   deleteWorkflow,
+  WorkFlowTask,
+  fetchWorkFlowTasks,
+  deleteWorkFlowTask,
+  saveWorkFlowTask,
+  createWorkFlowTask,
 } from './request';
 import { FireTowerPlugin } from './utils/FireTower';
 import { AxiosInstance } from 'axios';
@@ -70,6 +75,9 @@ export interface State {
   tasks: Task[];
   loadingTasks: boolean;
   fetchTasksCache: Map<number, Task[]>;
+
+  workFlowTasks: WorkFlowTask[];
+  loadingWorkFlowTasks: boolean;
 
   recentLogCountRecords: RecentLogCount[];
 
@@ -115,6 +123,9 @@ export const store = createStore<State>({
 
       tasks: [],
       loadingTasks: false,
+
+      workFlowTasks: [],
+      loadingWorkFlowTasks: false,
 
       fetchTasksCache: new Map(),
       recentLogCountRecords: [],
@@ -227,12 +238,28 @@ export const store = createStore<State>({
       }
       state.tasks = tasks;
     },
+    loadingWorkFlowTasks(state) {
+      state.loadingWorkFlowTasks = true;
+    },
+    unloadingWorkFlowTasks(state) {
+      state.loadingWorkFlowTasks = false;
+    },
+    setWorkFlowTasks(state, { workFlowTasks }) {
+      state.workFlowTasks = workFlowTasks;
+    },
     updateTask(state, { task }) {
       const idx = state.tasks.findIndex((t) => t.id === task.id);
       if (idx === -1) {
         return;
       }
       state.tasks[idx] = task;
+    },
+    updateWorkFlowTask(state, { task }) {
+      const idx = state.workFlowTasks.findIndex((t) => t.id === task.id);
+      if (idx === -1) {
+        return;
+      }
+      state.workFlowTasks[idx] = task;
     },
     setRecentLogCount(state, { records }) {
       state.recentLogCountRecords = records;
@@ -342,7 +369,7 @@ export const store = createStore<State>({
       const api = this.getters.apiv1;
       try {
         if (!cached || !state.fetchTasksCache.has(projectId)) {
-          const tasks = await taskList(api, projectId);
+          const tasks = await fetchTasks(api, projectId);
           commit('setTasks', { tasks, projectId });
         } else {
           commit('setTasksByCache', { projectId });
@@ -351,6 +378,17 @@ export const store = createStore<State>({
         commit('error', { error: e });
       }
       commit('unloadingTasks');
+    },
+    async fetchWorkFlowTasks({ commit, state }, { projectId, cached = false }) {
+      commit('loadingWorkFlowTasks');
+      const api = this.getters.apiv1;
+      try {
+        const workFlowTasks = await fetchWorkFlowTasks(api, projectId);
+        commit('setWorkFlowTasks', { workFlowTasks });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+      commit('unloadingWorkFlowTasks');
     },
     async saveTask({ commit }, { task }) {
       const api = this.getters.apiv1;
@@ -362,10 +400,38 @@ export const store = createStore<State>({
         commit('error', { error: e });
       }
     },
-    async deleteTask({ dispatch, commit }, { projectId, taskId }) {
+    async saveWorkFlowTask({ commit }, { task }) {
+      const api = this.getters.apiv1;
+      try {
+        if (task.id !== '') {
+          await saveWorkFlowTask(api, task);
+        } else {
+          await createWorkFlowTask(
+            api,
+            task.projectId,
+            task.name,
+            task.command,
+            task.remark,
+            task.timeout,
+          );
+        }
+        commit('updateWorkFlowTask', { task });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async deleteTask({ commit }, { projectId, taskId }) {
       const api = this.getters.apiv1;
       try {
         await deleteTask(api, projectId, taskId);
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async deleteWorkFlowTask({ commit }, { projectId, taskId }) {
+      const api = this.getters.apiv1;
+      try {
+        await deleteWorkFlowTask(api, projectId, taskId);
       } catch (e) {
         commit('error', { error: e });
       }

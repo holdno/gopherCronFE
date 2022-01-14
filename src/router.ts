@@ -5,6 +5,38 @@ import {
 } from 'vue-router';
 import { store } from '@/store';
 
+const TaskRoutes = (type: string) => [
+  {
+    name: `${type}_task`,
+    path: 'task/:taskId',
+    component: () => import('./pages/TaskDetail.vue'),
+    props: (route: RouteLocationNormalizedLoaded) => ({
+      id: route.params.taskId,
+      projectId: Number(route.params.projectId),
+      type: type,
+    }),
+  },
+  {
+    name: `${type}_task_logs`,
+    path: 'task/:taskId/logs',
+    component: () => import('./pages/TaskDetail.vue'),
+    props: (route: RouteLocationNormalizedLoaded) => ({
+      id: route.params.taskId,
+      projectId: Number(route.params.projectId),
+      type: type,
+    }),
+  },
+  {
+    name: `create_${type}_task`,
+    path: 'task/create',
+    component: () => import('./pages/TaskDetail.vue'),
+    props: (route: RouteLocationNormalizedLoaded) => ({
+      projectId: Number(route.params.projectId),
+      type: type,
+    }),
+  },
+];
+
 const routes = [
   {
     path: '/',
@@ -24,37 +56,30 @@ const routes = [
         children: [
           {
             name: 'project',
-            path: ':projectId(\\d+)/task',
-            component: () => import('./pages/TaskList.vue'),
-            props: (route: RouteLocationNormalizedLoaded) => ({
-              projectId: Number(route.params.projectId),
+            path: ':projectId(\\d+)',
+            component: () => import('./layouts/DummyContainer.vue'),
+            redirect: (from: RouteLocationNormalizedLoaded) => ({
+              name: 'crontab_tasks',
+              params: { ...from.params },
             }),
             children: [
               {
-                name: 'task',
-                path: ':taskId',
-                component: () => import('./pages/TaskDetail.vue'),
+                name: 'crontab_tasks',
+                path: 'crontab_tasks',
+                component: () => import('./pages/TaskList.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
-                  id: route.params.taskId,
                   projectId: Number(route.params.projectId),
                 }),
+                children: TaskRoutes('crontab'),
               },
               {
-                name: 'task_logs',
-                path: ':taskId/logs',
-                component: () => import('./pages/TaskDetail.vue'),
-                props: (route: RouteLocationNormalizedLoaded) => ({
-                  id: route.params.taskId,
-                  projectId: Number(route.params.projectId),
-                }),
-              },
-              {
-                name: 'create_task',
-                path: 'create',
-                component: () => import('./pages/TaskDetail.vue'),
+                name: 'workflow_tasks',
+                path: 'workflow_tasks',
+                component: () => import('./pages/TaskList.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   projectId: Number(route.params.projectId),
                 }),
+                children: TaskRoutes('workflow'),
               },
             ],
           },

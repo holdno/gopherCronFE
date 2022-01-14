@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md tw-h-full tw-w-full tw-flex tw-flex-col">
+  <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
     <q-dialog v-model="showDeleteConfirm">
       <q-card>
         <q-card-section class="row items-center">
@@ -62,7 +62,7 @@
         </q-form>
       </q-card>
     </q-dialog>
-    <div class="q-pa-xs tw-flex tw-justify-around">
+    <div class="q-pa-md tw-flex tw-justify-around">
       <q-input
         v-model="filter"
         borderless
@@ -84,8 +84,8 @@
         @click="showDeleteConfirm = true"
       />
     </div>
-    <q-scroll-area class="tw-grow" visible>
-      <q-list class="q-pa-xs">
+    <q-scroll-area class="tw-grow tw-px-1" visible>
+      <q-list>
         <router-link
           v-for="project in projects"
           :key="project.id"

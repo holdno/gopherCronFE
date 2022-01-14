@@ -30,7 +30,7 @@
     <q-btn
       color="primary"
       text-color="black"
-      :disable="modified"
+      :disable="true"
       class="tw-w-24"
       @click="() => task && execute(projectId, task.id)"
     >
@@ -61,14 +61,6 @@
       key="name"
       v-model="editable.name"
       label="任务名称"
-      square
-      filled
-      class="tw-mb-4"
-    />
-    <q-input
-      key="cron"
-      v-model="editable.cronExpr"
-      label="调度计划 (*秒 *分 *时 *日 *月 *周 *年)"
       square
       filled
       class="tw-mb-4"
@@ -108,14 +100,6 @@
       :false-value="0"
       :true-value="1"
       label="并行调度"
-      class="tw-mb-4"
-    />
-    <q-toggle
-      key="status"
-      v-model="editable.status"
-      :false-value="0"
-      :true-value="1"
-      label="是否启用"
       class="tw-mb-4"
     />
     <div class="q-pa-sm">
@@ -161,20 +145,16 @@
     name: '',
     projectId: props.projectId,
     command: 'echo "hello world"',
-    cronExpr: '0 0 0 * * * *',
     remark: '',
-    timeout: 0,
+    timeout: 300,
     createTime: 0,
-    status: 0,
-    isRunning: 0,
     noseize: 0,
-    exclusion: 0,
-    clientIp: '',
-    tmpId: '',
   }));
 
   const store = useStore();
-  const task = computed(() => store.state.tasks.find((t) => t.id === props.id));
+  const task = computed(() =>
+    store.state.workFlowTasks.find((t) => t.id === props.id),
+  );
   const project = computed(() =>
     store.state.projects.find((p) => p.id === props.projectId),
   );
@@ -188,22 +168,25 @@
     return JSON.stringify(task.value) !== JSON.stringify(editable.value);
   });
   const canSave = computed(() => {
-    const { name, command, timeout, cronExpr } = editable.value;
-    return name !== '' && command !== '' && timeout >= 0 && cronExpr !== '';
+    const { name, command, timeout } = editable.value;
+    return name !== '' && command !== '' && timeout > 0;
   });
 
   const router = useRouter();
   async function onSubmit() {
-    const newTask = await store.dispatch('saveTask', {
-      task: editable.value,
+    await store.dispatch('saveWorkFlowTask', {
+      task: {
+        ...editable.value,
+        timeout: Number(editable.value.timeout),
+      },
     });
-    await store.dispatch('fetchTasks', {
+    await store.dispatch('fetchWorkFlowTasks', {
       projectId: props.projectId,
     });
     router.push({
-      name: 'crontab_task',
+      name: 'workflow_tasks',
       params: {
-        taskId: newTask.id,
+        projectId: props.projectId,
       },
     });
   }
@@ -214,17 +197,17 @@
   const showDeleteConfirm = ref(false);
   async function deleteTask(projectId: number, taskId: string) {
     store.commit('clearError');
-    await store.dispatch('deleteTask', { projectId, taskId });
+    await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
     if (store.state.currentError === undefined) {
-      await store.dispatch('fetchTasks', { ...props });
-      router.push({ name: 'crontab_tasks' });
+      store.dispatch('fetchWorkFlowTasks', { ...props });
+      router.push({ name: 'workflow_tasks' });
       showDeleteConfirm.value = false;
     }
   }
 
   const route = useRoute();
   const isCreateMode = computed(
-    () => route.name && route.name.toString() === 'create_crontab_task',
+    () => route.name && route.name.toString() === 'create_workflow_task',
   );
 
   async function execute(projectId: number, taskId: string) {
