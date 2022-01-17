@@ -29,8 +29,16 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
     function (error: AxiosError) {
       // Any status codes that falls outside the range of 2xx cause this function to trigger
       // Do something with response error
-      const e = new Error(error.message);
-      store.commit('error', { error: e });
+      try {
+        const data = error.response?.data;
+        if (data.meta.code !== 0) {
+          const e = new Error(data.meta.msg);
+          store.commit('error', { error: e });
+        }
+      } catch (_) {
+        const e = new Error(error.message);
+        store.commit('error', { error: e });
+      }
       throw ErrHandled;
     },
   );
