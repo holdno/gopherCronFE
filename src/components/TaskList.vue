@@ -61,7 +61,13 @@
               "
             >
               <div :class="'task__status' + task.status">
-                {{ task.status == 1 ? '调度中' : '已暂停' }}
+                {{
+                  task.isRunning
+                    ? '执行中'
+                    : task.status == 1
+                    ? '调度中'
+                    : '已暂停'
+                }}
               </div>
               <div
                 :class="
@@ -83,12 +89,6 @@
                 <div class="task__bottom-time">
                   {{ formatTimestamp(task.createTime * 1000) }}
                 </div>
-                <!-- <div
-              class="task__bottom-button"
-              @click.stop="shutdown($event, item)"
-            >
-              {{ task.isRunning == 1 ? '结束进程' : '等待执行' }}
-            </div> -->
               </div>
             </div>
           </router-link>
@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect, watch } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useStore } from '@/store';
   import { Task } from '@/request';
   import { formatTimestamp } from '@/utils/datetime';
@@ -119,8 +119,8 @@
     watchEffect(async () => {
       await fetchTasks();
     });
-    watch(
-      () => [store.state.eventTask, store.state.eventWorkFlowTask],
+    store.watch(
+      (state) => [state.eventTask, state.eventWorkFlowTask],
       (current) => {
         fetchTasks();
       },

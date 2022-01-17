@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect, watch } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useStore } from '@/store';
   import { WorkFlowTask } from '@/request';
   import { formatTimestamp } from '@/utils/datetime';
@@ -104,8 +104,8 @@
     watchEffect(async () => {
       await fetchTasks();
     });
-    watch(
-      () => [store.state.eventTask, store.state.eventWorkFlowTask],
+    store.watch(
+      (state) => [state.eventTask, state.eventWorkFlowTask],
       (current) => {
         fetchTasks();
       },

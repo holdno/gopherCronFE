@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect, watch } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import WorkFlow from '@/components/WorkFlow.vue';
   import { Task, WorkFlowEdge } from '@/request';
   import { useStore } from '@/store';
@@ -231,8 +231,8 @@
     watchEffect(async () => {
       await refresh();
     });
-    watch(
-      () => [store.state.eventWorkFlowTask, store.state.eventWorkFlow],
+    store.watch(
+      (state) => [state.eventWorkFlowTask, state.eventWorkFlow],
       (current) => {
         refresh(true);
       },

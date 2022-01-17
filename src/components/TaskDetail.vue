@@ -32,7 +32,7 @@
       text-color="black"
       :disable="modified || task?.isRunning === 1"
       class="tw-w-24"
-      :loading="executing"
+      :loading="executing || task?.isRunning === 1"
       @click="() => task && execute(projectId, task.id)"
     >
       执行
@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { startTask } from '@/request';
   import { useStore } from '@/store';
@@ -237,4 +237,15 @@
       executing.value = false;
     }
   }
+
+  onMounted(() => {
+    store.watch(
+      (state) => [state.eventTask],
+      (current) => {
+        store.dispatch('fetchTasks', {
+          projectId: props.projectId,
+        });
+      },
+    );
+  });
 </script>

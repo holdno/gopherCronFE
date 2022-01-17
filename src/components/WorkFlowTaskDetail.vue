@@ -125,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { startTask } from '@/request';
   import { useStore } from '@/store';
@@ -220,4 +220,15 @@
       executing.value = false;
     }
   }
+
+  onMounted(() => {
+    store.watch(
+      (state) => [state.eventWorkFlowTask],
+      (current) => {
+        store.dispatch('fetchWorkFlowTasks', {
+          projectId: props.projectId,
+        });
+      },
+    );
+  });
 </script>
