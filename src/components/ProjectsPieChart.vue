@@ -15,7 +15,7 @@
   } from 'echarts/components';
   import { LabelLayout, UniversalTransition } from 'echarts/features';
   import { CanvasRenderer } from 'echarts/renderers';
-  import { Project } from '@/request';
+  import { Project } from '@/api/request';
 
   const props = defineProps({
     projects: {

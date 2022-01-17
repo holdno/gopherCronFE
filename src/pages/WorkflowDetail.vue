@@ -1,28 +1,26 @@
 <template>
   <div class="tw-w-full tw-h-full tw-flex tw-flex-col">
     <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap">
-      <q-btn flat type="primary" :disable="!canUpdate" @click="updateWorkFlow">
-        保存
-      </q-btn>
-      <q-btn flat icon="refresh" title="刷新" @click="() => refresh()">
-        刷新
-      </q-btn>
+      <q-btn flat type="primary" :disable="!canUpdate" @click="updateWorkFlow"
+        >保存</q-btn
+      >
+      <q-btn flat icon="refresh" title="刷新" @click="() => refresh()"
+        >刷新</q-btn
+      >
       <q-btn
         flat
         icon="restart_alt"
         title="重置视图"
         @click="() => workflow.ResetView()"
+        >重置视图</q-btn
       >
-        重置视图
-      </q-btn>
       <q-btn
         flat
         icon="add"
         title="添加新任务节点"
         @click="() => workflow.ShowAddNodeDialog()"
+        >添加新任务节点</q-btn
       >
-        添加新任务节点
-      </q-btn>
       <q-btn
         flat
         icon="delete"
@@ -34,9 +32,8 @@
             workflow.SelectedEdges.length > 0 && workflow.RemoveSelectedEdges();
           }
         "
+        >删除节点（关系）</q-btn
       >
-        删除节点（关系）
-      </q-btn>
       <q-btn
         flat
         icon="north_east"
@@ -53,9 +50,8 @@
             });
           }
         "
+        >关联节点</q-btn
       >
-        关联节点
-      </q-btn>
       <q-btn
         v-if="selectedTask !== undefined"
         key="jump_task_detail"
@@ -68,9 +64,8 @@
             taskId: selectedTask.origin.id,
           },
         }"
+        >任务详情</q-btn
       >
-        任务详情
-      </q-btn>
       <q-btn
         v-if="selectedTask !== undefined"
         key="jump_task_logs"
@@ -83,9 +78,8 @@
             taskId: selectedTask.origin.id,
           },
         }"
+        >任务日志</q-btn
       >
-        任务日志
-      </q-btn>
     </div>
     <WorkFlow
       ref="workflow"
@@ -99,7 +93,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import WorkFlow from '@/components/WorkFlow.vue';
-  import { WorkFlowEdge, WorkFlowTask } from '@/request';
+  import { WorkFlowEdge, WorkFlowTask } from '@/api/request';
   import { useStore } from '@/store';
   import { KahnTask } from '@/types';
 

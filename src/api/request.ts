@@ -11,6 +11,11 @@ export const keyApiv1: InjectionKey<AxiosInstance> = Symbol(
   'ApiV1 Axio Instance',
 );
 
+export interface Meta {
+  code: number;
+  message: string;
+}
+
 export function installApiv1(app: App, { store }: { store: Store<State> }) {
   app.provide(keyApiv1, apiv1);
   app.config.globalProperties.$apiv1 = apiv1;
@@ -27,18 +32,25 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
       return response;
     },
     function (error: AxiosError) {
+      let e = new Error(error.message);
       // Any status codes that falls outside the range of 2xx cause this function to trigger
       // Do something with response error
-      try {
-        const data = error.response?.data;
-        if (data.meta.code !== 0) {
-          const e = new Error(data.meta.msg);
-          store.commit('error', { error: e });
+      if (!error.response) {
+        e = new Error('网络错误，请稍后再试');
+      } else {
+        switch (error.response.status) {
+          case 401:
+            store.commit('unauthed');
+            break;
+          default:
         }
-      } catch (_) {
-        const e = new Error(error.message);
-        store.commit('error', { error: e });
+        try {
+          e = new Error(error.response.data.meta.msg || '请求失败，请稍后再试');
+        } catch (_) {
+          e = new Error(error.message);
+        }
       }
+      store.commit('error', { error: e });
       throw ErrHandled;
     },
   );
@@ -55,7 +67,9 @@ export function useApiv1(): AxiosInstance {
 export interface User {
   id: number;
   name: string;
+  account: string;
   permissions: string[];
+  createTime: number;
 }
 
 export async function login(
@@ -70,7 +84,13 @@ export async function login(
   const data = resp.data;
   const r = data.response;
   return [
-    { id: r.id, name: r.name, permissions: r.permission.split(',') },
+    {
+      id: r.id,
+      name: r.name,
+      account: r.account,
+      permissions: r.permission.split(','),
+      createTime: r.create_time,
+    },
     r.token,
   ];
 }
@@ -79,7 +99,13 @@ export async function userInfo(api: AxiosInstance): Promise<User> {
   const resp = await api.get('/user/info');
   const data = resp.data;
   const r = data.response;
-  return { id: r.id, name: r.name, permissions: r.permission.split(',') };
+  return {
+    id: r.id,
+    name: r.name,
+    account: r.account,
+    permissions: r.permission.split(','),
+    createTime: r.createTime,
+  };
 }
 
 export interface Project {

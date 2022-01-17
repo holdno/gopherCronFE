@@ -55,11 +55,9 @@
         clickable
         @click="() => removeEdges(selectedEdges)"
       >
-        <q-item-section
-          >删除指向：{{
-            selectedEdges.map(edgeParts).map(edgeName).join(', ')
-          }}</q-item-section
-        >
+        <q-item-section>
+          删除指向：{{ selectedEdges.map(edgeParts).map(edgeName).join(', ') }}
+        </q-item-section>
       </q-item>
       <q-item
         v-if="selectedNodes.length > 0"
@@ -68,11 +66,9 @@
         clickable
         @click="() => removeNodes(selectedNodes)"
       >
-        <q-item-section
-          >删除节点：{{
-            selectedNodes.map(nodeName).join(', ')
-          }}</q-item-section
-        >
+        <q-item-section>
+          删除节点：{{ selectedNodes.map(nodeName).join(', ') }}
+        </q-item-section>
       </q-item>
       <q-separator />
       <q-item key="reset-view" v-close-popup clickable @click="ResetView">
@@ -113,7 +109,7 @@
   import { QMenu } from 'quasar';
   import SelectProject from '@/components/SelectProject.vue';
   import SelectWorkFlowTask from '@/components/SelectWorkFlowTask.vue';
-  import { Project, WorkFlowTask } from '@/request';
+  import { Project, WorkFlowTask } from '@/api/request';
 
   const show = ref(false);
   const visual = ref(false);

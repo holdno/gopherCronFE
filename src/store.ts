@@ -35,8 +35,14 @@ import {
   deleteWorkFlowTask,
   saveWorkFlowTask,
   createWorkFlowTask,
-} from './request';
-import { FireTowerPlugin } from './utils/FireTower';
+} from '@/api/request';
+import {
+  createUser,
+  CreateUserRequest,
+  userList,
+  GetUserListRequest,
+} from '@/api/user';
+import { FireTowerPlugin } from '@/utils/FireTower';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
 
@@ -61,6 +67,8 @@ export interface EventWorkFlowTask {
 // 为 store state 声明类型
 export interface State {
   logined: boolean;
+  users?: User[];
+  userTotal?: number;
   user?: User;
   token?: string;
   apiv1?: AxiosInstance;
@@ -202,6 +210,16 @@ export const store = createStore<State>({
         });
       else throw error;
     },
+    success(state, { message, type = '' }: { message: string; type: string }) {
+      if (message && state.$q) {
+        // type: 'positive', 'negative', 'warning', 'info', 'ongoing'
+        state.$q.notify({
+          message: message,
+          type: type || 'info',
+          position: 'top-right',
+        });
+      }
+    },
     clearError(state) {
       state.currentError = undefined;
     },
@@ -213,6 +231,10 @@ export const store = createStore<State>({
     },
     setProjects(state, { projects }) {
       state.projects = projects;
+    },
+    setUsers(state, { list, total }) {
+      state.users = list;
+      state.userTotal = total;
     },
     loadingProjectClients(state) {
       state.loadingProjectClients = true;
@@ -474,6 +496,22 @@ export const store = createStore<State>({
       try {
         await deleteProject(api, projectId);
         await dispatch('fetchProjects');
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async fetchUsers({ dispatch, commit }, req: GetUserListRequest) {
+      try {
+        const res = await userList(req);
+        commit('setUsers', { list: res.list, total: res.total });
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async createUser({ dispatch, commit }, user: CreateUserRequest) {
+      try {
+        await createUser(user);
+        await dispatch('fetchUsers');
       } catch (e) {
         commit('error', { error: e });
       }

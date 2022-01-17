@@ -143,7 +143,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { startTask } from '@/request';
+  import { startTask } from '@/api/request';
   import { useStore } from '@/store';
 
   const props = defineProps({

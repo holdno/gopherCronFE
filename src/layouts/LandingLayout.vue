@@ -26,7 +26,7 @@
               <q-icon name="timeline" />
             </q-item-section>
 
-            <q-item-section>Overview</q-item-section>
+            <q-item-section class="tw-font-medium">看板</q-item-section>
           </q-item>
 
           <q-item v-ripple clickable :to="{ name: 'projects' }">
@@ -34,7 +34,7 @@
               <q-icon name="view_list" />
             </q-item-section>
 
-            <q-item-section>Projects</q-item-section>
+            <q-item-section class="tw-font-medium">项目管理</q-item-section>
           </q-item>
 
           <q-item v-ripple clickable :to="{ name: 'workflows' }">
@@ -42,7 +42,7 @@
               <q-icon name="mediation" />
             </q-item-section>
 
-            <q-item-section>Workflows</q-item-section>
+            <q-item-section class="tw-font-medium">任务编排</q-item-section>
           </q-item>
 
           <q-separator class="tw-bg-stone-800" />
@@ -50,20 +50,33 @@
           <q-expansion-item
             v-if="store.getters.isAdmin"
             v-model="adminMenuExpanded"
-            label="Admin"
+            label="系统管理"
+            header-class="tw-font-medium"
             icon="admin_panel_settings"
           >
             <q-item
               v-ripple
               clickable
-              :header-inset-level="2"
-              :to="{ name: 'projects-admin' }"
+              :inset-level="0.2"
+              :to="{ name: 'user-admin' }"
             >
               <q-item-section avatar>
-                <q-icon name="view_list" />
+                <q-icon name="supervisor_account" />
               </q-item-section>
 
-              <q-item-section>Projects</q-item-section>
+              <q-item-section class="tw-font-medium">用户管理</q-item-section>
+            </q-item>
+            <q-item
+              v-ripple
+              clickable
+              :inset-level="0.2"
+              :to="{ name: 'node-admin' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="dynamic_form" />
+              </q-item-section>
+
+              <q-item-section class="tw-font-medium">节点管理</q-item-section>
             </q-item>
           </q-expansion-item>
           <q-separator class="tw-bg-stone-800" />
@@ -73,7 +86,7 @@
               <q-icon name="logout" />
             </q-item-section>
 
-            <q-item-section>Logout</q-item-section>
+            <q-item-section class="tw-font-medium">退出</q-item-section>
           </q-item>
         </q-list>
       </q-scroll-area>

@@ -23,7 +23,7 @@
 <script setup lang="ts">
   import { QSelect } from 'quasar';
   import { computed, PropType, ref } from 'vue';
-  import { Project } from '@/request';
+  import { Project } from '@/api/request';
   import { useStore } from '@/store';
 
   const props = defineProps({
