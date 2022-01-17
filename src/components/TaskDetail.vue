@@ -30,8 +30,9 @@
     <q-btn
       color="primary"
       text-color="black"
-      :disable="modified"
+      :disable="modified || task?.isRunning === 1"
       class="tw-w-24"
+      :loading="executing"
       @click="() => task && execute(projectId, task.id)"
     >
       执行
@@ -227,7 +228,13 @@
     () => route.name && route.name.toString() === 'create_crontab_task',
   );
 
+  const executing = ref(false);
   async function execute(projectId: number, taskId: string) {
-    await startTask(store.getters.apiv1, projectId, taskId);
+    executing.value = true;
+    try {
+      await startTask(store.getters.apiv1, projectId, taskId);
+    } finally {
+      executing.value = false;
+    }
   }
 </script>
