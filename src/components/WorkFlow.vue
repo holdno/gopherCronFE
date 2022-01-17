@@ -26,6 +26,7 @@
           v-model="task"
           :disabled="project === undefined"
           :project-id="project ? project.id : 0"
+          :workflow-id="props.workflowId"
         />
       </q-card-section>
       <q-card-actions align="around">
@@ -207,6 +208,10 @@
   };
 
   const props = defineProps({
+    workflowId: {
+      type: Number,
+      required: true,
+    },
     tasks: {
       type: Object as PropType<KahnTask[]>,
       required: true,

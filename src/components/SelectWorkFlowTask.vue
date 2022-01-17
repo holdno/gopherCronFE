@@ -30,6 +30,10 @@
       type: Number,
       required: true,
     },
+    workflowId: {
+      type: Number,
+      required: true,
+    },
     disabled: {
       type: Boolean,
       default: false,
@@ -49,7 +53,8 @@
   const tasks = computed(() =>
     store.state.workFlowTasks.filter(
       (t: WorkFlowTask) =>
-        t.name.indexOf(filter.value) >= 0 || t.id.indexOf(filter.value) >= 0,
+        (t.workflowId === 0 || t.workflowId === props.workflowId) &&
+        (t.name.indexOf(filter.value) >= 0 || t.id.indexOf(filter.value) >= 0),
     ),
   );
   const filterTasks = (

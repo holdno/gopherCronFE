@@ -87,7 +87,12 @@
         任务日志
       </q-btn>
     </div>
-    <WorkFlow ref="workflow" v-model="current" :tasks="tasks" />
+    <WorkFlow
+      ref="workflow"
+      v-model="current"
+      :workflow-id="props.id"
+      :tasks="tasks"
+    />
   </div>
 </template>
 
