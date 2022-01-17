@@ -22,10 +22,11 @@
       </q-card-section>
       <q-card-section>
         <SelectProject v-model="project" />
-        <SelectTask
+        <SelectWorkFlowTask
           v-model="task"
           :disabled="project === undefined"
           :project-id="project ? project.id : 0"
+          :workflow-id="props.workflowId"
         />
       </q-card-section>
       <q-card-actions align="around">
@@ -111,8 +112,8 @@
   import { TaskInLevels } from '@/utils/kahn';
   import { QMenu } from 'quasar';
   import SelectProject from '@/components/SelectProject.vue';
-  import SelectTask from '@/components/SelectTask.vue';
-  import { Project, Task } from '@/request';
+  import SelectWorkFlowTask from '@/components/SelectWorkFlowTask.vue';
+  import { Project, WorkFlowTask } from '@/request';
 
   const show = ref(false);
   const visual = ref(false);
@@ -207,6 +208,10 @@
   };
 
   const props = defineProps({
+    workflowId: {
+      type: Number,
+      required: true,
+    },
     tasks: {
       type: Object as PropType<KahnTask[]>,
       required: true,
@@ -451,7 +456,7 @@
 
   const addNodeDialogVisibility = ref(false);
   const project = ref<Project>();
-  const task = ref<Task>();
+  const task = ref<WorkFlowTask>();
 
   function ShowAddNodeDialog() {
     addNodeDialogVisibility.value = true;
@@ -481,14 +486,16 @@
       (current, previous) => {
         show.value = false;
         visual.value = false;
+        previousNodes.value = undefined;
         reset();
       },
     );
+
     watch(
       () => props.modelValue,
       (current) => {
-        updateEdges(taskEdges.value);
         updateNodes(taskNodes.value);
+        updateEdges(taskEdges.value);
         if (JSON.stringify(current) === JSON.stringify(props.tasks)) {
           updateLayouts(taskLayouts.value);
         }
@@ -497,32 +504,31 @@
     );
 
     function similarLayout(A: NodePositions, B: NodePositions): boolean {
-      for (const key of Object.keys(A)) {
-        const nodeA = A[key];
-        const nodeB = B[key];
-        if (
-          Math.abs(nodeA.x - nodeB.x) > 0.5 ||
-          Math.abs(nodeA.y - nodeB.y) > 0.5
-        )
-          return false;
+      try {
+        for (const key of Object.keys(A)) {
+          const nodeA = A[key];
+          const nodeB = B[key];
+          if (
+            Math.abs(nodeA.x - nodeB.x) > 0.5 ||
+            Math.abs(nodeA.y - nodeB.y) > 0.5
+          )
+            return false;
+        }
+      } catch (error) {
+        return false;
       }
       return true;
     }
 
     const previousNodes = ref();
-    watch(
-      () => layouts.nodes,
-      (currentNodes) => {
-        if (
-          !visual.value &&
-          graph.value &&
-          show.value &&
-          currentNodes &&
-          previousNodes.value &&
-          similarLayout(currentNodes, previousNodes.value)
-        ) {
-          graph.value.panToCenter();
-          setTimeout(() => (visual.value = true), 100);
+    watch<[NodePositions, VNetworkGraphInstance | undefined, boolean]>(
+      () => [layouts.nodes, graph.value, show.value],
+      ([currentNodes, graph, show]) => {
+        if (!visual.value && graph && show) {
+          graph.panToCenter();
+          if (similarLayout(currentNodes, previousNodes.value)) {
+            setTimeout(() => (visual.value = true), 100);
+          }
         }
 
         previousNodes.value = JSON.parse(JSON.stringify(toRaw(layouts.nodes)));

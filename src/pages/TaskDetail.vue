@@ -35,30 +35,43 @@
       <q-route-tab
         name="detail"
         label="详情"
-        :to="{ name: 'task', params: { taskId: props.id } }"
+        :to="{ name: `${props.type}_task`, params: { taskId: props.id } }"
         replace
       />
       <q-route-tab
         name="logs"
         label="日志"
-        :to="{ name: 'task_logs', params: { taskId: props.id } }"
+        :to="{ name: `${props.type}_task_logs`, params: { taskId: props.id } }"
         replace
       />
     </q-tabs>
     <div class="tw-flex tw-w-full tw-grow">
-      <q-tab-panels
-        :model-value="tab"
-        animated
-        :vertical="width >= 1024"
-        class="tw-w-full tw-h-full"
-      >
-        <q-tab-panel name="detail">
-          <TaskDetail :id="props.id" :project-id="props.projectId" />
-        </q-tab-panel>
-        <q-tab-panel name="logs">
-          <TaskLogs :id="props.id" :project-id="props.projectId" />
-        </q-tab-panel>
-      </q-tab-panels>
+      <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
+        <q-scroll-area class="tw-grow">
+          <q-tab-panels
+            :model-value="tab"
+            animated
+            :vertical="width >= 1024"
+            class="tw-w-full tw-h-full"
+          >
+            <q-tab-panel name="detail">
+              <TaskDetail
+                v-if="props.type === 'crontab'"
+                :id="props.id"
+                :project-id="props.projectId"
+              />
+              <WorkFlowTaskDetail
+                v-else-if="props.type === 'workflow'"
+                :id="props.id"
+                :project-id="props.projectId"
+              />
+            </q-tab-panel>
+            <q-tab-panel name="logs">
+              <TaskLogs :id="props.id" :project-id="props.projectId" />
+            </q-tab-panel>
+          </q-tab-panels>
+        </q-scroll-area>
+      </div>
       <div class="tw-hidden lg:tw-block">
         <q-tabs
           v-if="!isCreateMode"
@@ -71,13 +84,16 @@
           <q-route-tab
             name="detail"
             label="详情"
-            :to="{ name: 'task', params: { taskId: props.id } }"
+            :to="{ name: `${props.type}_task`, params: { taskId: props.id } }"
             replace
           />
           <q-route-tab
             name="logs"
             label="日志"
-            :to="{ name: 'task_logs', params: { taskId: props.id } }"
+            :to="{
+              name: `${props.type}_task_logs`,
+              params: { taskId: props.id },
+            }"
             replace
           />
         </q-tabs>
@@ -90,6 +106,7 @@
   import { computed, onMounted } from 'vue';
   import { useStore } from '@/store';
   import TaskDetail from '@/components/TaskDetail.vue';
+  import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
   import TaskLogs from '@/components/TaskLogs.vue';
   import { useRoute } from 'vue-router';
   import { useWindowSize } from 'vue-window-size';
@@ -103,6 +120,10 @@
       type: Number,
       required: true,
     },
+    type: {
+      type: String,
+      default: 'crontab',
+    },
   });
 
   const store = useStore();
@@ -113,7 +134,7 @@
   const route = useRoute();
 
   const isCreateMode = computed(
-    () => route.name && route.name.toString() === 'create_task',
+    () => route.name && route.name.toString() === `create_${props.type}_task`,
   );
   const tab = computed(() => {
     if (isCreateMode.value) {
@@ -121,8 +142,8 @@
     }
     if (route.name) {
       const routeName = route.name.toString();
-      if (routeName === 'task') return 'detail';
-      else if (routeName === 'task_logs') return 'logs';
+      if (routeName === `${props.type}_task_logs`) return 'logs';
+      else if (routeName === `${props.type}_task`) return 'detail';
     }
     throw new Error(`Unknown route name ${route.name?.toString()}`);
   });

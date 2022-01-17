@@ -62,7 +62,7 @@
         icon="task_alt"
         flat
         :to="{
-          name: 'task',
+          name: 'workflow_task',
           params: {
             projectId: selectedTask.origin.projectId,
             taskId: selectedTask.origin.id,
@@ -77,7 +77,7 @@
         icon="view_timeline"
         flat
         :to="{
-          name: 'task_logs',
+          name: 'workflow_task_logs',
           params: {
             projectId: selectedTask.origin.projectId,
             taskId: selectedTask.origin.id,
@@ -87,14 +87,19 @@
         任务日志
       </q-btn>
     </div>
-    <WorkFlow ref="workflow" v-model="current" :tasks="tasks" />
+    <WorkFlow
+      ref="workflow"
+      v-model="current"
+      :workflow-id="props.id"
+      :tasks="tasks"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect, watch } from 'vue';
+  import { computed, onMounted, ref, watchEffect } from 'vue';
   import WorkFlow from '@/components/WorkFlow.vue';
-  import { Task, WorkFlowEdge } from '@/request';
+  import { WorkFlowEdge, WorkFlowTask } from '@/request';
   import { useStore } from '@/store';
   import { KahnTask } from '@/types';
 
@@ -129,13 +134,13 @@
     edges: WorkFlowEdge[],
   ): Promise<KahnTask[]> {
     const childMapParents = new Map<string, string[]>();
-    const keyMapTask = new Map<string, Task>();
+    const keyMapTask = new Map<string, WorkFlowTask>();
     for (const edge of edges) {
-      await store.dispatch('fetchTasks', {
+      await store.dispatch('fetchWorkFlowTasks', {
         projectId: edge.projectId,
         cached: true,
       });
-      const tasks = store.state.fetchTasksCache.get(edge.projectId);
+      const tasks = store.state.fetchWorkFlowTasksCache.get(edge.projectId);
       if (tasks === undefined)
         throw new Error(`fetchTasksCache missing projectId=${edge.projectId}`);
 
@@ -175,8 +180,7 @@
 
   function kahnTasksToWorkFlowEdges(tasks: KahnTask[]): WorkFlowEdge[] {
     const edges = [];
-    const id2task = new Map<string, Task>();
-    console.log(tasks);
+    const id2task = new Map<string, WorkFlowTask>();
     for (const task of tasks) {
       id2task.set(task.id, task.origin);
     }
@@ -231,8 +235,8 @@
     watchEffect(async () => {
       await refresh();
     });
-    watch(
-      () => [store.state.eventWorkFlowTask, store.state.eventWorkFlow],
+    store.watch(
+      (state) => [state.eventWorkFlowTask, state.eventWorkFlow],
       (current) => {
         refresh(true);
       },

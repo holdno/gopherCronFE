@@ -35,7 +35,7 @@
         </template>
       </q-input>
       <q-btn flat :loading="loading" icon="refresh" @click="fetchTasks" />
-      <q-btn flat :to="{ name: 'create_crontab_task' }" icon="add" />
+      <q-btn flat :to="{ name: 'create_workflow_task' }" icon="add" />
       <q-btn
         flat
         class="tw-text-red-300 lg:tw-flex tw-hidden"
@@ -44,64 +44,49 @@
         @click="showDeleteConfirm = true"
       />
     </div>
-    <div class="tw-w-full tw-grow">
-      <q-scroll-area class="tw-w-full tw-h-full tw-px-1" visible>
-        <q-list>
-          <router-link
-            v-for="task in tasks"
-            :key="task.id"
-            :to="{ name: 'crontab_task', params: { taskId: task.id } }"
+    <q-scroll-area class="tw-h-full tw-grow" visible>
+      <q-list class="">
+        <router-link
+          v-for="task in tasks"
+          :key="task.id"
+          :to="{ name: 'workflow_task', params: { taskId: task.id } }"
+        >
+          <div
+            :class="
+              (!activated(task)
+                ? 'tw-bg-[#27272a] '
+                : 'tw-bg-primary tw-text-black ') +
+              'tw-w-full tw-min-h-[130px] tw-py-3 tw-mb-4 tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
+            "
           >
             <div
               :class="
-                (!activated(task)
-                  ? 'tw-bg-[#27272a] '
-                  : 'tw-bg-primary tw-text-black ') +
-                'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-4 tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
+                (activated(task) ? 'active ' : '') +
+                'task__title tw-inline-flex tw-items-center'
               "
             >
-              <div :class="'task__status' + task.status">
-                {{
-                  task.isRunning
-                    ? '执行中'
-                    : task.status == 1
-                    ? '调度中'
-                    : '已暂停'
-                }}
-              </div>
-              <div
-                :class="
-                  (activated(task) ? 'active ' : '') +
-                  'task__title tw-inline-flex tw-items-center'
-                "
-              >
-                <div class="task__cron">
-                  <q-icon name="schedule" />
-                  {{ task.cronExpr }}
-                </div>
-                <q-icon name="numbers" />
-                {{ task.name }}
-              </div>
-              <div class="task__remark">
-                {{ task.remark || '-' }}
-              </div>
-              <div class="task__bottom-box">
-                <div class="task__bottom-time">
-                  {{ formatTimestamp(task.createTime * 1000) }}
-                </div>
+              <q-icon name="numbers" />
+              {{ task.name }}
+            </div>
+            <div class="task__remark">
+              {{ task.remark || '-' }}
+            </div>
+            <div class="task__bottom-box">
+              <div class="task__bottom-time">
+                {{ formatTimestamp(task.createTime * 1000) }}
               </div>
             </div>
-          </router-link>
-        </q-list>
-      </q-scroll-area>
-    </div>
+          </div>
+        </router-link>
+      </q-list>
+    </q-scroll-area>
   </div>
 </template>
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useStore } from '@/store';
-  import { Task } from '@/request';
+  import { WorkFlowTask } from '@/request';
   import { formatTimestamp } from '@/utils/datetime';
   import { useRoute, useRouter } from 'vue-router';
 
@@ -113,7 +98,7 @@
   });
 
   const store = useStore();
-  const loading = computed(() => store.state.loadingTasks);
+  const loading = computed(() => store.state.loadingWorkFlowTasks);
 
   onMounted(() => {
     watchEffect(async () => {
@@ -127,19 +112,19 @@
     );
   });
   async function fetchTasks() {
-    await store.dispatch('fetchTasks', { ...props });
+    await store.dispatch('fetchWorkFlowTasks', { ...props });
   }
 
   const filter = ref('');
   const tasks = computed(() =>
-    store.state.tasks.filter(
-      (t: Task) =>
+    store.state.workFlowTasks.filter(
+      (t: WorkFlowTask) =>
         t.name.indexOf(filter.value) >= 0 ||
         t.id.toString().indexOf(filter.value) >= 0,
     ),
   );
 
-  function activated(task: Task): boolean {
+  function activated(task: WorkFlowTask): boolean {
     const route = useRoute();
     return route.params.taskId === task.id;
   }
@@ -149,7 +134,7 @@
   const showDeleteConfirm = ref(false);
   async function deleteTask(projectId: number, taskId: string) {
     store.commit('clearError');
-    await store.dispatch('deleteTask', { projectId, taskId });
+    await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
     if (store.state.currentError === undefined) {
       router.push({
         name: 'project',
