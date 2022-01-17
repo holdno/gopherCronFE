@@ -78,6 +78,7 @@ export interface State {
 
   workFlowTasks: WorkFlowTask[];
   loadingWorkFlowTasks: boolean;
+  fetchWorkFlowTasksCache: Map<number, WorkFlowTask[]>;
 
   recentLogCountRecords: RecentLogCount[];
 
@@ -123,11 +124,12 @@ export const store = createStore<State>({
 
       tasks: [],
       loadingTasks: false,
+      fetchTasksCache: new Map(),
 
       workFlowTasks: [],
       loadingWorkFlowTasks: false,
+      fetchWorkFlowTasksCache: new Map(),
 
-      fetchTasksCache: new Map(),
       recentLogCountRecords: [],
       taskLogs: [],
       taskLogsTotal: 0,
@@ -244,8 +246,17 @@ export const store = createStore<State>({
     unloadingWorkFlowTasks(state) {
       state.loadingWorkFlowTasks = false;
     },
-    setWorkFlowTasks(state, { workFlowTasks }) {
+    setWorkFlowTasks(state, { projectId, workFlowTasks }) {
+      if (projectId !== undefined)
+        state.fetchWorkFlowTasksCache.set(projectId, workFlowTasks);
       state.workFlowTasks = workFlowTasks;
+    },
+    setWorkFlowTasksByCache(state, { projectId }) {
+      const tasks = state.fetchWorkFlowTasksCache.get(projectId);
+      if (tasks === undefined) {
+        throw new Error(`fetchTasks Cache missing projectId=${projectId}`);
+      }
+      state.workFlowTasks = tasks;
     },
     updateTask(state, { task }) {
       const idx = state.tasks.findIndex((t) => t.id === task.id);
@@ -383,8 +394,12 @@ export const store = createStore<State>({
       commit('loadingWorkFlowTasks');
       const api = this.getters.apiv1;
       try {
-        const workFlowTasks = await fetchWorkFlowTasks(api, projectId);
-        commit('setWorkFlowTasks', { workFlowTasks });
+        if (!cached || !state.fetchWorkFlowTasksCache.has(projectId)) {
+          const workFlowTasks = await fetchWorkFlowTasks(api, projectId);
+          commit('setWorkFlowTasks', { projectId, workFlowTasks });
+        } else {
+          commit('setWorkFlowTasksByCache', { projectId });
+        }
       } catch (e) {
         commit('error', { error: e });
       }

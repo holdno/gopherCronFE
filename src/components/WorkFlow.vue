@@ -22,7 +22,7 @@
       </q-card-section>
       <q-card-section>
         <SelectProject v-model="project" />
-        <SelectTask
+        <SelectWorkFlowTask
           v-model="task"
           :disabled="project === undefined"
           :project-id="project ? project.id : 0"
@@ -111,8 +111,8 @@
   import { TaskInLevels } from '@/utils/kahn';
   import { QMenu } from 'quasar';
   import SelectProject from '@/components/SelectProject.vue';
-  import SelectTask from '@/components/SelectTask.vue';
-  import { Project, Task } from '@/request';
+  import SelectWorkFlowTask from '@/components/SelectWorkFlowTask.vue';
+  import { Project, WorkFlowTask } from '@/request';
 
   const show = ref(false);
   const visual = ref(false);
@@ -451,7 +451,7 @@
 
   const addNodeDialogVisibility = ref(false);
   const project = ref<Project>();
-  const task = ref<Task>();
+  const task = ref<WorkFlowTask>();
 
   function ShowAddNodeDialog() {
     addNodeDialogVisibility.value = true;
