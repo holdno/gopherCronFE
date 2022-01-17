@@ -110,7 +110,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { Project } from '@/request';
+  import { Project } from '@/api/request';
   import { useStore } from '@/store';
 
   const store = useStore();

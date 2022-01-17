@@ -35,12 +35,14 @@ import {
   deleteWorkFlowTask,
   saveWorkFlowTask,
   createWorkFlowTask,
+} from '@/api/request';
+import {
   createUser,
   CreateUserRequest,
   userList,
   GetUserListRequest,
-} from './request';
-import { FireTowerPlugin } from './utils/FireTower';
+} from '@/api/user';
+import { FireTowerPlugin } from '@/utils/FireTower';
 import { AxiosInstance } from 'axios';
 import { QVueGlobals } from 'quasar';
 
@@ -207,6 +209,16 @@ export const store = createStore<State>({
           position: 'top-right',
         });
       else throw error;
+    },
+    success(state, { message, type = '' }: { message: string; type: string }) {
+      if (message && state.$q) {
+        // type: 'positive', 'negative', 'warning', 'info', 'ongoing'
+        state.$q.notify({
+          message: message,
+          type: type || 'info',
+          position: 'top-right',
+        });
+      }
     },
     clearError(state) {
       state.currentError = undefined;
@@ -489,18 +501,16 @@ export const store = createStore<State>({
       }
     },
     async fetchUsers({ dispatch, commit }, req: GetUserListRequest) {
-      const api = this.getters.apiv1;
       try {
-        const res = await userList(api, req);
+        const res = await userList(req);
         commit('setUsers', { list: res.list, total: res.total });
       } catch (e) {
         commit('error', { error: e });
       }
     },
     async createUser({ dispatch, commit }, user: CreateUserRequest) {
-      const api = this.getters.apiv1;
       try {
-        await createUser(api, user);
+        await createUser(user);
         await dispatch('fetchUsers');
       } catch (e) {
         commit('error', { error: e });

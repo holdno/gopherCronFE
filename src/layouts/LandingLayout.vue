@@ -66,6 +66,18 @@
 
               <q-item-section class="tw-font-medium">用户管理</q-item-section>
             </q-item>
+            <q-item
+              v-ripple
+              clickable
+              :inset-level="0.2"
+              :to="{ name: 'node-admin' }"
+            >
+              <q-item-section avatar>
+                <q-icon name="dynamic_form" />
+              </q-item-section>
+
+              <q-item-section class="tw-font-medium">节点管理</q-item-section>
+            </q-item>
           </q-expansion-item>
           <q-separator class="tw-bg-stone-800" />
 

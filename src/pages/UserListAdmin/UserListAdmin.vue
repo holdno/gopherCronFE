@@ -27,6 +27,7 @@
                 v-for="user in userList"
                 :key="user.id"
                 :user="user"
+                @modify="refreshList"
               ></UserItem>
             </tbody>
           </table>
@@ -36,12 +37,11 @@
         <q-pagination
           v-model="page"
           color="black"
-          :max="total"
-          :max-pages="10"
+          :max="totalPage"
           :boundary-numbers="false"
         />
       </div>
-      <ModifyBox v-model="showCreate"></ModifyBox>
+      <ModifyBox v-model="showCreate" @modify="refreshList"></ModifyBox>
     </div>
   </div>
 </template>
@@ -60,8 +60,9 @@
   const userList = computed(() => {
     return store.state.users;
   });
-  const total = computed((): number => {
-    return store.state.userTotal ? store.state.userTotal : 0;
+  const totalPage = computed((): number => {
+    const total = store.state.userTotal ? store.state.userTotal : 0;
+    return Math.ceil(total / pagesize.value);
   });
 
   const refreshList = async () => {

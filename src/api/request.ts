@@ -11,6 +11,11 @@ export const keyApiv1: InjectionKey<AxiosInstance> = Symbol(
   'ApiV1 Axio Instance',
 );
 
+export interface Meta {
+  code: number;
+  message: string;
+}
+
 export function installApiv1(app: App, { store }: { store: Store<State> }) {
   app.provide(keyApiv1, apiv1);
   app.config.globalProperties.$apiv1 = apiv1;
@@ -62,7 +67,9 @@ export function useApiv1(): AxiosInstance {
 export interface User {
   id: number;
   name: string;
+  account: string;
   permissions: string[];
+  createTime: number;
 }
 
 export async function login(
@@ -77,7 +84,13 @@ export async function login(
   const data = resp.data;
   const r = data.response;
   return [
-    { id: r.id, name: r.name, permissions: r.permission.split(',') },
+    {
+      id: r.id,
+      name: r.name,
+      account: r.account,
+      permissions: r.permission.split(','),
+      createTime: r.create_time,
+    },
     r.token,
   ];
 }
@@ -86,7 +99,13 @@ export async function userInfo(api: AxiosInstance): Promise<User> {
   const resp = await api.get('/user/info');
   const data = resp.data;
   const r = data.response;
-  return { id: r.id, name: r.name, permissions: r.permission.split(',') };
+  return {
+    id: r.id,
+    name: r.name,
+    account: r.account,
+    permissions: r.permission.split(','),
+    createTime: r.createTime,
+  };
 }
 
 export interface Project {
@@ -682,66 +701,4 @@ export async function saveWorkFlowTask(api: AxiosInstance, task: WorkFlowTask) {
       'content-type': 'application/json',
     },
   });
-}
-export interface CreateUserRequest {
-  account: String;
-  password: String;
-  name: String;
-  permisssion: String[];
-}
-
-export async function createUser(api: AxiosInstance, args: CreateUserRequest) {
-  const resp = await api.post('/user/create', {
-    name: args.name,
-    account: args.account,
-    password: args.password,
-    permisssion: args.permisssion.join(','),
-  });
-  const data = resp.data;
-  if (data.meta.code !== 0) {
-    throw new Error(data.meta.msg);
-  }
-}
-
-export interface GetUserListRequest {
-  name?: String;
-  account?: String;
-  projectID?: Number;
-  page: Number;
-  pagesize: Number;
-}
-
-export interface GetUserListResponse {
-  total: Number;
-  list: User[];
-}
-
-export async function userList(
-  api: AxiosInstance,
-  args: GetUserListRequest,
-): Promise<GetUserListResponse> {
-  const resp = await api.get('/user/list', {
-    params: {
-      name: args.name,
-      account: args.account,
-      project_id: args.projectID,
-      page: args.page,
-      pagesize: args.pagesize,
-    },
-  });
-  const data = resp.data;
-  if (data.meta.code === 0) {
-    const list = data.response.list ? data.response.list : [];
-    const resList: User[] = [];
-    list.forEach((element: any, i: number) => {
-      resList.push({
-        id: element.id,
-        name: element.name,
-        permissions: element.permission.split(','),
-      });
-    });
-    return { total: data.response.total, list: resList };
-  } else {
-    throw new Error(data.meta.msg);
-  }
 }

@@ -114,6 +114,12 @@ const routes = [
         component: () => import('./pages/UserListAdmin/UserListAdmin.vue'),
         meta: { requiresAdmin: true },
       },
+      {
+        name: 'node-admin',
+        path: 'admin/node',
+        component: () => import('./pages/NodeListAdmin/NodeListAdmin.vue'),
+        meta: { requiresAdmin: true },
+      },
     ],
   },
   {

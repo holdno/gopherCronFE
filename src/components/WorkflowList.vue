@@ -206,7 +206,7 @@
   import { onMounted, watchEffect, ref, computed } from 'vue';
   import { useStore } from '@/store';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
-  import { startWorkflow, killWorkflow } from '@/request';
+  import { startWorkflow, killWorkflow } from '@/api/request';
   import { useRoute, useRouter } from 'vue-router';
 
   const store = useStore();
