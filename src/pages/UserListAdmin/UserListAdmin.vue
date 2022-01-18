@@ -63,11 +63,13 @@ const refreshList = async () => {
       page: page.value,
       pagesize: pagesize.value,
     });
+
   } catch (e) {
     console.log(e)
   }
   loading.value = false
 };
+
 refreshList();
 watch(page, (now, old) => {
   refreshList();

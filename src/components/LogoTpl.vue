@@ -6,14 +6,14 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps({
-  class: {
-    type: String,
-    default: ''
-  },
-  src: {
-    type: String,
-    default: '/logo.png'
-  }
-})
+  const props = defineProps({
+    class: {
+      type: String,
+      default: '',
+    },
+    src: {
+      type: String,
+      default: '/logo.png',
+    },
+  });
 </script>
