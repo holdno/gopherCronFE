@@ -59,21 +59,15 @@
             class="tw-mb-4"
           />
 
-          <div class="q-pa-sm tw-flex tw-flex-row-reverse tw-gap-4">
+          <div class="tw-flex tw-flex-row-reverse tw-gap-4">
             <q-btn
               color="primary"
               text-color="black"
               type="submit"
               label="提交"
-              class="lg:tw-w-24 tw-w-full lg:tw-mb-0 tw-mb-4"
-            />
-            <q-btn
-              flat
-              type="reset"
-              label="取消"
               class="lg:tw-w-24 tw-w-full"
-              @click="open = false"
             />
+            <q-btn flat type="reset" label="取消" class="lg:tw-w-24 tw-w-full" @click="open = false" />
           </div>
         </q-form>
       </q-card-section>
@@ -82,95 +76,95 @@
 </template>
 
 <script lang="ts" setup>
-  import { PropType, computed, reactive } from 'vue';
-  import { User } from '@/api/request';
-  import { createUser, changePassword } from '@/api/user';
-  import { store } from '@/store';
+import { PropType, computed, reactive } from 'vue';
+import { User } from '@/api/request';
+import { createUser, changePassword } from '@/api/user';
+import { store } from '@/store';
 
-  const props = defineProps({
-    modelValue: {
-      type: Boolean,
-      default: false,
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+  user: {
+    type: Object as PropType<User>,
+    default: null,
+  },
+});
+
+const userData = reactive(
+  props.user != null
+    ? { ...props.user, password: '', passwordAgain: '', newPassword: '' }
+    : {
+      id: undefined,
+      account: '',
+      password: '',
+      newPassword: '',
+      passwordAgain: '',
+      name: '',
     },
-    user: {
-      type: Object as PropType<User>,
-      default: null,
-    },
-  });
+);
 
-  const userData = reactive(
-    props.user != null
-      ? { ...props.user, password: '', passwordAgain: '', newPassword: '' }
-      : {
-          id: undefined,
-          account: '',
-          password: '',
-          newPassword: '',
-          passwordAgain: '',
-          name: '',
-        },
-  );
+const isAdmin = store.getters.isAdmin;
+const emits = defineEmits(['update:modelValue', 'modify']);
 
-  const isAdmin = store.getters.isAdmin;
-  const emits = defineEmits(['update:modelValue', 'modify']);
+const open = computed<boolean>({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emits('update:modelValue', value);
+  },
+});
 
-  const open = computed<boolean>({
-    get() {
-      return props.modelValue;
-    },
-    set(value) {
-      emits('update:modelValue', value);
-    },
-  });
-
-  const update = async () => {
-    try {
-      if (userData.newPassword !== userData.passwordAgain) {
-        store.commit('error', { error: new Error('两次密码不一致') });
-        return;
-      }
-      const resp = await changePassword({
-        id: userData.id ? userData.id : 0,
-        password: userData.password,
-        newPassword: userData.newPassword,
-      });
-      if (resp.meta.code === 0) {
-        store.commit('success', '修改成功');
-        open.value = false;
-        emits('modify', {});
-      }
-    } catch (e) {
-      console.log(e);
+const update = async () => {
+  try {
+    if (userData.newPassword !== userData.passwordAgain) {
+      store.commit('error', { error: new Error('两次密码不一致') });
+      return;
     }
-  };
-
-  const create = async () => {
-    try {
-      if (userData.password !== userData.passwordAgain) {
-        store.commit('error', { error: new Error('两次密码不一致') });
-        return;
-      }
-      const res = await createUser({
-        account: userData.account,
-        password: userData.password,
-        name: userData.name,
-      });
-
-      if (res.meta.code === 0) {
-        store.commit('success', { message: '新增成功' });
-        open.value = false;
-        emits('modify', {});
-      }
-    } catch (e) {
-      console.log(e);
+    const resp = await changePassword({
+      id: userData.id ? userData.id : 0,
+      password: userData.password,
+      newPassword: userData.newPassword,
+    });
+    if (resp.meta.code === 0) {
+      store.commit('success', '修改成功');
+      open.value = false;
+      emits('modify', {});
     }
-  };
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-  const onSubmit = async () => {
-    if (props.user) {
-      return await update();
-    } else {
-      return await create();
+const create = async () => {
+  try {
+    if (userData.password !== userData.passwordAgain) {
+      store.commit('error', { error: new Error('两次密码不一致') });
+      return;
     }
-  };
+    const res = await createUser({
+      account: userData.account,
+      password: userData.password,
+      name: userData.name,
+    });
+
+    if (res.meta.code === 0) {
+      store.commit('success', { message: '新增成功' });
+      open.value = false;
+      emits('modify', {});
+    }
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const onSubmit = async () => {
+  if (props.user) {
+    return await update();
+  } else {
+    return await create();
+  }
+};
 </script>
