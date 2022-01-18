@@ -640,7 +640,7 @@ export async function fetchWorkFlowTasks(
     id: v.task_id,
     name: v.task_name,
     projectId: v.project_id,
-    workFlowId: v.workflow_id,
+    workflowId: v.workflow_id,
     command: v.command,
     remark: v.remark,
     timeout: v.timeout,
