@@ -45,8 +45,8 @@
       />
     </div>
     <div class="tw-w-full tw-grow">
-      <q-scroll-area class="tw-w-full tw-h-full tw-px-1" visible>
-        <q-list>
+      <q-scroll-area class="tw-w-full tw-h-full tw-px-[15px]" visible>
+        <q-list class="tw-flex tw-flex-col tw-gap-2">
           <router-link
             v-for="task in tasks"
             :key="task.id"
@@ -57,7 +57,7 @@
                 (!activated(task)
                   ? 'tw-bg-[#27272a] '
                   : 'tw-bg-primary tw-text-black ') +
-                'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-mb-4 tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
+                'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
               "
             >
               <div :class="'task__status' + task.status">

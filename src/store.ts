@@ -35,6 +35,7 @@ import {
   deleteWorkFlowTask,
   saveWorkFlowTask,
   createWorkFlowTask,
+  updateProject,
 } from '@/api/request';
 import {
   createUser,
@@ -486,6 +487,15 @@ export const store = createStore<State>({
       const api = this.getters.apiv1;
       try {
         await createProject(api, title, remark);
+        await dispatch('fetchProjects');
+      } catch (e) {
+        commit('error', { error: e });
+      }
+    },
+    async updateProject({ dispatch, commit }, { projectId, title, remark }) {
+      const api = this.getters.apiv1;
+      try {
+        await updateProject(api, projectId, title, remark);
         await dispatch('fetchProjects');
       } catch (e) {
         commit('error', { error: e });

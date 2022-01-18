@@ -184,6 +184,7 @@
               日志
             </q-btn>
             <q-btn
+              dense
               flat
               class="tw-text-red-300"
               icon="delete"
