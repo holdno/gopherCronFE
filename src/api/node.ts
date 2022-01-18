@@ -34,7 +34,7 @@ export async function getClientList(
   }
   return {
     nodeList: data,
-    meta: { code: resp.data.meta.code, message: resp.data.meta.message },
+    meta: { code: resp.data.meta.code, message: resp.data.meta.msg },
   };
 }
 
