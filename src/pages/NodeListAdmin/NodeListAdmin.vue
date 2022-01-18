@@ -18,10 +18,7 @@
             </tbody>
           </table>
         </div>
-        <q-inner-loading
-          size="md"
-          :showing="loading"
-        ></q-inner-loading>
+        <q-inner-loading size="md" :showing="loading"></q-inner-loading>
       </div>
     </div>
   </div>
@@ -47,7 +44,7 @@ const getList = async () => {
       store.commit('error', { message: res.meta.message });
     }
   } catch (e) {
-    store.commit('error', { message: e });
+    console.log(e)
   }
   loading.value = false;
 };
