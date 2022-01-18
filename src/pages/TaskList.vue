@@ -1,7 +1,7 @@
 <template>
   <div
     :class="
-      'xl:tw-basis-1/6 tw-basis-1/4 tw-w-full tw-h-full tw-bg-[#1E1E1E]' +
+      'xl:tw-basis-1/5 tw-basis-1/4 tw-w-full tw-h-full tw-bg-[#1E1E1E]' +
       (inList ? ' tw-hidden lg:tw-block' : '')
     "
   >
@@ -38,7 +38,7 @@
   </div>
   <div
     :class="
-      'xl:tw-basis-2/3 tw-basis-1/2 tw-h-full tw-w-full' +
+      'xl:tw-basis-3/5 tw-basis-1/2 tw-h-full tw-w-full' +
       (!inList ? ' tw-hidden lg:tw-block' : '')
     "
   >

@@ -44,42 +44,45 @@
         @click="showDeleteConfirm = true"
       />
     </div>
-    <q-scroll-area class="tw-h-full tw-grow" visible>
-      <q-list class="">
-        <router-link
-          v-for="task in tasks"
-          :key="task.id"
-          :to="{ name: 'workflow_task', params: { taskId: task.id } }"
-        >
-          <div
-            :class="
-              (!activated(task)
-                ? 'tw-bg-[#27272a] '
-                : 'tw-bg-primary tw-text-black ') +
-              'tw-w-full tw-min-h-[130px] tw-py-3 tw-mb-4 tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
-            "
+
+    <div class="tw-w-full tw-grow">
+      <q-scroll-area class="tw-h-full tw-w-full tw-px-[15px]" visible>
+        <q-list class="tw-flex tw-flex-col tw-gap-2">
+          <router-link
+            v-for="task in tasks"
+            :key="task.id"
+            :to="{ name: 'workflow_task', params: { taskId: task.id } }"
           >
             <div
               :class="
-                (activated(task) ? 'active ' : '') +
-                'task__title tw-inline-flex tw-items-center'
+                (!activated(task)
+                  ? 'tw-bg-[#27272a] '
+                  : 'tw-bg-primary tw-text-black ') +
+                'tw-w-full tw-min-h-[130px] tw-py-3 tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
               "
             >
-              <q-icon name="numbers" />
-              {{ task.name }}
-            </div>
-            <div class="task__remark">
-              {{ task.remark || '-' }}
-            </div>
-            <div class="task__bottom-box">
-              <div class="task__bottom-time">
-                {{ formatTimestamp(task.createTime * 1000) }}
+              <div
+                :class="
+                  (activated(task) ? 'active ' : '') +
+                  'task__title tw-inline-flex tw-items-center'
+                "
+              >
+                <q-icon name="numbers" />
+                {{ task.name }}
+              </div>
+              <div class="task__remark">
+                {{ task.remark || '-' }}
+              </div>
+              <div class="task__bottom-box">
+                <div class="task__bottom-time">
+                  {{ formatTimestamp(task.createTime * 1000) }}
+                </div>
               </div>
             </div>
-          </div>
-        </router-link>
-      </q-list>
-    </q-scroll-area>
+          </router-link>
+        </q-list>
+      </q-scroll-area>
+    </div>
   </div>
 </template>
 

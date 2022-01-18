@@ -278,11 +278,76 @@ export async function createProject(
   });
 }
 
+export async function updateProject(
+  api: AxiosInstance,
+  projectId: number,
+  title: string,
+  remark: string,
+) {
+  const payload = JSON.stringify({
+    project_id: projectId,
+    title: title,
+    remark: remark,
+  });
+  return await api.post('/project/update', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
+
 export async function deleteProject(api: AxiosInstance, projectId: number) {
   const payload = JSON.stringify({
     project_id: projectId,
   });
   return await api.post('/project/delete', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
+
+export async function fetchProjectUsers(api: AxiosInstance, projectId: number) {
+  const resp = await api.get('/project/users', {
+    params: {
+      project_id: projectId,
+    },
+  });
+  return resp.data.response.list.map((v: any) => ({
+    id: v.id,
+    name: v.name,
+    account: v.account,
+    permissions: v.permission.split(','),
+    createTime: v.create_time,
+  }));
+}
+
+export async function removeProjectUser(
+  api: AxiosInstance,
+  projectId: number,
+  userId: number,
+) {
+  const payload = JSON.stringify({
+    project_id: projectId,
+    user_id: userId,
+  });
+  return await api.post('/project/remove_user', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
+
+export async function addProjectUser(
+  api: AxiosInstance,
+  projectId: number,
+  userAccount: string,
+) {
+  const payload = JSON.stringify({
+    project_id: projectId,
+    user_account: userAccount,
+  });
+  return await api.post('/project/add_user', payload, {
     headers: {
       'content-type': 'application/json',
     },
