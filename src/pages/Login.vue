@@ -1,11 +1,9 @@
 <template>
-  <div
-    class="tw-h-full tw-bg-gradient-to-tl tw-from-primary tw-to-black tw-w-full tw-py-16 tw-px-4"
-  >
-    <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-h-4/5 tw-w-full">
-      <LogoTpl></LogoTpl>
+  <div class="tw-h-full tw-bg-gradient-to-tl tw-from-primary tw-to-black tw-w-full tw-px-4">
+    <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-h-full tw-w-full">
+      <LogoTpl class="tw-w-24 md:tw-w-32" src="/logo_white.png"></LogoTpl>
       <div
-        class="tw-bg-[#1D1D1D] tw-shadow tw-rounded tw-max-w-md lg:tw-w-1/3 sm:tw-w-2/3 tw-w-full tw-p-10 tw-mt-12"
+        class="tw-bg-[#1D1D1D] tw-shadow tw-rounded tw-max-w-md lg:tw-w-1/3 sm:tw-w-2/3 tw-w-full tw-p-10 md:tw-mt-6 tw-mt-2"
       >
         <p
           tabindex="0"
