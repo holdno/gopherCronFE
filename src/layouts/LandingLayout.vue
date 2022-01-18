@@ -109,7 +109,7 @@
   const route = useRoute();
   watchEffect(() => {
     if (!route.name) return;
-    const adminMenuItemRouteNames = ['projects-admin'];
+    const adminMenuItemRouteNames = ['user-admin', 'node-admin'];
     adminMenuExpanded.value = adminMenuItemRouteNames.includes(
       route.name.toString(),
     );
