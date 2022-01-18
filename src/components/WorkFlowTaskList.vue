@@ -86,7 +86,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useStore } from '@/store';
-  import { WorkFlowTask } from '@/request';
+  import { WorkFlowTask } from '@/api/request';
   import { formatTimestamp } from '@/utils/datetime';
   import { useRoute, useRouter } from 'vue-router';
 
