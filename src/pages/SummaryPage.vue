@@ -1,5 +1,5 @@
 <template>
-  <div class="lg:tw-flex lg:tw-justify-around tw-w-full tw-h-full q-pa-sm">
+  <div class="lg:tw-flex lg:tw-justify-around tw-w-full tw-mt-2 tw-h-1/2 q-pa-sm">
     <div class="tw-w-full tw-h-full">
       <RecentLogCountChart :records="records" />
     </div>
@@ -10,17 +10,17 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted } from 'vue';
-  import RecentLogCountChart from '@/components/RecentLogCountChart.vue';
-  import ProjectsPieChart from '@/components/ProjectsPieChart.vue';
-  import { useStore } from '@/store';
+import { computed, onMounted } from 'vue';
+import RecentLogCountChart from '@/components/RecentLogCountChart.vue';
+import ProjectsPieChart from '@/components/ProjectsPieChart.vue';
+import { useStore } from '@/store';
 
-  const store = useStore();
-  const records = computed(() => store.state.recentLogCountRecords);
-  const projects = computed(() => store.state.projects);
+const store = useStore();
+const records = computed(() => store.state.recentLogCountRecords);
+const projects = computed(() => store.state.projects);
 
-  onMounted(async () => {
-    await store.dispatch('recentLog');
-    await store.dispatch('fetchProjects');
-  });
+onMounted(async () => {
+  await store.dispatch('recentLog');
+  await store.dispatch('fetchProjects');
+});
 </script>
