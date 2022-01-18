@@ -34,7 +34,7 @@ export async function getClientList(
   }
   return {
     nodeList: data,
-    meta: { code: resp.data.meta.code, message: resp.data.meta.message },
+    meta: { code: resp.data.meta.code, message: resp.data.meta.msg },
   };
 }
 
@@ -48,5 +48,5 @@ export async function reloadNodeConfig(
   const resp = await apiv1.post('/client/reload/config', {
     client_ip: args.clientIP,
   });
-  return { code: resp.data.meta.code, message: resp.data.meta.message };
+  return { code: resp.data.meta.code, message: resp.data.meta.msg };
 }

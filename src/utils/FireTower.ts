@@ -115,24 +115,28 @@ export class FireTower {
 }
 
 export function FireTowerPlugin(store: Store<any>) {
-  const tower = new FireTower(import.meta.env.VITE_API_V1_WS_URL, () => {
-    console.log('connected');
-    tower.subscribe([
-      '/task/status',
-      '/workflow/status',
-      '/workflow/task/status',
-    ]);
-    tower.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.topic === '/task/status') {
-        store.commit('emitEventTask', { event: data.data });
-      } else if (data.topic === '/workflow/status') {
-        store.commit('emitEventWorkFlow', { event: data.data });
-      } else if (data.topic === '/workflow/task/status') {
-        store.commit('emitEventWorkFlowTask', { event: data.data });
-      } else {
-        console.log('unknown event', event);
-      }
-    };
-  });
+  try {
+    const tower = new FireTower(import.meta.env.VITE_API_V1_WS_URL, () => {
+      console.log('connected');
+      tower.subscribe([
+        '/task/status',
+        '/workflow/status',
+        '/workflow/task/status',
+      ]);
+      tower.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.topic === '/task/status') {
+          store.commit('emitEventTask', { event: data.data });
+        } else if (data.topic === '/workflow/status') {
+          store.commit('emitEventWorkFlow', { event: data.data });
+        } else if (data.topic === '/workflow/task/status') {
+          store.commit('emitEventWorkFlowTask', { event: data.data });
+        } else {
+          console.log('unknown event', event);
+        }
+      };
+    });
+  } catch (e) {
+    console.log(e);
+  }
 }

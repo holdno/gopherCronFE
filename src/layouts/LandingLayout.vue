@@ -1,12 +1,12 @@
 <template>
-  <q-layout
-    view="hHh Lpr lff"
-    class="rounded-borders tw-flex tw-flex-no-wrap tw-h-full tw-w-full"
-  >
+  <q-layout view="hHh Lpr lff" class="rounded-borders tw-flex tw-flex-no-wrap tw-h-full tw-w-full">
     <q-header elevated class="bg-black">
       <q-toolbar>
         <q-btn flat round dense icon="menu" @click="drawer = !drawer" />
-        <q-toolbar-title>GopherCron</q-toolbar-title>
+        <q-toolbar-title>
+          GopherCron
+          <span v-if="version" class="tw-text-sm">({{ version }})</span>
+        </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -54,24 +54,14 @@
             header-class="tw-font-medium"
             icon="admin_panel_settings"
           >
-            <q-item
-              v-ripple
-              clickable
-              :inset-level="0.2"
-              :to="{ name: 'user-admin' }"
-            >
+            <q-item v-ripple clickable :inset-level="0.2" :to="{ name: 'user-admin' }">
               <q-item-section avatar>
                 <q-icon name="supervisor_account" />
               </q-item-section>
 
               <q-item-section class="tw-font-medium">用户管理</q-item-section>
             </q-item>
-            <q-item
-              v-ripple
-              clickable
-              :inset-level="0.2"
-              :to="{ name: 'node-admin' }"
-            >
+            <q-item v-ripple clickable :inset-level="0.2" :to="{ name: 'node-admin' }">
               <q-item-section avatar>
                 <q-icon name="dynamic_form" />
               </q-item-section>
@@ -99,19 +89,27 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watchEffect } from 'vue';
-  import { useRoute } from 'vue-router';
-  import { useStore } from '@/store';
-  const drawer = ref(false);
-  const miniState = ref(true);
-  const adminMenuExpanded = ref(false);
-  const store = useStore();
-  const route = useRoute();
-  watchEffect(() => {
-    if (!route.name) return;
-    const adminMenuItemRouteNames = ['user-admin', 'node-admin'];
-    adminMenuExpanded.value = adminMenuItemRouteNames.includes(
-      route.name.toString(),
-    );
-  });
+import { ref, watchEffect } from 'vue';
+import { useRoute } from 'vue-router';
+import { useStore } from '@/store';
+import { getServiceVersion } from '@/api/version'
+const drawer = ref(false);
+const miniState = ref(true);
+const adminMenuExpanded = ref(false);
+const store = useStore();
+const route = useRoute();
+watchEffect(() => {
+  if (!route.name) return;
+  const adminMenuItemRouteNames = ['user-admin', 'node-admin'];
+  adminMenuExpanded.value = adminMenuItemRouteNames.includes(
+    route.name.toString(),
+  );
+});
+
+const version = ref('')
+const getVersion = async () => {
+  const v = await getServiceVersion()
+  version.value = v
+}
+getVersion()
 </script>
