@@ -84,24 +84,26 @@
         @click="showDeleteConfirm = true"
       />
     </div>
-    <q-scroll-area class="tw-grow tw-px-1" visible>
-      <q-list>
-        <router-link
+    <q-scroll-area class="tw-grow tw-px-[15px]" visible>
+      <q-list class="tw-flex tw-flex-col tw-gap-2">
+        <div
           v-for="project in projects"
           :key="project.id"
-          :to="{ name: 'project', params: { projectId: project.id } }"
+          :class="
+            (!activated(project)
+              ? 'tw-bg-[#27272a] '
+              : 'tw-bg-primary tw-text-black ') +
+            'tw-w-full tw-flex tw-flex-row tw-rounded-md'
+          "
         >
-          <div
-            :class="
-              (!activated(project)
-                ? 'tw-bg-[#27272a] '
-                : 'tw-bg-primary tw-text-black ') +
-              'tw-w-full q-pa-md tw-mb-4 tw-rounded-md tw-items-center hover:tw-bg-primary hover:tw-text-black'
-            "
+          <router-link
+            class="tw-grow tw-p-4"
+            :to="{ name: 'project', params: { projectId: project.id } }"
           >
             {{ project.title }}
-          </div>
-        </router-link>
+          </router-link>
+          <DropdownProjectManage />
+        </div>
       </q-list>
     </q-scroll-area>
   </div>
@@ -112,6 +114,7 @@
   import { useRoute, useRouter } from 'vue-router';
   import { Project } from '@/api/request';
   import { useStore } from '@/store';
+  import DropdownProjectManage from './DropdownProjectManage.vue';
 
   const store = useStore();
   const loading = computed(() => store.state.loadingProjects);
