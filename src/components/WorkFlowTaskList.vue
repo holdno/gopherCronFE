@@ -4,7 +4,7 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="delete" color="primary" text-color="white" />
-          <span class="q-ml-sm"> 是否要删除任务 {{ selectedTask?.name }}</span>
+          <span class="q-ml-sm">是否要删除任务 {{ selectedTask?.name }}</span>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -23,13 +23,7 @@
       </q-card>
     </q-dialog>
     <div class="q-pa-md tw-flex tw-justify-around">
-      <q-input
-        v-model="filter"
-        borderless
-        dense
-        debounce="300"
-        placeholder="Search"
-      >
+      <q-input v-model="filter" borderless dense debounce="300" placeholder="Search">
         <template #append>
           <q-icon name="search" />
         </template>
@@ -46,7 +40,12 @@
     </div>
 
     <div class="tw-w-full tw-grow">
-      <q-scroll-area class="tw-h-full tw-w-full tw-px-[15px]" visible>
+      <q-scroll-area
+        class="tw-h-full tw-w-full tw-px-[15px]"
+        visible
+        :thumb-style="thumbStyle"
+        :bar-style="barStyle"
+      >
         <q-list class="tw-flex tw-flex-col tw-gap-2">
           <router-link
             v-for="task in tasks"
@@ -70,13 +69,9 @@
                 <q-icon name="numbers" />
                 {{ task.name }}
               </div>
-              <div class="task__remark">
-                {{ task.remark || '-' }}
-              </div>
+              <div class="task__remark">{{ task.remark || '-' }}</div>
               <div class="task__bottom-box">
-                <div class="task__bottom-time">
-                  {{ formatTimestamp(task.createTime * 1000) }}
-                </div>
+                <div class="task__bottom-time">{{ formatTimestamp(task.createTime * 1000) }}</div>
               </div>
             </div>
           </router-link>
@@ -87,134 +82,135 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
-  import { useStore } from '@/store';
-  import { WorkFlowTask } from '@/api/request';
-  import { formatTimestamp } from '@/utils/datetime';
-  import { useRoute, useRouter } from 'vue-router';
+import { computed, onMounted, ref, watchEffect } from 'vue';
+import { useStore } from '@/store';
+import { WorkFlowTask } from '@/api/request';
+import { formatTimestamp } from '@/utils/datetime';
+import { useRoute, useRouter } from 'vue-router';
+import { thumbStyle, barStyle } from '@/utils/thumbStyle'
 
-  const props = defineProps({
-    projectId: {
-      type: Number,
-      required: true,
+const props = defineProps({
+  projectId: {
+    type: Number,
+    required: true,
+  },
+});
+
+const store = useStore();
+const loading = computed(() => store.state.loadingWorkFlowTasks);
+
+onMounted(() => {
+  watchEffect(async () => {
+    await fetchTasks();
+  });
+  store.watch(
+    (state) => [state.eventTask, state.eventWorkFlowTask],
+    (current) => {
+      fetchTasks();
     },
-  });
-
-  const store = useStore();
-  const loading = computed(() => store.state.loadingWorkFlowTasks);
-
-  onMounted(() => {
-    watchEffect(async () => {
-      await fetchTasks();
-    });
-    store.watch(
-      (state) => [state.eventTask, state.eventWorkFlowTask],
-      (current) => {
-        fetchTasks();
-      },
-    );
-  });
-  async function fetchTasks() {
-    await store.dispatch('fetchWorkFlowTasks', { ...props });
-  }
-
-  const filter = ref('');
-  const tasks = computed(() =>
-    store.state.workFlowTasks.filter(
-      (t: WorkFlowTask) =>
-        t.name.indexOf(filter.value) >= 0 ||
-        t.id.toString().indexOf(filter.value) >= 0,
-    ),
   );
+});
+async function fetchTasks() {
+  await store.dispatch('fetchWorkFlowTasks', { ...props });
+}
 
-  function activated(task: WorkFlowTask): boolean {
-    const route = useRoute();
-    return route.params.taskId === task.id;
-  }
+const filter = ref('');
+const tasks = computed(() =>
+  store.state.workFlowTasks.filter(
+    (t: WorkFlowTask) =>
+      t.name.indexOf(filter.value) >= 0 ||
+      t.id.toString().indexOf(filter.value) >= 0,
+  ),
+);
 
-  const selectedTask = computed(() => tasks.value.filter(activated).pop());
-  const router = useRouter();
-  const showDeleteConfirm = ref(false);
-  async function deleteTask(projectId: number, taskId: string) {
-    store.commit('clearError');
-    await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
-    if (store.state.currentError === undefined) {
-      router.push({
-        name: 'project',
-        params: {
-          projectId: projectId,
-        },
-      });
-      showDeleteConfirm.value = false;
-      await fetchTasks();
-    }
+function activated(task: WorkFlowTask): boolean {
+  const route = useRoute();
+  return route.params.taskId === task.id;
+}
+
+const selectedTask = computed(() => tasks.value.filter(activated).pop());
+const router = useRouter();
+const showDeleteConfirm = ref(false);
+async function deleteTask(projectId: number, taskId: string) {
+  store.commit('clearError');
+  await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
+  if (store.state.currentError === undefined) {
+    router.push({
+      name: 'project',
+      params: {
+        projectId: projectId,
+      },
+    });
+    showDeleteConfirm.value = false;
+    await fetchTasks();
   }
+}
 </script>
 
 <style>
-  .task__title {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: rgba(60, 59, 59, 0.6);
-    font-size: 16px;
-    line-height: 20px;
-    position: relative;
-  }
+.task__title {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: rgba(60, 59, 59, 0.6);
+  font-size: 16px;
+  line-height: 20px;
+  position: relative;
+}
 
-  .task__title.active {
-    background-color: rgba(60, 59, 59, 0.3);
-  }
+.task__title.active {
+  background-color: rgba(60, 59, 59, 0.3);
+}
 
-  .task__cron {
-    font-size: 14px;
-    position: absolute;
-    line-height: 20px;
-    width: 200px;
-    height: 20px;
-    top: -30px;
-    left: 20px;
-  }
+.task__cron {
+  font-size: 14px;
+  position: absolute;
+  line-height: 20px;
+  width: 200px;
+  height: 20px;
+  top: -30px;
+  left: 20px;
+}
 
-  .task__remark {
-    font-size: 14px;
-    line-height: 20px;
-    margin: 10px 15px;
-    max-height: 60px;
-    overflow: hidden;
-  }
+.task__remark {
+  font-size: 14px;
+  line-height: 20px;
+  margin: 10px 15px;
+  max-height: 60px;
+  overflow: hidden;
+}
 
-  .task__bottom-box {
-    height: 24px;
-    line-height: 24px;
-    margin-left: 15px;
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-  }
+.task__bottom-box {
+  height: 24px;
+  line-height: 24px;
+  margin-left: 15px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+}
 
-  .task__status0 {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    border: 1px solid #f00;
-    color: #f00;
-    padding: 0 6px;
-    line-height: 24px;
-    border-radius: 5px;
-    font-size: 12px;
-    background-color: rgba(255, 0, 0, 0.2);
-  }
+.task__status0 {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  border: 1px solid #f00;
+  color: #f00;
+  padding: 0 6px;
+  line-height: 24px;
+  border-radius: 5px;
+  font-size: 12px;
+  background-color: rgba(255, 0, 0, 0.2);
+}
 
-  .task__status1 {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    border: 1px solid #67c23a;
-    color: #67c23a;
-    padding: 0 6px;
-    line-height: 24px;
-    border-radius: 5px;
-    font-size: 12px;
-    background-color: rgba(103, 194, 58, 0.2);
-  }
+.task__status1 {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  border: 1px solid #67c23a;
+  color: #67c23a;
+  padding: 0 6px;
+  line-height: 24px;
+  border-radius: 5px;
+  font-size: 12px;
+  background-color: rgba(103, 194, 58, 0.2);
+}
 </style>

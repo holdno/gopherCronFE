@@ -1,27 +1,24 @@
 <template>
   <div class="q-pa-md tw-w-full tw-h-full tw-flex tw-flex-col">
     <div class="tw-text-[#7e7e7e] tw-mb-4">
-      <div
-        class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg tw-mb-4"
-      >
-        <span><q-icon name="folder" /> {{ project?.title }} </span>
+      <div class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg tw-mb-4">
+        <span>
+          <q-icon name="folder" />
+          {{ project?.title }}
+        </span>
         <span>
           ID:
           {{ projectId }}
         </span>
       </div>
-      <div v-if="project && project.remark.trim() !== ''" class="tw-pb-4">
-        {{ project.remark }}
-      </div>
+      <div v-if="project && project.remark.trim() !== ''" class="tw-pb-4">{{ project.remark }}</div>
       <div>
         <div class="tw-pb-4">
           <q-icon name="hive" />
           在线节点： {{ projectClients.length }}
         </div>
         <div class="tw-flex tw-flex-wrap tw-gap-1 tw-pa-1">
-          <div v-for="client of projectClients" :key="client">
-            {{ client }}
-          </div>
+          <div v-for="client of projectClients" :key="client">{{ client }}</div>
         </div>
       </div>
     </div>
@@ -47,12 +44,12 @@
     </q-tabs>
     <div class="tw-flex tw-w-full tw-grow">
       <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
-        <q-scroll-area class="tw-grow">
+        <q-scroll-area class="tw-grow" :thumb-style="thumbStyle" :bar-style="barStyle">
           <q-tab-panels
             :model-value="tab"
             animated
             :vertical="width >= 1024"
-            class="tw-w-full tw-h-full"
+            class="tw-w-full tw-h-full tw-bg-[#121212]"
           >
             <q-tab-panel name="detail">
               <TaskDetail
@@ -103,55 +100,56 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted } from 'vue';
-  import { useStore } from '@/store';
-  import TaskDetail from '@/components/TaskDetail.vue';
-  import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
-  import TaskLogs from '@/components/TaskLogs.vue';
-  import { useRoute } from 'vue-router';
-  import { useWindowSize } from 'vue-window-size';
+import { computed, onMounted } from 'vue';
+import { useStore } from '@/store';
+import TaskDetail from '@/components/TaskDetail.vue';
+import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
+import TaskLogs from '@/components/TaskLogs.vue';
+import { useRoute } from 'vue-router';
+import { useWindowSize } from 'vue-window-size';
+import { thumbStyle, barStyle } from '@/utils/thumbStyle'
 
-  const props = defineProps({
-    id: {
-      type: String,
-      default: '',
-    },
-    projectId: {
-      type: Number,
-      required: true,
-    },
-    type: {
-      type: String,
-      default: 'crontab',
-    },
-  });
+const props = defineProps({
+  id: {
+    type: String,
+    default: '',
+  },
+  projectId: {
+    type: Number,
+    required: true,
+  },
+  type: {
+    type: String,
+    default: 'crontab',
+  },
+});
 
-  const store = useStore();
-  const project = computed(() =>
-    store.state.projects.find((p) => p.id === props.projectId),
-  );
+const store = useStore();
+const project = computed(() =>
+  store.state.projects.find((p) => p.id === props.projectId),
+);
 
-  const route = useRoute();
+const route = useRoute();
 
-  const isCreateMode = computed(
-    () => route.name && route.name.toString() === `create_${props.type}_task`,
-  );
-  const tab = computed(() => {
-    if (isCreateMode.value) {
-      return 'detail';
-    }
-    if (route.name) {
-      const routeName = route.name.toString();
-      if (routeName === `${props.type}_task_logs`) return 'logs';
-      else if (routeName === `${props.type}_task`) return 'detail';
-    }
-    throw new Error(`Unknown route name ${route.name?.toString()}`);
-  });
+const isCreateMode = computed(
+  () => route.name && route.name.toString() === `create_${props.type}_task`,
+);
+const tab = computed(() => {
+  if (isCreateMode.value) {
+    return 'detail';
+  }
+  if (route.name) {
+    const routeName = route.name.toString();
+    if (routeName === `${props.type}_task_logs`) return 'logs';
+    else if (routeName === `${props.type}_task`) return 'detail';
+  }
+  throw new Error(`Unknown route name ${route.name?.toString()}`);
+});
 
-  const { width } = useWindowSize();
+const { width } = useWindowSize();
 
-  onMounted(() => {
-    store.dispatch('fetchProjectClients', { projectId: props.projectId });
-  });
-  const projectClients = computed(() => store.state.projectClients);
+onMounted(() => {
+  store.dispatch('fetchProjectClients', { projectId: props.projectId });
+});
+const projectClients = computed(() => store.state.projectClients);
 </script>

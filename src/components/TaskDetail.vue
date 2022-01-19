@@ -1,9 +1,9 @@
 <template>
   <q-dialog v-model="showDeleteConfirm">
-    <q-card>
+    <q-card flat>
       <q-card-section class="row items-center">
         <q-avatar icon="delete" color="primary" text-color="white" />
-        <span class="q-ml-sm"> 是否要删除任务 {{ task?.name }}</span>
+        <span class="q-ml-sm">是否要删除任务 {{ task?.name }}</span>
       </q-card-section>
 
       <q-card-actions align="right">
@@ -17,10 +17,7 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
-  <div
-    v-if="!isCreateMode"
-    class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-1"
-  >
+  <div v-if="!isCreateMode" class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-1">
     <q-btn
       flat
       class="tw-w-24 tw-text-red-300 lg:tw-hidden"
@@ -34,9 +31,7 @@
       class="tw-w-24"
       :loading="executing || task?.isRunning === 1"
       @click="() => task && execute(projectId, task.id)"
-    >
-      执行
-    </q-btn>
+    >执行</q-btn>
   </div>
   <q-form class="tw-w-full" @submit="onSubmit" @reset="onReset">
     <q-input
@@ -58,14 +53,7 @@
       filled
       class="tw-mb-4"
     />
-    <q-input
-      key="name"
-      v-model="editable.name"
-      label="任务名称"
-      square
-      filled
-      class="tw-mb-4"
-    />
+    <q-input key="name" v-model="editable.name" label="任务名称" square filled class="tw-mb-4" />
     <q-input
       key="cron"
       v-model="editable.cronExpr"
@@ -141,111 +129,111 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
-  import { startTask } from '@/api/request';
-  import { useStore } from '@/store';
+import { computed, onMounted, ref, watchEffect } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { startTask } from '@/api/request';
+import { useStore } from '@/store';
 
-  const props = defineProps({
-    id: {
-      type: String,
-      default: '',
-    },
-    projectId: {
-      type: Number,
-      required: true,
-    },
+const props = defineProps({
+  id: {
+    type: String,
+    default: '',
+  },
+  projectId: {
+    type: Number,
+    required: true,
+  },
+});
+
+const DefaultTaskValues = computed(() => ({
+  id: '',
+  name: '',
+  projectId: props.projectId,
+  command: 'echo "hello world"',
+  cronExpr: '0 0 0 * * * *',
+  remark: '',
+  timeout: 0,
+  createTime: 0,
+  status: 0,
+  isRunning: 0,
+  noseize: 0,
+  exclusion: 0,
+  clientIp: '',
+  tmpId: '',
+}));
+
+const store = useStore();
+const task = computed(() => store.state.tasks.find((t) => t.id === props.id));
+const project = computed(() =>
+  store.state.projects.find((p) => p.id === props.projectId),
+);
+const editable = ref(
+  Object.assign({}, task.value || DefaultTaskValues.value),
+);
+watchEffect(() => {
+  editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
+});
+const modified = computed(() => {
+  return JSON.stringify(task.value) !== JSON.stringify(editable.value);
+});
+const canSave = computed(() => {
+  const { name, command, timeout, cronExpr } = editable.value;
+  return name !== '' && command !== '' && timeout >= 0 && cronExpr !== '';
+});
+
+const router = useRouter();
+async function onSubmit() {
+  const newTask = await store.dispatch('saveTask', {
+    task: editable.value,
   });
-
-  const DefaultTaskValues = computed(() => ({
-    id: '',
-    name: '',
+  await store.dispatch('fetchTasks', {
     projectId: props.projectId,
-    command: 'echo "hello world"',
-    cronExpr: '0 0 0 * * * *',
-    remark: '',
-    timeout: 0,
-    createTime: 0,
-    status: 0,
-    isRunning: 0,
-    noseize: 0,
-    exclusion: 0,
-    clientIp: '',
-    tmpId: '',
-  }));
+  });
+  router.push({
+    name: 'crontab_task',
+    params: {
+      taskId: newTask.id,
+    },
+  });
+}
+function onReset() {
+  editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
+}
 
-  const store = useStore();
-  const task = computed(() => store.state.tasks.find((t) => t.id === props.id));
-  const project = computed(() =>
-    store.state.projects.find((p) => p.id === props.projectId),
+const showDeleteConfirm = ref(false);
+async function deleteTask(projectId: number, taskId: string) {
+  store.commit('clearError');
+  await store.dispatch('deleteTask', { projectId, taskId });
+  if (store.state.currentError === undefined) {
+    await store.dispatch('fetchTasks', { ...props });
+    router.push({ name: 'crontab_tasks' });
+    showDeleteConfirm.value = false;
+  }
+}
+
+const route = useRoute();
+const isCreateMode = computed(
+  () => route.name && route.name.toString() === 'create_crontab_task',
+);
+
+const executing = ref(false);
+async function execute(projectId: number, taskId: string) {
+  executing.value = true;
+  try {
+    await startTask(store.getters.apiv1, projectId, taskId);
+  } finally {
+    executing.value = false;
+  }
+}
+
+onMounted(() => {
+  store.watch(
+    (state) => [state.eventTask],
+    (current) => {
+      store.dispatch('fetchTasks', {
+        projectId: props.projectId,
+      });
+    },
   );
-  const editable = ref(
-    Object.assign({}, task.value || DefaultTaskValues.value),
-  );
-  watchEffect(() => {
-    editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
-  });
-  const modified = computed(() => {
-    return JSON.stringify(task.value) !== JSON.stringify(editable.value);
-  });
-  const canSave = computed(() => {
-    const { name, command, timeout, cronExpr } = editable.value;
-    return name !== '' && command !== '' && timeout >= 0 && cronExpr !== '';
-  });
-
-  const router = useRouter();
-  async function onSubmit() {
-    const newTask = await store.dispatch('saveTask', {
-      task: editable.value,
-    });
-    await store.dispatch('fetchTasks', {
-      projectId: props.projectId,
-    });
-    router.push({
-      name: 'crontab_task',
-      params: {
-        taskId: newTask.id,
-      },
-    });
-  }
-  function onReset() {
-    editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
-  }
-
-  const showDeleteConfirm = ref(false);
-  async function deleteTask(projectId: number, taskId: string) {
-    store.commit('clearError');
-    await store.dispatch('deleteTask', { projectId, taskId });
-    if (store.state.currentError === undefined) {
-      await store.dispatch('fetchTasks', { ...props });
-      router.push({ name: 'crontab_tasks' });
-      showDeleteConfirm.value = false;
-    }
-  }
-
-  const route = useRoute();
-  const isCreateMode = computed(
-    () => route.name && route.name.toString() === 'create_crontab_task',
-  );
-
-  const executing = ref(false);
-  async function execute(projectId: number, taskId: string) {
-    executing.value = true;
-    try {
-      await startTask(store.getters.apiv1, projectId, taskId);
-    } finally {
-      executing.value = false;
-    }
-  }
-
-  onMounted(() => {
-    store.watch(
-      (state) => [state.eventTask],
-      (current) => {
-        store.dispatch('fetchTasks', {
-          projectId: props.projectId,
-        });
-      },
-    );
-  });
-</script>
+});
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </script>
