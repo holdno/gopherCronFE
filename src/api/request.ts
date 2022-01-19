@@ -429,7 +429,7 @@ export async function fetchWorkflows(
   const data = resp.data;
   const r = data.response;
   return [
-    r.list.map((v: any) => ({
+    r.list?.map((v: any) => ({
       id: v.id,
       title: v.title,
       remark: v.remark,
@@ -437,7 +437,7 @@ export async function fetchWorkflows(
       state: v.state,
       createTime: v.create_time,
       cronExpr: v.cron,
-    })),
+    })) || [],
     r.total,
   ];
 }
