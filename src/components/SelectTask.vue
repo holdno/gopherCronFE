@@ -4,6 +4,7 @@
     label="任务列表"
     map-options
     emit-value
+    behavior="menu"
     :disable="props.disabled"
     :options="
       tasks.map((t) => ({

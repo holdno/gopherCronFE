@@ -4,6 +4,7 @@
     label="项目列表"
     map-options
     emit-value
+    behavior="menu"
     :options="
       projects.map((p) => ({
         label: p.title,
