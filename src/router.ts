@@ -47,7 +47,7 @@ const routes = [
       {
         name: 'summary',
         path: 'summary',
-        component: () => import('./pages/SummaryPage.vue'),
+        component: () => import('./pages/Summary/SummaryPage.vue'),
       },
       {
         name: 'projects',

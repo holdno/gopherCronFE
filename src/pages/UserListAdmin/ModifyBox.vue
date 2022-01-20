@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="open">
+  <q-dialog v-model="open" :no-backdrop-dismiss="!canDismiss">
     <q-card style="width: 300px">
       <q-card-section>
         <div class="text-h6">{{ user ? '编辑' : '新增' }}</div>
@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { PropType, computed, reactive } from 'vue';
+  import { PropType, computed, ref } from 'vue';
   import { User } from '@/api/request';
   import { createUser, changePassword } from '@/api/user';
   import { store } from '@/store';
@@ -97,8 +97,7 @@
       default: null,
     },
   });
-
-  const userData = reactive(
+  const defaultValue =
     props.user != null
       ? { ...props.user, password: '', passwordAgain: '', newPassword: '' }
       : {
@@ -108,34 +107,42 @@
           newPassword: '',
           passwordAgain: '',
           name: '',
-        },
-  );
-
+        };
+  const userData = ref(Object.assign({}, defaultValue));
+  const canDismiss = computed(() => {
+    return JSON.stringify(defaultValue) === JSON.stringify(userData.value);
+  });
   const isAdmin = store.getters.isAdmin;
   const emits = defineEmits(['update:modelValue', 'modify']);
+  const reset = () => {
+    userData.value = Object.assign({}, defaultValue);
+  };
 
   const open = computed<boolean>({
     get() {
       return props.modelValue;
     },
     set(value) {
+      if (!value) {
+        reset();
+      }
       emits('update:modelValue', value);
     },
   });
 
   const update = async () => {
     try {
-      if (userData.newPassword !== userData.passwordAgain) {
+      if (userData.value.newPassword !== userData.value.passwordAgain) {
         store.commit('error', { error: new Error('两次密码不一致') });
         return;
       }
       const resp = await changePassword({
-        id: userData.id ? userData.id : 0,
-        password: userData.password,
-        newPassword: userData.newPassword,
+        userID: userData.value.id ? userData.value.id : 0,
+        password: userData.value.password,
+        newPassword: userData.value.newPassword,
       });
       if (resp.meta.code === 0) {
-        store.commit('success', '修改成功');
+        store.commit('success', { message: '修改成功' });
         open.value = false;
         emits('modify', {});
       }
@@ -146,14 +153,14 @@
 
   const create = async () => {
     try {
-      if (userData.password !== userData.passwordAgain) {
+      if (userData.value.password !== userData.value.passwordAgain) {
         store.commit('error', { error: new Error('两次密码不一致') });
         return;
       }
       const res = await createUser({
-        account: userData.account,
-        password: userData.password,
-        name: userData.name,
+        account: userData.value.account,
+        password: userData.value.password,
+        name: userData.value.name,
       });
 
       if (res.meta.code === 0) {

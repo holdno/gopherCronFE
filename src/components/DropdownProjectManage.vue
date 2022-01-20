@@ -14,8 +14,13 @@
     dropdown-icon="more_horiz"
     no-icon-animation
   >
-    <q-list>
-      <q-item v-close-popup clickable @click.stop="showEditDialog = true">
+    <q-list dense>
+      <q-item
+        v-close-popup
+        clickable
+        class="hover:tw-bg-primary hover:tw-text-black"
+        @click.stop="showEditDialog = true"
+      >
         <q-item-section>
           <q-item-label>编辑</q-item-label>
         </q-item-section>
@@ -23,13 +28,19 @@
       <q-item
         v-close-popup
         clickable
+        class="hover:tw-bg-primary hover:tw-text-black"
         @click.stop="showUsersManageDialog = true"
       >
         <q-item-section>
           <q-item-label>人员管理</q-item-label>
         </q-item-section>
       </q-item>
-      <q-item v-close-popup clickable @click.stop="showDeleteConfirm = true">
+      <q-item
+        v-close-popup
+        clickable
+        class="hover:tw-bg-primary hover:tw-text-black"
+        @click.stop="showDeleteConfirm = true"
+      >
         <q-item-section>
           <q-item-label>删除</q-item-label>
         </q-item-section>

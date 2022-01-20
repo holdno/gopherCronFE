@@ -31,22 +31,25 @@
               filled
             />
           </q-card-section>
-          <q-card-actions align="around">
-            <q-btn
-              color="primary"
-              text-color="black"
-              type="submit"
-              label="创建"
-              :disable="!canSubmit"
-              class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
-            />
+          <q-card-section
+            align="right"
+            class="tw-flex tw-gap-4 tw-flex-col-reverse lg:tw-flex-row lg:tw-justify-end"
+          >
             <q-btn
               v-close-popup
               flat
               label="取消"
               class="lg:tw-w-24 tw-w-full"
             />
-          </q-card-actions>
+            <q-btn
+              color="primary"
+              text-color="black"
+              type="submit"
+              label="创建"
+              :disable="!canSubmit"
+              class="lg:tw-w-24 tw-w-full"
+            />
+          </q-card-section>
         </q-form>
       </q-card>
     </q-dialog>
@@ -54,8 +57,8 @@
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="delete" color="primary" text-color="white" />
-          <span class="q-ml-sm">
-            是否要删除该任务编排 {{ workflowToBeDeleted?.title }}</span
+          <span class="q-ml-sm"
+            >是否要删除该任务编排 {{ workflowToBeDeleted?.title }}</span
           >
         </q-card-section>
 
@@ -71,6 +74,7 @@
       </q-card>
     </q-dialog>
     <q-table
+      ref="table"
       v-model:pagination="pagination"
       class="tw-w-full tw-h-full"
       :rows-per-page-options="[10, 20, 30]"
@@ -100,7 +104,7 @@
         />
       </template>
       <template #body-cell-cron="props">
-        <q-td key="cron" class="text-right">
+        <q-td key="cron" class="text-left">
           {{ props.value }}
           <q-popup-edit
             v-slot="scope"
@@ -121,19 +125,20 @@
         </q-td>
       </template>
       <template #body-cell-state="props">
-        <q-td key="state" class="text-right">
+        <q-td key="state" class="text-center">
           <q-spinner-gears
             v-if="isRunning(props.row)"
+            class="tw-m-auto"
             color="primary"
             size="2em"
-            style="margin-left: auto; margin-right: 0"
           />
           <q-icon v-else name="check_circle" color="primary" size="2em" />
         </q-td>
       </template>
       <template #body-cell-status="props">
-        <q-td key="status" class="text-right">
+        <q-td key="status" class="text-center">
           <q-toggle
+            class="tw-m-auto"
             color="primary"
             :model-value="props.value !== 2"
             @update:model-value="(v) => updateStatus(props.row, v)"
@@ -142,14 +147,14 @@
       </template>
       <template #body-cell-operation="props">
         <q-td key="operation">
-          <div class="xl:tw-flex tw-grid tw-gap-4 tw-justify-items-center">
+          <div class="xl:tw-flex tw-grid tw-gap-4 tw-items-center">
             <q-btn
               :to="{ name: 'workflow', params: { workflowId: props.row.id } }"
               dense
               flat
               color="primary"
-              >详情
-            </q-btn>
+              >详情</q-btn
+            >
             <q-btn
               v-if="!isRunning(props.row)"
               dense
@@ -170,9 +175,8 @@
                 () =>
                   killWorkflow(store.getters.apiv1, props.row.id).then(refresh)
               "
+              >Kill</q-btn
             >
-              Kill
-            </q-btn>
             <q-btn
               dense
               flat
@@ -180,9 +184,8 @@
                 name: 'workflow_logs',
                 params: { workflowId: props.row.id },
               }"
+              >日志</q-btn
             >
-              日志
-            </q-btn>
             <q-btn
               dense
               flat
@@ -204,11 +207,12 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, watchEffect, ref, computed } from 'vue';
+  import { onMounted, watchEffect, ref, computed, nextTick } from 'vue';
   import { useStore } from '@/store';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
   import { startWorkflow, killWorkflow } from '@/api/request';
   import { useRoute, useRouter } from 'vue-router';
+  import { QTable } from 'quasar';
 
   const store = useStore();
 
@@ -216,17 +220,28 @@
   const loading = computed(() => store.state.loadingWorkflows);
   const workflows = computed(() => store.state.workflows);
   const columns = [
-    { name: 'id', field: 'id', label: 'ID' },
-    { name: 'title', field: 'title', label: '名称' },
-    { name: 'remark', field: 'remark', label: '备注' },
-    { name: 'cron', field: 'cronExpr', label: '调度计划' },
-    { name: 'status', field: 'status', label: '启用状态' },
+    { name: 'id', field: 'id', label: 'ID', align: 'left' as const },
+    { name: 'title', field: 'title', label: '名称', align: 'left' as const },
+    { name: 'remark', field: 'remark', label: '备注', align: 'left' as const },
+    {
+      name: 'cron',
+      field: 'cronExpr',
+      label: '调度计划',
+      align: 'left' as const,
+    },
+    {
+      name: 'status',
+      field: 'status',
+      label: '启用状态',
+      align: 'center' as const,
+    },
     {
       name: 'state',
       field: 'state',
       label: '运行状态',
+      align: 'center' as const,
     },
-    { name: 'operation', field: () => null, label: '操作' },
+    { name: 'operation', field: '', label: '操作', align: 'left' as const },
   ];
   const pagination = ref<Pagination>({
     sortBy: '',
@@ -264,12 +279,24 @@
       .then(refresh);
   }
 
+  const table = ref<QTable>();
+  const pageChange = () => {
+    nextTick(() => {
+      const node: HTMLElement | null =
+        table.value?.$el.querySelector('.scroll');
+      node?.scrollTo({ top: 0 });
+    });
+  };
+
   async function refresh() {
     const p = pagination.value;
     await store.dispatch('fetchWorkflows', {
       page: p.page,
       pageSize: p.rowsPerPage,
     });
+    if (p.page !== 1) {
+      pageChange();
+    }
   }
 
   onMounted(() => {

@@ -18,14 +18,14 @@ export async function createUser(args: CreateUserRequest) {
 }
 
 export interface ChangePasswordRequest {
-  id: number;
+  userID: number;
   password: string;
   newPassword?: string;
 }
 
 export async function changePassword(args: ChangePasswordRequest) {
   const resp = await apiv1.post('/user/change_password', {
-    id: args.id,
+    user_id: args.userID,
     password: args.password,
     new_password: args.newPassword,
   });

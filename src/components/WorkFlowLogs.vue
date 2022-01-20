@@ -1,7 +1,8 @@
 <template>
   <q-table
+    ref="table"
     v-model:pagination="pagination"
-    class="tw-w-full tw-h-full"
+    class="tw-w-full tw-h-full tw-bg-[#121212]"
     :rows-per-page-options="[5, 10, 15]"
     title="执行日志"
     :rows="logs"
@@ -16,7 +17,7 @@
       <q-inner-loading showing color="primary" />
     </template>
     <template #body="scope">
-      <q-card class="tw-my-8 tw-mx-4" flat bordered>
+      <q-card class="tw-my-4 tw-mx-4" flat bordered>
         <q-item>
           <q-item-section>
             <q-item-label overline>开始时间</q-item-label>
@@ -43,11 +44,12 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
+  import { computed, nextTick, onMounted, ref, watchEffect } from 'vue';
   import { useStore } from '@/store';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
   import { formatTimestamp } from '@/utils/datetime';
   import JSONViewer from '@/components/JSONViewer.vue';
+  import { QTable } from 'quasar';
 
   const props = defineProps({
     id: {
@@ -66,12 +68,23 @@
     rowsPerPage: 5,
     rowsNumber: 0,
   });
+
+  const table = ref<QTable>();
+  const pageChange = () => {
+    nextTick(() => {
+      const node: HTMLElement | null =
+        table.value?.$el.querySelector('.scroll');
+      node?.scrollTo({ top: 0 });
+    });
+  };
+
   function updatePagination({
     pagination: { page, rowsPerPage },
   }: TableRequestProp) {
     const p = pagination.value;
     p.page = page;
     p.rowsPerPage = rowsPerPage;
+    pageChange();
   }
   watchEffect(() => {
     const p = pagination.value;

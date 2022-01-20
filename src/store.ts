@@ -208,6 +208,7 @@ export const store = createStore<State>({
           color: 'red',
           icon: 'announcement',
           position: 'top-right',
+          classes: 'tw-mt-14',
         });
       else throw error;
     },
@@ -218,6 +219,7 @@ export const store = createStore<State>({
           message: message,
           type: type || 'info',
           position: 'top-right',
+          classes: 'tw-mt-14',
         });
       }
     },

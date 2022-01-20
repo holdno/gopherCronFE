@@ -23,17 +23,20 @@
             filled
           />
         </q-card-section>
-        <q-card-actions align="around">
+        <q-card-section
+          align="right"
+          class="tw-flex tw-gap-4 tw-flex-col-reverse lg:tw-flex-row lg:tw-justify-end"
+        >
+          <q-btn v-close-popup flat label="取消" class="lg:tw-w-24 tw-w-full" />
           <q-btn
             color="primary"
             text-color="black"
             type="submit"
             :label="project === undefined ? '创建' : '保存'"
             :disable="!canSubmit"
-            class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
+            class="lg:tw-w-24 tw-w-full"
           />
-          <q-btn v-close-popup flat label="取消" class="lg:tw-w-24 tw-w-full" />
-        </q-card-actions>
+        </q-card-section>
       </q-form>
     </q-card>
   </q-dialog>

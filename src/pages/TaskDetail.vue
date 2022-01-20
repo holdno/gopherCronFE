@@ -1,7 +1,9 @@
 <template>
-  <div class="q-pa-md tw-w-full tw-h-full tw-flex tw-flex-col">
+  <div class="tw-px-4 tw-pt-2 tw-w-full tw-h-full tw-flex tw-flex-col">
     <div class="tw-text-[#7e7e7e] tw-mb-4">
-      <div class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg tw-mb-4">
+      <div
+        class="tw-flex tw-items-center tw-justify-start tw-gap-4 tw-text-lg tw-mb-4"
+      >
         <span>
           <q-icon name="folder" />
           {{ project?.title }}
@@ -11,13 +13,17 @@
           {{ projectId }}
         </span>
       </div>
-      <div v-if="project && project.remark.trim() !== ''" class="tw-pb-4">{{ project.remark }}</div>
+      <div v-if="project && project.remark.trim() !== ''" class="tw-pb-4">
+        {{ project.remark }}
+      </div>
       <div>
         <div class="tw-pb-4">
           <q-icon name="hive" />
-          在线节点： {{ projectClients.length }}
+          在线节点: {{ projectClients.length }}
         </div>
-        <div class="tw-flex tw-flex-wrap tw-gap-1 tw-pa-1">
+        <div
+          class="tw-flex tw-flex-wrap tw-gap-1 tw-px-2 tw-py-1 tw-text-white tw-bg-black"
+        >
           <div v-for="client of projectClients" :key="client">{{ client }}</div>
         </div>
       </div>
@@ -44,14 +50,19 @@
     </q-tabs>
     <div class="tw-flex tw-w-full tw-grow">
       <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
-        <q-scroll-area class="tw-grow" :thumb-style="thumbStyle" :bar-style="barStyle">
+        <q-scroll-area
+          ref="scroll"
+          class="tw-grow"
+          :thumb-style="thumbStyle"
+          :bar-style="barStyle"
+        >
           <q-tab-panels
             :model-value="tab"
             animated
             :vertical="width >= 1024"
             class="tw-w-full tw-h-full tw-bg-[#121212]"
           >
-            <q-tab-panel name="detail">
+            <q-tab-panel name="detail" class="tw-p-0 tw-pr-4">
               <TaskDetail
                 v-if="props.type === 'crontab'"
                 :id="props.id"
@@ -63,8 +74,12 @@
                 :project-id="props.projectId"
               />
             </q-tab-panel>
-            <q-tab-panel name="logs">
-              <TaskLogs :id="props.id" :project-id="props.projectId" />
+            <q-tab-panel name="logs" class="tw-p-0 tw-pr-4">
+              <TaskLogs
+                :id="props.id"
+                :project-id="props.projectId"
+                @onpage="pageChange"
+              />
             </q-tab-panel>
           </q-tab-panels>
         </q-scroll-area>
@@ -100,56 +115,63 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
-import { useStore } from '@/store';
-import TaskDetail from '@/components/TaskDetail.vue';
-import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
-import TaskLogs from '@/components/TaskLogs.vue';
-import { useRoute } from 'vue-router';
-import { useWindowSize } from 'vue-window-size';
-import { thumbStyle, barStyle } from '@/utils/thumbStyle'
+  import { computed, nextTick, onMounted, ref } from 'vue';
+  import { useStore } from '@/store';
+  import TaskDetail from '@/components/TaskDetail.vue';
+  import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
+  import TaskLogs from '@/components/TaskLogs.vue';
+  import { useRoute } from 'vue-router';
+  import { useWindowSize } from 'vue-window-size';
+  import { thumbStyle, barStyle } from '@/utils/thumbStyle';
+  import { QScrollArea } from 'quasar';
 
-const props = defineProps({
-  id: {
-    type: String,
-    default: '',
-  },
-  projectId: {
-    type: Number,
-    required: true,
-  },
-  type: {
-    type: String,
-    default: 'crontab',
-  },
-});
+  const props = defineProps({
+    id: {
+      type: String,
+      default: '',
+    },
+    projectId: {
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      default: 'crontab',
+    },
+  });
 
-const store = useStore();
-const project = computed(() =>
-  store.state.projects.find((p) => p.id === props.projectId),
-);
+  const store = useStore();
+  const project = computed(() =>
+    store.state.projects.find((p) => p.id === props.projectId),
+  );
 
-const route = useRoute();
+  const route = useRoute();
+  const scroll = ref<QScrollArea>();
+  const pageChange = () => {
+    nextTick(() => {
+      scroll.value?.setScrollPosition('vertical', 0);
+    });
+  };
 
-const isCreateMode = computed(
-  () => route.name && route.name.toString() === `create_${props.type}_task`,
-);
-const tab = computed(() => {
-  if (isCreateMode.value) {
-    return 'detail';
-  }
-  if (route.name) {
-    const routeName = route.name.toString();
-    if (routeName === `${props.type}_task_logs`) return 'logs';
-    else if (routeName === `${props.type}_task`) return 'detail';
-  }
-  throw new Error(`Unknown route name ${route.name?.toString()}`);
-});
+  const isCreateMode = computed(
+    () => route.name && route.name.toString() === `create_${props.type}_task`,
+  );
+  const tab = computed(() => {
+    if (isCreateMode.value) {
+      return 'detail';
+    }
+    if (route.name) {
+      const routeName = route.name.toString();
+      if (routeName === `${props.type}_task_logs`) return 'logs';
+      else if (routeName === `${props.type}_task`) return 'detail';
+    }
+    throw new Error(`Unknown route name ${route.name?.toString()}`);
+  });
 
-const { width } = useWindowSize();
+  const { width } = useWindowSize();
 
-onMounted(() => {
-  store.dispatch('fetchProjectClients', { projectId: props.projectId });
-});
-const projectClients = computed(() => store.state.projectClients);
+  onMounted(() => {
+    store.dispatch('fetchProjectClients', { projectId: props.projectId });
+  });
+  const projectClients = computed(() => store.state.projectClients);
 </script>

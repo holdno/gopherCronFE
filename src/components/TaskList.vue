@@ -23,15 +23,22 @@
       </q-card>
     </q-dialog>
     <div class="q-pa-md tw-flex tw-justify-around">
-      <q-input v-model="filter" borderless dense debounce="300" placeholder="Search">
+      <q-input
+        v-model="filter"
+        borderless
+        dense
+        debounce="300"
+        placeholder="Search"
+      >
         <template #append>
           <q-icon name="search" />
         </template>
       </q-input>
-      <q-btn flat :loading="loading" icon="refresh" @click="fetchTasks" />
-      <q-btn flat :to="{ name: 'create_crontab_task' }" icon="add" />
+      <q-btn flat dense :loading="loading" icon="refresh" @click="fetchTasks" />
+      <q-btn flat dense :to="{ name: 'create_crontab_task' }" icon="add" />
       <q-btn
         flat
+        dense
         class="tw-text-red-300 lg:tw-flex tw-hidden"
         icon="delete"
         :disable="!selectedTask"
@@ -45,7 +52,7 @@
         :thumb-style="thumbStyle"
         :bar-style="barStyle"
       >
-        <q-list class="tw-flex tw-flex-col tw-gap-2">
+        <q-list class="tw-flex tw-flex-col tw-gap-2 tw-pb-4">
           <router-link
             v-for="task in tasks"
             :key="task.id"
@@ -64,8 +71,8 @@
                   task.isRunning
                     ? '执行中'
                     : task.status == 1
-                      ? '调度中'
-                      : '已暂停'
+                    ? '调度中'
+                    : '已暂停'
                 }}
               </div>
               <div
@@ -83,7 +90,9 @@
               </div>
               <div class="task__remark">{{ task.remark || '-' }}</div>
               <div class="task__bottom-box">
-                <div class="task__bottom-time">{{ formatTimestamp(task.createTime * 1000) }}</div>
+                <div class="task__bottom-time">
+                  {{ formatTimestamp(task.createTime * 1000) }}
+                </div>
               </div>
             </div>
           </router-link>
@@ -94,136 +103,135 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watchEffect } from 'vue';
-import { useStore } from '@/store';
-import { Task } from '@/api/request';
-import { formatTimestamp } from '@/utils/datetime';
-import { useRoute, useRouter } from 'vue-router';
-import { thumbStyle, barStyle } from '@/utils/thumbStyle'
+  import { computed, onMounted, ref, watchEffect } from 'vue';
+  import { useStore } from '@/store';
+  import { Task } from '@/api/request';
+  import { formatTimestamp } from '@/utils/datetime';
+  import { useRoute, useRouter } from 'vue-router';
+  import { thumbStyle, barStyle } from '@/utils/thumbStyle';
 
-const props = defineProps({
-  projectId: {
-    type: Number,
-    required: true,
-  },
-});
-
-const store = useStore();
-const loading = computed(() => store.state.loadingTasks);
-
-onMounted(() => {
-  watchEffect(async () => {
-    await fetchTasks();
-  });
-  store.watch(
-    (state) => [state.eventTask, state.eventWorkFlowTask],
-    (current) => {
-      fetchTasks();
+  const props = defineProps({
+    projectId: {
+      type: Number,
+      required: true,
     },
-  );
-});
-async function fetchTasks() {
-  await store.dispatch('fetchTasks', { ...props });
-}
+  });
 
-const filter = ref('');
-const tasks = computed(() =>
-  store.state.tasks.filter(
-    (t: Task) =>
-      t.name.indexOf(filter.value) >= 0 ||
-      t.id.toString().indexOf(filter.value) >= 0,
-  ),
-);
+  const store = useStore();
+  const loading = computed(() => store.state.loadingTasks);
 
-function activated(task: Task): boolean {
-  const route = useRoute();
-  return route.params.taskId === task.id;
-}
-
-const selectedTask = computed(() => tasks.value.filter(activated).pop());
-const router = useRouter();
-const showDeleteConfirm = ref(false);
-async function deleteTask(projectId: number, taskId: string) {
-  store.commit('clearError');
-  await store.dispatch('deleteTask', { projectId, taskId });
-  if (store.state.currentError === undefined) {
-    router.push({
-      name: 'project',
-      params: {
-        projectId: projectId,
-      },
+  onMounted(() => {
+    watchEffect(async () => {
+      await fetchTasks();
     });
-    showDeleteConfirm.value = false;
-    await fetchTasks();
+    store.watch(
+      (state) => [state.eventTask, state.eventWorkFlowTask],
+      (current) => {
+        fetchTasks();
+      },
+    );
+  });
+  async function fetchTasks() {
+    await store.dispatch('fetchTasks', { ...props });
   }
-}
 
+  const filter = ref('');
+  const tasks = computed(() =>
+    store.state.tasks.filter(
+      (t: Task) =>
+        t.name.indexOf(filter.value) >= 0 ||
+        t.id.toString().indexOf(filter.value) >= 0,
+    ),
+  );
+
+  function activated(task: Task): boolean {
+    const route = useRoute();
+    return route.params.taskId === task.id;
+  }
+
+  const selectedTask = computed(() => tasks.value.filter(activated).pop());
+  const router = useRouter();
+  const showDeleteConfirm = ref(false);
+  async function deleteTask(projectId: number, taskId: string) {
+    store.commit('clearError');
+    await store.dispatch('deleteTask', { projectId, taskId });
+    if (store.state.currentError === undefined) {
+      router.push({
+        name: 'project',
+        params: {
+          projectId: projectId,
+        },
+      });
+      showDeleteConfirm.value = false;
+      await fetchTasks();
+    }
+  }
 </script>
 
 <style>
-.task__title {
-  margin-top: 10px;
-  padding: 5px 10px;
-  background-color: rgba(60, 59, 59, 0.6);
-  font-size: 16px;
-  line-height: 20px;
-  position: relative;
-}
+  .task__title {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: rgba(60, 59, 59, 0.6);
+    font-size: 16px;
+    line-height: 20px;
+    position: relative;
+  }
 
-.task__title.active {
-  background-color: rgba(60, 59, 59, 0.3);
-}
+  .task__title.active {
+    background-color: rgba(60, 59, 59, 0.3);
+  }
 
-.task__cron {
-  font-size: 14px;
-  position: absolute;
-  line-height: 20px;
-  width: 200px;
-  height: 20px;
-  top: -30px;
-  left: 20px;
-}
+  .task__cron {
+    font-size: 14px;
+    position: absolute;
+    line-height: 20px;
+    width: 200px;
+    height: 20px;
+    top: -30px;
+    left: 20px;
+  }
 
-.task__remark {
-  font-size: 14px;
-  line-height: 20px;
-  margin: 10px 15px;
-  max-height: 60px;
-  overflow: hidden;
-}
+  .task__remark {
+    font-size: 14px;
+    line-height: 20px;
+    margin: 10px 15px;
+    max-height: 60px;
+    overflow: hidden;
+  }
 
-.task__bottom-box {
-  height: 24px;
-  line-height: 24px;
-  margin-left: 15px;
-  margin-bottom: 5px;
-  display: flex;
-  justify-content: space-between;
-}
+  .task__bottom-box {
+    height: 24px;
+    line-height: 24px;
+    margin-left: 15px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+  }
 
-.task__status0 {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  border: 1px solid #f00;
-  color: #f00;
-  padding: 0 6px;
-  line-height: 24px;
-  border-radius: 5px;
-  font-size: 12px;
-  background-color: rgba(255, 0, 0, 0.2);
-}
+  .task__status0 {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    border: 1px solid #f00;
+    color: #f00;
+    padding: 0 6px;
+    line-height: 24px;
+    border-radius: 5px;
+    font-size: 12px;
+    background-color: rgba(255, 0, 0, 0.2);
+  }
 
-.task__status1 {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  border: 1px solid #67c23a;
-  color: #67c23a;
-  padding: 0 6px;
-  line-height: 24px;
-  border-radius: 5px;
-  font-size: 12px;
-  background-color: rgba(103, 194, 58, 0.2);
-}
+  .task__status1 {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    border: 1px solid #67c23a;
+    color: #67c23a;
+    padding: 0 6px;
+    line-height: 24px;
+    border-radius: 5px;
+    font-size: 12px;
+    background-color: rgba(103, 194, 58, 0.2);
+  }
 </style>

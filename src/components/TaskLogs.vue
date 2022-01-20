@@ -1,9 +1,8 @@
 <template>
   <q-table
     v-model:pagination="pagination"
-    class="tw-w-full tw-h-full"
+    class="tw-w-full tw-h-full tw-bg-[#121212]"
     :rows-per-page-options="[5, 10, 15]"
-    title="任务执行日志"
     :rows="logs"
     :loading="loading"
     row-key="id"
@@ -16,7 +15,7 @@
       <q-inner-loading showing color="primary" />
     </template>
     <template #body="scope">
-      <q-card class="tw-my-8 tw-mx-4" flat bordered>
+      <q-card class="tw-my-4" flat bordered>
         <q-item>
           <q-item-section>
             <q-item-label overline>节点 IP</q-item-label>
@@ -64,6 +63,8 @@
       required: true,
     },
   });
+
+  const emits = defineEmits(['onpage']);
   const store = useStore();
   const logs = computed(() => store.state.taskLogs);
   const total = computed(() => store.state.taskLogsTotal);
@@ -82,6 +83,7 @@
     const p = pagination.value;
     p.page = page;
     p.rowsPerPage = rowsPerPage;
+    emits('onpage');
   }
   watchEffect(() => {
     const p = pagination.value;
