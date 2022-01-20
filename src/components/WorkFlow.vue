@@ -316,7 +316,7 @@
     selectedEdges.value = [];
   }
 
-  const layouts = reactive<Layouts>({ nodes: {} });
+  const layouts = ref<Layouts>({ nodes: {} });
 
   const taskLayouts = computed<Layouts>(() => {
     const nodes: NodePositions = {};
@@ -340,7 +340,7 @@
   });
 
   function updateLayouts(current: Layouts) {
-    const nodes = layouts.nodes;
+    const nodes = layouts.value.nodes;
     for (const key of Object.keys(nodes)) {
       delete nodes[key];
     }
@@ -517,17 +517,19 @@
     }
 
     const previousNodes = ref();
-    watch<[NodePositions, VNetworkGraphInstance | undefined, boolean]>(
-      () => [layouts.nodes, graph.value, show.value],
-      ([currentNodes, graph, show]) => {
+    watch<[Layouts, VNetworkGraphInstance | undefined, boolean]>(
+      () => [layouts.value, graph.value, show.value],
+      ([currentLayouts, graph, show]) => {
         if (!visual.value && graph && show) {
           graph.panToCenter();
-          if (similarLayout(currentNodes, previousNodes.value)) {
+          if (similarLayout(currentLayouts.nodes, previousNodes.value)) {
             setTimeout(() => (visual.value = true), 100);
           }
         }
 
-        previousNodes.value = JSON.parse(JSON.stringify(toRaw(layouts.nodes)));
+        previousNodes.value = JSON.parse(
+          JSON.stringify(toRaw(layouts.value.nodes)),
+        );
       },
       { deep: true },
     );
