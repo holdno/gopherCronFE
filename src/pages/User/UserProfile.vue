@@ -72,7 +72,7 @@
                 <div
                   class="tw-flex tw-box-border tw-px-2 q-dark tw-h-10 tw-border-dashed tw-shadow tw-items-center tw-w-full tw-justify-between tw-rounded"
                 >
-                  {{ user.account }} boya.wang@baishancloud.com
+                  {{ user.account }}
                 </div>
                 <div
                   class="tw-flex tw-box-border tw-px-2 tw-mt-4 q-dark tw-h-10 tw-border-dashed tw-shadow tw-items-center tw-w-full tw-justify-between tw-rounded"
