@@ -1,7 +1,11 @@
 <template>
   <div class="tw-w-full tw-h-full tw-flex tw-flex-col">
     <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap">
-      <q-btn flat type="primary" :disable="!canUpdate" @click="updateWorkFlow"
+      <q-btn
+        :color="canUpdate ? 'primary' : ''"
+        :text-color="canUpdate ? 'black' : 'white'"
+        :disable="!canUpdate"
+        @click="updateWorkFlow"
         >保存</q-btn
       >
       <q-btn flat icon="refresh" title="刷新" @click="() => refresh()"

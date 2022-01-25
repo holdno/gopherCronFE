@@ -22,9 +22,11 @@
           在线节点: {{ projectClients.length }}
         </div>
         <div
-          class="tw-flex tw-flex-wrap tw-gap-1 tw-px-2 tw-py-1 tw-text-white tw-bg-black"
+          class="tw-flex tw-flex-wrap tw-gap-3 tw-px-2 tw-py-1 tw-text-white tw-bg-black"
         >
-          <div v-for="client of projectClients" :key="client">{{ client }}</div>
+          <div v-for="client of projectClients" :key="client">
+            {{ client }}
+          </div>
         </div>
       </div>
     </div>
@@ -115,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, nextTick, onMounted, ref } from 'vue';
+  import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useStore } from '@/store';
   import TaskDetail from '@/components/TaskDetail.vue';
   import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
@@ -172,6 +174,9 @@
 
   onMounted(() => {
     store.dispatch('fetchProjectClients', { projectId: props.projectId });
+  });
+  onUnmounted(() => {
+    store.commit('setProjectClients', { clients: [] });
   });
   const projectClients = computed(() => store.state.projectClients);
 </script>

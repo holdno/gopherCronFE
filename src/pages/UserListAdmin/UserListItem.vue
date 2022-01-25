@@ -76,6 +76,7 @@
   import { formatTimestamp } from '@/utils/datetime';
   import ModifyBox from './ModifyBox.vue';
   import { useStore } from '@/store';
+  import { generateAvatarName } from '@/utils/utils';
 
   const props = defineProps({
     user: {
@@ -85,18 +86,7 @@
   });
   const emits = defineEmits(['modify']);
   const store = useStore();
-  const generateAvatarName = (name: string) => {
-    if (name === '') {
-      return 'EM';
-    }
-    if (name.length > 3) {
-      return name.substring(name.length - 2).toUpperCase();
-    } else if (name.length < 3) {
-      return name.substring(0, 1).toUpperCase();
-    } else {
-      return name.substring(1, 3).toUpperCase();
-    }
-  };
+
   const avatar = generateAvatarName(props.user.name);
 
   const onModify = () => {

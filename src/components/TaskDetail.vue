@@ -85,6 +85,7 @@
     <q-input
       key="command"
       v-model="editable.command"
+      placeholder='echo "hello word"'
       type="textarea"
       label="执行指令"
       autogrow
@@ -160,7 +161,7 @@
     id: '',
     name: '',
     projectId: props.projectId,
-    command: 'echo "hello world"',
+    command: '',
     cronExpr: '0 0 0 * * * *',
     remark: '',
     timeout: 0,

@@ -85,6 +85,13 @@
             </div>
           </router-link>
         </q-list>
+        <div
+          v-if="!loading && (!tasks || tasks.length === 0)"
+          class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
+        >
+          <q-icon name="outlet" style="font-size: 3rem" />
+          暂无数据
+        </div>
       </q-scroll-area>
     </div>
   </div>
@@ -145,7 +152,7 @@
     await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
     if (store.state.currentError === undefined) {
       router.push({
-        name: 'project',
+        name: 'workflow_tasks',
         params: {
           projectId: projectId,
         },

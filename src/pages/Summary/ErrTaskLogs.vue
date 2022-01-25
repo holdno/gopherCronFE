@@ -65,7 +65,7 @@
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section class="tw-w-full tw-overflow-x-auto">
           <JSONViewer :json="scope.row.result" />
         </q-card-section>
       </q-card>
@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watchEffect, Ref, nextTick } from 'vue';
+  import { ref, watchEffect, Ref, nextTick, onMounted } from 'vue';
   import { formatTimestamp } from '@/utils/datetime';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
   import { getSummaryErrorLogs, TaskLog } from '@/api/log';
@@ -110,6 +110,16 @@
   getLogList();
 
   const table = ref<QTable>();
+  onMounted(() => {
+    // 设置talbe fixed
+    nextTick(() => {
+      console.log(
+        table.value?.$el
+          .querySelector('table.q-table')
+          .classList.add('tw-table-fixed'),
+      );
+    });
+  });
 
   async function updatePagination({
     pagination: { page, rowsPerPage },

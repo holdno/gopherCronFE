@@ -9,7 +9,7 @@ const TaskRoutes = (type: string) => [
   {
     name: `${type}_task`,
     path: 'task/:taskId',
-    component: () => import('./pages/TaskDetail.vue'),
+    component: () => import('@/pages/TaskDetail.vue'),
     props: (route: RouteLocationNormalizedLoaded) => ({
       id: route.params.taskId,
       projectId: Number(route.params.projectId),
@@ -19,7 +19,7 @@ const TaskRoutes = (type: string) => [
   {
     name: `${type}_task_logs`,
     path: 'task/:taskId/logs',
-    component: () => import('./pages/TaskDetail.vue'),
+    component: () => import('@/pages/TaskDetail.vue'),
     props: (route: RouteLocationNormalizedLoaded) => ({
       id: route.params.taskId,
       projectId: Number(route.params.projectId),
@@ -29,7 +29,7 @@ const TaskRoutes = (type: string) => [
   {
     name: `create_${type}_task`,
     path: 'task/create',
-    component: () => import('./pages/TaskDetail.vue'),
+    component: () => import('@/pages/TaskDetail.vue'),
     props: (route: RouteLocationNormalizedLoaded) => ({
       projectId: Number(route.params.projectId),
       type: type,
@@ -41,23 +41,23 @@ const routes = [
   {
     path: '/',
     redirect: 'summary',
-    component: () => import('./layouts/LandingLayout.vue'),
+    component: () => import('@/layouts/LandingLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       {
         name: 'summary',
         path: 'summary',
-        component: () => import('./pages/Summary/SummaryPage.vue'),
+        component: () => import('@/pages/Summary/SummaryPage.vue'),
       },
       {
         name: 'projects',
         path: 'project',
-        component: () => import('./pages/ProjectList.vue'),
+        component: () => import('@/pages/ProjectList.vue'),
         children: [
           {
             name: 'project',
             path: ':projectId(\\d+)',
-            component: () => import('./layouts/DummyContainer.vue'),
+            component: () => import('@/layouts/DummyContainer.vue'),
             redirect: (from: RouteLocationNormalizedLoaded) => ({
               name: 'crontab_tasks',
               params: { ...from.params },
@@ -66,7 +66,7 @@ const routes = [
               {
                 name: 'crontab_tasks',
                 path: 'crontab_tasks',
-                component: () => import('./pages/TaskList.vue'),
+                component: () => import('@/pages/TaskList.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   projectId: Number(route.params.projectId),
                 }),
@@ -75,7 +75,7 @@ const routes = [
               {
                 name: 'workflow_tasks',
                 path: 'workflow_tasks',
-                component: () => import('./pages/TaskList.vue'),
+                component: () => import('@/pages/TaskList.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   projectId: Number(route.params.projectId),
                 }),
@@ -88,12 +88,12 @@ const routes = [
       {
         name: 'workflows',
         path: 'workflows',
-        component: () => import('./pages/WorkflowList.vue'),
+        component: () => import('@/pages/WorkflowList.vue'),
         children: [
           {
             name: 'workflow',
             path: ':workflowId(\\d+)',
-            component: () => import('./pages/WorkflowDetail.vue'),
+            component: () => import('@/pages/WorkflowDetail.vue'),
             props: (route: RouteLocationNormalizedLoaded) => ({
               id: Number(route.params.workflowId),
             }),
@@ -101,7 +101,7 @@ const routes = [
           {
             name: 'workflow_logs',
             path: ':workflowId(\\d+)/logs',
-            component: () => import('./pages/WorkFlowLogs.vue'),
+            component: () => import('@/pages/WorkFlowLogs.vue'),
             props: (route: RouteLocationNormalizedLoaded) => ({
               id: Number(route.params.workflowId),
             }),
@@ -111,21 +111,26 @@ const routes = [
       {
         name: 'user-admin',
         path: 'admin/user',
-        component: () => import('./pages/UserListAdmin/UserListAdmin.vue'),
+        component: () => import('@/pages/UserListAdmin/UserListAdmin.vue'),
         meta: { requiresAdmin: true },
       },
       {
         name: 'node-admin',
         path: 'admin/node',
-        component: () => import('./pages/NodeListAdmin/NodeListAdmin.vue'),
+        component: () => import('@/pages/NodeListAdmin/NodeListAdmin.vue'),
         meta: { requiresAdmin: true },
+      },
+      {
+        name: 'user-profile',
+        path: 'user/profile',
+        component: () => import('@/pages/User/UserProfile.vue'),
       },
     ],
   },
   {
     name: 'login',
     path: '/login',
-    component: () => import('./pages/Login.vue'),
+    component: () => import('@/pages/Login.vue'),
   },
   {
     name: 'logout',
@@ -135,7 +140,7 @@ const routes = [
   {
     name: 'forbidden',
     path: '/error/forbidden',
-    component: () => import('./pages/HTTPStatus.vue'),
+    component: () => import('@/pages/HTTPStatus.vue'),
     props: {
       code: 403,
     },
@@ -143,7 +148,7 @@ const routes = [
   {
     name: 'notfound',
     path: '/error/notfound',
-    component: () => import('./pages/HTTPStatus.vue'),
+    component: () => import('@/pages/HTTPStatus.vue'),
     props: {
       code: 404,
     },

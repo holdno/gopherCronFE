@@ -1,5 +1,6 @@
 <template>
   <q-table
+    ref="logtable"
     v-model:pagination="pagination"
     class="tw-w-full tw-h-full tw-bg-[#121212]"
     :rows-per-page-options="[5, 10, 15]"
@@ -15,7 +16,7 @@
       <q-inner-loading showing color="primary" />
     </template>
     <template #body="scope">
-      <q-card class="tw-my-4" flat bordered>
+      <q-card class="tw-my-4 tw-x-full" flat bordered>
         <q-item>
           <q-item-section>
             <q-item-label overline>节点 IP</q-item-label>
@@ -39,7 +40,7 @@
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section class="tw-w-full tw-overflow-x-auto">
           <JSONViewer :json="scope.row.result" />
         </q-card-section>
       </q-card>
@@ -48,11 +49,12 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, computed, ref, watchEffect } from 'vue';
+  import { onMounted, computed, ref, watchEffect, nextTick } from 'vue';
   import { useStore } from '@/store';
   import { formatTimestamp } from '@/utils/datetime';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
   import JSONViewer from '@/components/JSONViewer.vue';
+  import { QTable } from 'quasar';
   const props = defineProps({
     id: {
       type: String,
@@ -75,6 +77,18 @@
     page: 1,
     rowsPerPage: 5,
     rowsNumber: 0,
+  });
+
+  const logtable = ref<QTable>();
+  onMounted(() => {
+    // 设置talbe fixed
+    nextTick(() => {
+      console.log(
+        logtable.value?.$el
+          .querySelector('table.q-table')
+          .classList.add('tw-table-fixed'),
+      );
+    });
   });
 
   function updatePagination({

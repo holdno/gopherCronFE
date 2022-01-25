@@ -15,14 +15,16 @@
 
     <q-drawer
       v-model="drawer"
-      show-if-above
       :mini="miniState && !adminMenuExpanded"
       :width="200"
       :breakpoint="500"
       @mouseover="miniState = false"
       @mouseout="miniState = true"
     >
-      <q-scroll-area class="fit">
+      <q-scroll-area
+        class="fit"
+        style="margin-bottom: 80px; height: calc(100% - 80px)"
+      >
         <q-list padding>
           <q-item v-ripple clickable :to="{ name: 'summary' }">
             <q-item-section avatar>
@@ -93,6 +95,11 @@
           </q-item>
         </q-list>
       </q-scroll-area>
+
+      <UserBaseInfo
+        class="tw-absolute tw-bottom-0 tw-left-0 tw-w-full"
+        style="height: 80px"
+      ></UserBaseInfo>
     </q-drawer>
 
     <q-page-container class="tw-w-full tw-h-full tw-box-border">
@@ -106,6 +113,8 @@
   import { useRoute } from 'vue-router';
   import { useStore } from '@/store';
   import { getServiceVersion } from '@/api/version';
+  import UserBaseInfo from './UserBaseInfo.vue';
+
   const drawer = ref(false);
   const miniState = ref(true);
   const adminMenuExpanded = ref(false);

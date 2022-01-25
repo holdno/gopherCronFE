@@ -9,6 +9,7 @@
     :nodes="nodes"
     :edges="edges"
     :configs="configs"
+    :zoom-level="0.75"
     :event-handlers="eventHandlers"
   />
   <q-dialog
@@ -30,7 +31,14 @@
         />
       </q-card-section>
       <q-card-actions align="around">
-        <q-btn flat type="primary" @click="addTaskNode">添加</q-btn>
+        <q-btn
+          class="tw-w-full tw-mx-2 tw-my-3"
+          :color="task ? 'primary' : ''"
+          :text-color="task ? 'black' : 'white'"
+          :disable="!task"
+          @click="addTaskNode"
+          >添加</q-btn
+        >
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -91,6 +99,7 @@
     reactive,
     toRaw,
     watchEffect,
+    nextTick,
   } from 'vue';
   import {
     Nodes,
@@ -148,7 +157,7 @@
     view: {
       layoutHandler: layoutHandler,
       scalingObjects: false,
-      fit: true,
+      fit: false,
     },
     node: {
       selectable: true,
@@ -235,6 +244,7 @@
       }
     };
     return {
+      'view:load': () => {},
       'view:contextmenu': showViewContextMenu,
       'node:select': (nodes) => {
         hideContextMenu();
@@ -321,8 +331,8 @@
   const taskLayouts = computed<Layouts>(() => {
     const nodes: NodePositions = {};
     const levels = TaskInLevels(props.modelValue);
-    const xOffset = 100;
-    const yOffset = 100;
+    const xOffset = 50;
+    const yOffset = 50;
     let y = 0;
     for (const level of levels) {
       let x = 0;
@@ -521,9 +531,14 @@
       () => [layouts.value, graph.value, show.value],
       ([currentLayouts, graph, show]) => {
         if (!visual.value && graph && show) {
-          graph.panToCenter();
+          // graph.panToCenter();
           if (similarLayout(currentLayouts.nodes, previousNodes.value)) {
-            setTimeout(() => (visual.value = true), 100);
+            setTimeout(() => {
+              nextTick(() => {
+                graph.panToCenter();
+                visual.value = true;
+              });
+            }, 500);
           }
         }
 

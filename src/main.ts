@@ -14,24 +14,24 @@ import '@quasar/extras/material-icons/material-icons.css';
 import 'quasar/src/css/index.sass';
 
 // Import Custom css
-import './index.css';
+import '@/index.css';
 
 // Assumes your root component is App.vue
 // and placed in same folder as main.js
-import App from './App.vue';
+import App from '@/App.vue';
 
 // network graph
 import 'v-network-graph/lib/style.css';
 import VNetworkGraph from 'v-network-graph';
 
 // Axios
-import { apiv1, installApiv1 } from './api/request';
+import { apiv1, installApiv1 } from '@/api/request';
 
 // Vuex
-import { store, key as storeKey } from './store';
+import { store, key as storeKey } from '@/store';
 
 // Router
-import router from './router';
+import router from '@/router';
 
 const app = createApp(App);
 

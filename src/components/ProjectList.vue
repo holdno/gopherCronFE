@@ -60,6 +60,13 @@
           <DropdownProjectManage v-if="isAdmin" :project-id="project.id" />
         </div>
       </q-list>
+      <div
+        v-if="!loading && (!projects || projects.length === 0)"
+        class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
+      >
+        <q-icon name="outlet" style="font-size: 3rem" />
+        暂无数据
+      </div>
     </q-scroll-area>
   </div>
 </template>

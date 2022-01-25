@@ -24,7 +24,7 @@ export async function getClientList(
   });
 
   const data: Node[] = [];
-  if (resp.data.response.length > 0) {
+  if (resp.data.response && resp.data.response.length > 0) {
     resp.data.response.forEach((element: any, i: number) => {
       data.push({
         clientIP: element.client_ip,

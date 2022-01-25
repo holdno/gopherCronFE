@@ -79,6 +79,7 @@
       key="command"
       v-model="editable.command"
       type="textarea"
+      placeholder='echo "hello word"'
       label="执行指令"
       autogrow
       square
@@ -145,7 +146,7 @@
     id: '',
     name: '',
     projectId: props.projectId,
-    command: 'echo "hello world"',
+    command: '',
     remark: '',
     timeout: 300,
     createTime: 0,

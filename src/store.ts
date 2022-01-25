@@ -174,6 +174,13 @@ export const store = createStore<State>({
         state.user !== undefined && state.user.permissions.includes('admin')
       );
     },
+    currentUser(state): User {
+      if (state.user === undefined) {
+        // router.push({ name: 'login' });
+        throw new Error('User is not login');
+      }
+      return state.user;
+    },
   },
   mutations: {
     setApi(state, { apiv1 }) {
@@ -196,7 +203,10 @@ export const store = createStore<State>({
       state.logined = false;
       Cookies.remove(COOKIE_TOKEN);
       const api = state.apiv1;
-      if (api) delete api.defaults.headers.common[COOKIE_TOKEN];
+      if (api) {
+        delete api.defaults.headers.common[COOKIE_TOKEN];
+        // router.push({ name: 'login' });
+      }
     },
     error(state, { error }) {
       if (error === ErrHandled) return;
