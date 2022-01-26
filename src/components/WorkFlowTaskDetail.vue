@@ -128,7 +128,7 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { startTask } from '@/api/request';
+  import { startTask, WorkFlowTask } from '@/api/request';
   import { useStore } from '@/store';
 
   const props = defineProps({
@@ -185,12 +185,20 @@
     await store.dispatch('fetchWorkFlowTasks', {
       projectId: props.projectId,
     });
-    router.push({
-      name: 'workflow_tasks',
-      params: {
-        projectId: props.projectId,
-      },
-    });
+    if (isCreateMode.value) {
+      const tasks = Object.assign([], store.state.workFlowTasks);
+      tasks.sort((a: WorkFlowTask, b: WorkFlowTask) => {
+        return a.createTime - b.createTime;
+      });
+      const newTask: WorkFlowTask = tasks[tasks.length - 1];
+      router.push({
+        name: 'workflow_task',
+        params: {
+          projectId: props.projectId,
+          taskId: newTask.id,
+        },
+      });
+    }
   }
   function onReset() {
     editable.value = Object.assign({}, task.value || DefaultTaskValues.value);

@@ -212,12 +212,14 @@
     await store.dispatch('fetchTasks', {
       projectId: props.projectId,
     });
-    router.push({
-      name: 'crontab_task',
-      params: {
-        taskId: newTask.id,
-      },
-    });
+    if (isCreateMode.value) {
+      router.push({
+        name: 'crontab_task',
+        params: {
+          taskId: newTask.id,
+        },
+      });
+    }
   }
   function onReset() {
     editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
