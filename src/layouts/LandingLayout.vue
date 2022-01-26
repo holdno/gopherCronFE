@@ -21,10 +21,7 @@
       @mouseover="miniState = false"
       @mouseout="miniState = true"
     >
-      <q-scroll-area
-        class="fit"
-        style="margin-bottom: 80px; height: calc(100% - 80px)"
-      >
+      <q-scroll-area style="margin-bottom: 80px; height: calc(100% - 80px)">
         <q-list padding>
           <q-item v-ripple clickable :to="{ name: 'summary' }">
             <q-item-section avatar>
@@ -115,7 +112,7 @@
   import { getServiceVersion } from '@/api/version';
   import UserBaseInfo from './UserBaseInfo.vue';
 
-  const drawer = ref(false);
+  const drawer = ref(true);
   const miniState = ref(true);
   const adminMenuExpanded = ref(false);
   const store = useStore();
