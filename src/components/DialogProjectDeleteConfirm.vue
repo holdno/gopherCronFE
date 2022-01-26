@@ -1,28 +1,17 @@
 <template>
-  <q-dialog v-model="show">
-    <q-card>
-      <q-card-section class="row items-center">
-        <q-avatar icon="delete" color="primary" text-color="white" />
-        <span class="q-ml-sm"> 是否要删除项目 {{ project?.title }}</span>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn v-close-popup flat label="取消" color="primary" />
-        <q-btn
-          flat
-          label="删除"
-          color="red"
-          @click="() => project && deleteProject(project.id)"
-        />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+  <Confirm
+    v-model="show"
+    :content="'是否要删除项目' + project?.title + '?'"
+    type="warning"
+    @confirm="project && deleteProject(project.id)"
+  ></Confirm>
 </template>
 
 <script setup lang="ts">
   import { useStore } from '@/store';
   import { computed } from 'vue';
   import { useRouter } from 'vue-router';
+  import Confirm from './Confirm.vue';
 
   const props = defineProps({
     projectId: {

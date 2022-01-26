@@ -1,27 +1,13 @@
 <template>
   <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
-    <q-dialog v-model="showDeleteConfirm">
-      <q-card>
-        <q-card-section class="row items-center">
-          <q-avatar icon="delete" color="primary" text-color="white" />
-          <span class="q-ml-sm">是否要删除任务 {{ selectedTask?.name }}</span>
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn v-close-popup flat label="取消" color="primary" />
-          <q-btn
-            flat
-            label="删除"
-            color="red"
-            @click="
-              () =>
-                selectedTask &&
-                deleteTask(selectedTask.projectId, selectedTask.id)
-            "
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <Confirm
+      v-model="showDeleteConfirm"
+      :content="'是否要删除任务' + selectedTask?.name + '?'"
+      type="warning"
+      @confirm="
+        selectedTask && deleteTask(selectedTask.projectId, selectedTask.id)
+      "
+    ></Confirm>
     <div class="q-pa-md tw-flex tw-justify-around">
       <q-input
         v-model="filter"
@@ -104,6 +90,7 @@
   import { formatTimestamp } from '@/utils/datetime';
   import { useRoute, useRouter } from 'vue-router';
   import { thumbStyle, barStyle } from '@/utils/thumbStyle';
+  import Confirm from '@/components/Confirm.vue';
 
   const props = defineProps({
     projectId: {

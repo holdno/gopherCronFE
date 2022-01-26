@@ -1,22 +1,21 @@
 <template>
-  <q-dialog v-model="showDeleteConfirm">
-    <q-card flat>
-      <q-card-section class="row items-center">
-        <q-avatar icon="delete" color="primary" text-color="white" />
-        <span class="q-ml-sm">是否要删除任务 {{ task?.name }}</span>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn v-close-popup flat label="取消" color="primary" />
-        <q-btn
-          flat
-          label="删除"
-          color="red"
-          @click="() => project && task && deleteTask(project.id, task.id)"
-        />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+  <Confirm
+    v-model="showDeleteConfirm"
+    :content="'是否要删除任务' + task?.name + '?'"
+    type="warning"
+    @confirm="project && task && deleteTask(project.id, task.id)"
+  ></Confirm>
+  <Confirm
+    v-model="showKillConfirm"
+    content="确定要结束进程吗？"
+    type="warning"
+    @confirm="kill"
+  ></Confirm>
+  <Confirm
+    v-model="showExecuteConfirm"
+    content="确定要立即执行吗？"
+    @confirm="task && execute(projectId, task.id)"
+  ></Confirm>
   <div
     v-if="!isCreateMode"
     class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-1"
@@ -28,12 +27,22 @@
       @click="showDeleteConfirm = true"
     />
     <q-btn
+      v-if="task?.isRunning === 1"
+      flat
+      text-color="red"
+      :disable="task?.isRunning !== 1"
+      class="tw-w-24 tw-ml-1"
+      :loading="waitingKill"
+      @click="showKillConfirm = true"
+      >结束进程</q-btn
+    >
+    <q-btn
       color="primary"
       text-color="black"
       :disable="modified || task?.isRunning === 1"
       class="tw-w-24"
       :loading="executing || task?.isRunning === 1"
-      @click="() => task && execute(projectId, task.id)"
+      @click="showExecuteConfirm = true"
       >立即执行</q-btn
     >
   </div>
@@ -144,7 +153,9 @@
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { startTask } from '@/api/request';
+  import { killTask } from '@/api/task';
   import { useStore } from '@/store';
+  import Confirm from '@/components/Confirm.vue';
 
   const props = defineProps({
     id: {
@@ -229,7 +240,9 @@
   );
 
   const executing = ref(false);
+  const showExecuteConfirm = ref(false);
   async function execute(projectId: number, taskId: string) {
+    showExecuteConfirm.value = false;
     executing.value = true;
     try {
       await startTask(store.getters.apiv1, projectId, taskId);
@@ -248,4 +261,17 @@
       },
     );
   });
+
+  const waitingKill = ref(false);
+  const showKillConfirm = ref(false);
+  const kill = async () => {
+    showKillConfirm.value = false;
+    waitingKill.value = true;
+    try {
+      await killTask({ projectID: props.projectId, taskID: props.id });
+    } catch (e) {
+      console.log(e);
+    }
+    waitingKill.value = false;
+  };
 </script>
