@@ -241,9 +241,13 @@
     );
   });
 
-  const canUpdate = computed(
-    () => JSON.stringify(tasks.value) !== JSON.stringify(current.value),
-  );
+  const canUpdate = computed(() => {
+    const pure = (tasks: KahnTask[]) =>
+      tasks.map((t) => ({ ...t, origin: undefined, state: undefined }));
+    return (
+      JSON.stringify(pure(tasks.value)) !== JSON.stringify(pure(current.value))
+    );
+  });
 
   async function updateWorkFlow() {
     await store.dispatch('updateWorkFlowEdges', {
