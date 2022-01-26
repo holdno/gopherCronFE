@@ -5,6 +5,7 @@
         :color="canUpdate ? 'primary' : ''"
         :text-color="canUpdate ? 'black' : 'white'"
         :disable="!canUpdate"
+        :loading="saveLoading"
         @click="updateWorkFlow"
         >保存</q-btn
       >
@@ -249,11 +250,14 @@
     );
   });
 
+  const saveLoading = ref(false);
   async function updateWorkFlow() {
+    saveLoading.value = true;
     await store.dispatch('updateWorkFlowEdges', {
       workflowId: props.id,
       edges: kahnTasksToWorkFlowEdges(current.value),
     });
     await refresh();
+    saveLoading.value = false;
   }
 </script>
