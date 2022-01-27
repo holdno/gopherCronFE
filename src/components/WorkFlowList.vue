@@ -4,60 +4,60 @@
       <q-btn flat :loading="loading" icon="refresh" @click="refresh" />
       <q-btn flat icon="add" />
     </div>
-    <div class="tw-w-full tw-grow">
-      <q-infinite-scroll
-        class="tw-w-full tw-h-full tw-px-[15px]"
-        visible
-        :thumb-style="thumbStyle"
-        :bar-style="barStyle"
-        @load="onLoad"
-      >
-        <q-list class="tw-flex tw-flex-col tw-gap-2 tw-pb-4">
-          <router-link
-            v-for="[, workflow] in workflows"
-            :key="workflow.id"
-            :to="{ name: 'workflow', params: { workflowId: workflow.id } }"
-          >
-            <div
-              :class="
-                (!activated(workflow)
-                  ? 'tw-bg-[#27272a] '
-                  : 'tw-bg-primary tw-text-black ') +
-                'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
-              "
+    <div class="tw-w-full tw-grow tw-overflow-hidden">
+      <q-infinite-scroll class="tw-w-full tw-h-full" @load="onLoad">
+        <q-scroll-area
+          visible
+          :thumb-style="thumbStyle"
+          :bar-style="barStyle"
+          class="tw-w-full tw-h-full tw-px-[15px]"
+        >
+          <q-list class="tw-flex tw-flex-col tw-gap-2 tw-pb-4">
+            <router-link
+              v-for="[, workflow] in workflows"
+              :key="workflow.id"
+              :to="{ name: 'workflow', params: { workflowId: workflow.id } }"
             >
-              <div :class="'task__status' + workflow.status">
-                {{
-                  isRunning(workflow)
-                    ? '执行中'
-                    : workflow.status == 1
-                    ? '调度中'
-                    : '已暂停'
-                }}
-              </div>
               <div
                 :class="
-                  (activated(workflow) ? 'active ' : '') +
-                  'task__title tw-inline-flex tw-items-center'
+                  (!activated(workflow)
+                    ? 'tw-bg-[#27272a] '
+                    : 'tw-bg-primary tw-text-black ') +
+                  'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
                 "
               >
-                <div class="task__cron">
-                  <q-icon name="schedule" />
-                  {{ workflow.cronExpr }}
+                <div :class="'task__status' + workflow.status">
+                  {{
+                    isRunning(workflow)
+                      ? '执行中'
+                      : workflow.status == 1
+                      ? '调度中'
+                      : '已暂停'
+                  }}
                 </div>
-                <q-icon name="numbers" />
-                {{ workflow.title }}
-              </div>
-              <div class="task__remark">{{ workflow.remark || '-' }}</div>
-              <div class="task__bottom-box">
-                <div class="task__bottom-time">
-                  {{ formatTimestamp(workflow.createTime * 1000) }}
+                <div
+                  :class="
+                    (activated(workflow) ? 'active ' : '') +
+                    'task__title tw-inline-flex tw-items-center'
+                  "
+                >
+                  <div class="task__cron">
+                    <q-icon name="schedule" />
+                    {{ workflow.cronExpr }}
+                  </div>
+                  <q-icon name="numbers" />
+                  {{ workflow.title }}
+                </div>
+                <div class="task__remark">{{ workflow.remark || '-' }}</div>
+                <div class="task__bottom-box">
+                  <div class="task__bottom-time">
+                    {{ formatTimestamp(workflow.createTime * 1000) }}
+                  </div>
                 </div>
               </div>
-            </div>
-          </router-link>
-        </q-list>
-
+            </router-link>
+          </q-list>
+        </q-scroll-area>
         <div
           v-if="!loading && (!workflows || workflows.size === 0)"
           class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
@@ -117,10 +117,7 @@
   }
 
   function activated(workflow: Workflow): boolean {
-    return (
-      route.name === 'workflow' &&
-      workflow.id === Number(route.params.workflowId)
-    );
+    return workflow.id === Number(route.params.workflowId || 0);
   }
 
   function isRunning(workflow: any): boolean {

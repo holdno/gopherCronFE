@@ -1,6 +1,6 @@
 <template>
   <div class="tw-w-full tw-h-full tw-flex tw-flex-col">
-    <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap">
+    <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap tw-grow-0">
       <q-btn
         :color="canUpdate ? 'primary' : ''"
         :text-color="canUpdate ? 'black' : 'white'"
@@ -86,12 +86,14 @@
         >任务日志</q-btn
       >
     </div>
-    <WorkFlow
-      ref="workflow"
-      v-model="current"
-      :workflow-id="props.id"
-      :tasks="tasks"
-    />
+    <div class="tw-grow tw-w-full tw-overflow-hidden">
+      <WorkFlow
+        ref="workflow"
+        v-model="current"
+        :workflow-id="props.id"
+        :tasks="tasks"
+      />
+    </div>
   </div>
 </template>
 
