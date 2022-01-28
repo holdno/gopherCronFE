@@ -2,44 +2,46 @@
   <div class="tw-w-full tw-h-full tw-flex tw-flex-col">
     <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap tw-grow-0">
       <q-btn
+        :dense="isSmallScreen"
         :color="canUpdate ? 'primary' : ''"
         :text-color="canUpdate ? 'black' : 'white'"
         :disable="!canUpdate"
         :loading="saveLoading"
         @click="updateWorkFlow"
-        >保存</q-btn
       >
-      <q-btn flat icon="refresh" title="刷新" @click="() => refresh()"
-        >刷新</q-btn
-      >
+        保存
+      </q-btn>
       <q-btn
+        :dense="isSmallScreen"
+        flat
+        icon="refresh"
+        title="刷新"
+        @click="() => refresh()"
+      >
+        刷新
+      </q-btn>
+      <q-btn
+        :dense="isSmallScreen"
         flat
         icon="restart_alt"
         title="重置视图"
         @click="() => workflow.ResetView()"
-        >重置视图</q-btn
       >
+        重置视图
+      </q-btn>
       <q-btn
+        :dense="isSmallScreen"
         flat
         icon="add"
         title="添加新任务节点"
         @click="() => workflow.ShowAddNodeDialog()"
-        >添加新任务节点</q-btn
       >
+        添加新任务节点
+      </q-btn>
       <q-btn
-        flat
-        icon="delete"
-        title="删除已选的节点及节点关联关系"
-        :disable="canRemoveNodes"
-        @click="
-          () => {
-            workflow.SelectedNodes.length > 0 && workflow.RemoveSelectedNodes();
-            workflow.SelectedEdges.length > 0 && workflow.RemoveSelectedEdges();
-          }
-        "
-        >删除节点（关系）</q-btn
-      >
-      <q-btn
+        v-if="selectedTask !== undefined"
+        key="create_relationship"
+        :dense="isSmallScreen"
         flat
         icon="north_east"
         title="关联节点"
@@ -55,11 +57,30 @@
             });
           }
         "
-        >关联节点</q-btn
       >
+        关联节点
+      </q-btn>
+      <q-btn
+        v-if="selectedTask !== undefined"
+        key="delete_task_or_relationship"
+        :dense="isSmallScreen"
+        icon="delete"
+        :disable="canRemoveNodes"
+        title="删除已选的节点及节点关联关系"
+        flat
+        @click="
+          () => {
+            workflow.SelectedNodes.length > 0 && workflow.RemoveSelectedNodes();
+            workflow.SelectedEdges.length > 0 && workflow.RemoveSelectedEdges();
+          }
+        "
+      >
+        删除节点（关系）
+      </q-btn>
       <q-btn
         v-if="selectedTask !== undefined"
         key="jump_task_detail"
+        :dense="isSmallScreen"
         icon="task_alt"
         flat
         :to="{
@@ -69,11 +90,13 @@
             taskId: selectedTask.origin.id,
           },
         }"
-        >任务详情</q-btn
       >
+        任务详情
+      </q-btn>
       <q-btn
         v-if="selectedTask !== undefined"
         key="jump_task_logs"
+        :dense="isSmallScreen"
         icon="view_timeline"
         flat
         :to="{
@@ -83,8 +106,9 @@
             taskId: selectedTask.origin.id,
           },
         }"
-        >任务日志</q-btn
       >
+        任务日志
+      </q-btn>
     </div>
     <div class="tw-grow tw-w-full tw-overflow-hidden">
       <WorkFlow
@@ -103,6 +127,10 @@
   import { WorkFlowEdge, WorkFlowTask } from '@/api/request';
   import { useStore } from '@/store';
   import { KahnTask } from '@/types';
+  import { useWindowSize } from 'vue-window-size';
+
+  const { width } = useWindowSize();
+  const isSmallScreen = computed(() => width.value < 1024);
 
   const workflow = ref();
   const canRemoveNodes = computed(
