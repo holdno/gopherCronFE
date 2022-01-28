@@ -190,7 +190,6 @@
   const workflowInfo = ref<Workflow>();
   async function refreshInfo() {
     workflowInfo.value = await fetchWorkflowDetail(props.id);
-    console.log(workflowInfo.value, isRunning.value);
   }
   const isRunning = computed(
     () =>

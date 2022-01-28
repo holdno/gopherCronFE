@@ -2,7 +2,7 @@
   <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
     <div class="q-pa-md tw-flex tw-flex-row-reverse tw-gap-4">
       <q-btn flat :loading="loading" icon="refresh" @click="refresh" />
-      <q-btn flat icon="add" />
+      <q-btn flat icon="add" :to="{ name: 'create_workflow' }" />
     </div>
     <div class="tw-w-full tw-grow tw-overflow-hidden">
       <q-infinite-scroll class="tw-w-full tw-h-full" @load="onLoad">
@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, reactive, ref } from 'vue';
+  import { computed, onMounted, reactive, ref, watch } from 'vue';
   import { useStore } from '@/store';
   import { formatTimestamp } from '@/utils/datetime';
   import { thumbStyle, barStyle } from '@/utils/thumbStyle';
@@ -82,6 +82,12 @@
   const route = useRoute();
   const loading = computed(() => store.state.loadingWorkflows);
 
+  watch(
+    () => route.name,
+    (current) => {
+      if (current?.toString() === 'workflows') refresh();
+    },
+  );
   onMounted(async () => {
     store.watch(
       (state) => [state.eventTask, state.eventWorkFlowTask],

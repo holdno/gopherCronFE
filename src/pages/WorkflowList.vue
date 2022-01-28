@@ -4,12 +4,13 @@
   >
     <div
       :class="
-        'lg:tw-basis-1/4 tw-h-full tw-w-full tw-shrink-0 ' + visibilyClass
+        'xl:tw-basis-1/5 tw-basis-1/4  tw-h-full tw-w-full tw-shrink-0 ' +
+        visibilyClass
       "
     >
       <WorkflowList />
     </div>
-    <div class="lg:tw-basis-3/4 tw-w-full tw-h-full tw-grow tw-overflow-hidden">
+    <div class="tw-w-full tw-h-full tw-grow tw-overflow-hidden">
       <router-view />
     </div>
   </div>

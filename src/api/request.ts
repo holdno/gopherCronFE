@@ -411,11 +411,14 @@ export interface WorkflowState {
   status: string;
 }
 
+export type STATUS_WORKFLOW = 1 | 2;
+export const STATUS_WORKFLOW_ENABLE = 1;
+export const STATUS_WORKFLOW_DISABLE = 2;
 export interface Workflow {
   id: number;
   title: string;
   remark: string;
-  status: number;
+  status: STATUS_WORKFLOW;
   state: WorkflowState | null;
   createTime: number;
   cronExpr: string;
@@ -453,11 +456,13 @@ export async function createWorkflow(
   title: string,
   remark: string,
   cronExpr: string,
+  status: STATUS_WORKFLOW = STATUS_WORKFLOW_DISABLE,
 ) {
   const payload = JSON.stringify({
     title: title,
     remark: remark,
     cron: cronExpr,
+    status: status,
   });
   return await api.post('/workflow/create', payload, {
     headers: {

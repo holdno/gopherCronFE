@@ -36,13 +36,13 @@
         class="tw-w-full tw-h-full tw-bg-[#121212] tw-p-0 lg:tw-pr-4 tw-box-border"
       >
         <q-tab-panel name="graph">
-          <WorkflowDetail :id="props.id" />
+          <WorkflowGraph :id="props.id" />
         </q-tab-panel>
         <q-tab-panel name="logs">
           <WorkFlowLogs :id="props.id" />
         </q-tab-panel>
         <q-tab-panel name="detail">
-          <p>detail</p>
+          <WorkFlowDetail :id="props.id" />
         </q-tab-panel>
       </q-tab-panels>
       <div class="tw-hidden lg:tw-block">
@@ -81,8 +81,9 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import { useRoute } from 'vue-router';
-  import WorkflowDetail from './WorkflowGraph.vue';
+  import WorkflowGraph from './WorkflowGraph.vue';
   import WorkFlowLogs from '@/components/WorkFlowLogs.vue';
+  import WorkFlowDetail from '@/components/WorkFlowDetail.vue';
   import { useWindowSize } from 'vue-window-size';
 
   const props = defineProps({
