@@ -1,6 +1,6 @@
 <template>
   <q-table
-    ref="logtable"
+    ref="logTable"
     v-model:pagination="pagination"
     class="tw-w-full tw-h-full tw-bg-[#121212]"
     :rows-per-page-options="[5, 10, 15]"
@@ -79,15 +79,13 @@
     rowsNumber: 0,
   });
 
-  const logtable = ref<QTable>();
+  const logTable = ref<QTable>();
   onMounted(() => {
-    // 设置talbe fixed
+    // 设置 table fixed
     nextTick(() => {
-      console.log(
-        logtable.value?.$el
-          .querySelector('table.q-table')
-          .classList.add('tw-table-fixed'),
-      );
+      logTable.value?.$el
+        .querySelector('table.q-table')
+        .classList.add('tw-table-fixed');
     });
   });
 

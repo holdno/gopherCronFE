@@ -35,7 +35,7 @@
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section class="tw-w-full tw-overflow-x-auto">
           <JSONViewer :json="scope.row.result" />
         </q-card-section>
       </q-card>
@@ -70,6 +70,14 @@
   });
 
   const table = ref<QTable>();
+  onMounted(() => {
+    // 设置 table fixed
+    nextTick(() => {
+      table.value?.$el
+        .querySelector('table.q-table')
+        .classList.add('tw-table-fixed');
+    });
+  });
   const pageChange = () => {
     nextTick(() => {
       const node: HTMLElement | null =

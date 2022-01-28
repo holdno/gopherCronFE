@@ -111,13 +111,11 @@
 
   const table = ref<QTable>();
   onMounted(() => {
-    // 设置talbe fixed
+    // 设置 table fixed
     nextTick(() => {
-      console.log(
-        table.value?.$el
-          .querySelector('table.q-table')
-          .classList.add('tw-table-fixed'),
-      );
+      table.value?.$el
+        .querySelector('table.q-table')
+        .classList.add('tw-table-fixed');
     });
   });
 

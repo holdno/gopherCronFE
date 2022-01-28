@@ -82,7 +82,7 @@
   import { computed } from 'vue';
   import { useRoute } from 'vue-router';
   import WorkflowDetail from './WorkflowDetail.vue';
-  import WorkFlowLogs from './WorkFlowLogs.vue';
+  import WorkFlowLogs from '@/components/WorkFlowLogs.vue';
   import { useWindowSize } from 'vue-window-size';
 
   const props = defineProps({
