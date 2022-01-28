@@ -5,12 +5,16 @@
       <q-btn flat icon="add" :to="{ name: 'create_workflow' }" />
     </div>
     <div class="tw-w-full tw-grow tw-overflow-hidden">
-      <q-infinite-scroll class="tw-w-full tw-h-full" @load="onLoad">
-        <q-scroll-area
-          visible
-          :thumb-style="thumbStyle"
-          :bar-style="barStyle"
-          class="tw-w-full tw-h-full tw-px-[15px]"
+      <q-scroll-area
+        visible
+        :thumb-style="thumbStyle"
+        :bar-style="barStyle"
+        class="tw-w-full tw-h-full tw-px-[15px]"
+      >
+        <q-infinite-scroll
+          class="tw-w-full tw-h-full"
+          :offset="100"
+          @load="onLoad"
         >
           <q-list class="tw-flex tw-flex-col tw-gap-2 tw-pb-4">
             <router-link
@@ -57,15 +61,15 @@
               </div>
             </router-link>
           </q-list>
-        </q-scroll-area>
-        <div
-          v-if="!loading && (!workflows || workflows.size === 0)"
-          class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
-        >
-          <q-icon name="outlet" style="font-size: 3rem" />
-          暂无数据
-        </div>
-      </q-infinite-scroll>
+        </q-infinite-scroll>
+      </q-scroll-area>
+      <div
+        v-if="!loading && (!workflows || workflows.size === 0)"
+        class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
+      >
+        <q-icon name="outlet" style="font-size: 3rem" />
+        暂无数据
+      </div>
     </div>
   </div>
 </template>
@@ -110,7 +114,7 @@
 
   const pagination = reactive({
     page: 1,
-    pageSize: 10,
+    pageSize: 5,
   });
 
   async function refresh() {
