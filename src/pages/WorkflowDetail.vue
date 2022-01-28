@@ -1,6 +1,26 @@
 <template>
   <div class="tw-w-full tw-h-full tw-flex tw-flex-col">
+    <Confirm
+      v-model="showExecuteConfirm"
+      content="确定要立即执行吗？"
+      @confirm="
+        () =>
+          startWorkflow(store.getters.apiv1, props.id).then(() => {
+            showExecuteConfirm = false;
+            refresh();
+          })
+      "
+    />
     <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap tw-grow-0">
+      <q-btn
+        :dense="isSmallScreen"
+        color="primary"
+        text-color="black"
+        :loading="isRunning"
+        @click="showExecuteConfirm = true"
+      >
+        运行
+      </q-btn>
       <q-btn
         :dense="isSmallScreen"
         :color="canUpdate ? 'primary' : ''"
@@ -122,12 +142,19 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import WorkFlow from '@/components/WorkFlow.vue';
-  import { WorkFlowEdge, WorkFlowTask } from '@/api/request';
+  import {
+    WorkFlowEdge,
+    WorkFlowTask,
+    startWorkflow,
+    Workflow,
+  } from '@/api/request';
   import { useStore } from '@/store';
   import { KahnTask } from '@/types';
   import { useWindowSize } from 'vue-window-size';
+  import Confirm from '@/components/Confirm.vue';
+  import { fetchWorkflowDetail } from '@/api/workflow';
 
   const { width } = useWindowSize();
   const isSmallScreen = computed(() => width.value < 1024);
@@ -158,6 +185,19 @@
   const tasks = ref<KahnTask[]>([]);
   const current = ref<KahnTask[]>([]);
   const store = useStore();
+
+  const showExecuteConfirm = ref(false);
+  const workflowInfo = ref<Workflow>();
+  async function refreshInfo() {
+    workflowInfo.value = await fetchWorkflowDetail(props.id);
+    console.log(workflowInfo.value, isRunning.value);
+  }
+  const isRunning = computed(
+    () =>
+      workflowInfo.value !== undefined &&
+      workflowInfo.value.state !== null &&
+      workflowInfo.value.state.status === 'running',
+  );
 
   async function workflowEdgesToKahnTasks(
     edges: WorkFlowEdge[],
@@ -261,13 +301,20 @@
   }
 
   onMounted(() => {
-    watchEffect(async () => {
-      await refresh();
-    });
+    refreshInfo();
+    refresh();
+    watch(
+      () => props.id,
+      async (current) => {
+        await refreshInfo();
+        await refresh();
+      },
+    );
     store.watch(
       (state) => [state.eventWorkFlowTask, state.eventWorkFlow],
-      (current) => {
-        refresh(true);
+      async (current) => {
+        await refreshInfo();
+        await refresh(true);
       },
     );
   });

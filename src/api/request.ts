@@ -407,12 +407,16 @@ export async function fetchLogs(
   ];
 }
 
+export interface WorkflowState {
+  status: string;
+}
+
 export interface Workflow {
   id: number;
   title: string;
   remark: string;
   status: number;
-  state: Object;
+  state: WorkflowState | null;
   createTime: number;
   cronExpr: string;
 }
