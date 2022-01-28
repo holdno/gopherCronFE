@@ -1,6 +1,6 @@
 <template>
   <div
-    class="q-pa-md tw-box-border tw-flex tw-flex-row tw-gap-4 tw-h-full tw-w-full"
+    class="lg:q-pa-md tw-box-border tw-flex tw-flex-row tw-gap-4 tw-h-full tw-w-full"
   >
     <div
       :class="

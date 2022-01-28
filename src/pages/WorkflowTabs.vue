@@ -1,6 +1,6 @@
 <template>
   <div
-    class="tw-px-4 tw-pt-2 tw-w-full tw-h-full tw-flex tw-flex-col tw-box-border"
+    class="lg:tw-px-4 lg:tw-pt-2 tw-w-full tw-h-full tw-flex tw-flex-col tw-box-border"
   >
     <q-tabs
       v-if="!isCreateMode"
@@ -33,7 +33,7 @@
         :model-value="tab"
         animated
         :vertical="width >= 1024"
-        class="tw-w-full tw-h-full tw-bg-[#121212] tw-p-0 tw-pr-4 tw-box-border"
+        class="tw-w-full tw-h-full tw-bg-[#121212] tw-p-0 lg:tw-pr-4 tw-box-border"
       >
         <q-tab-panel name="graph">
           <WorkflowDetail :id="props.id" />

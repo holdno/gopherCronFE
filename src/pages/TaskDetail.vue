@@ -62,9 +62,9 @@
             :model-value="tab"
             animated
             :vertical="width >= 1024"
-            class="tw-w-full tw-h-full tw-bg-[#121212]"
+            class="tw-w-full tw-h-full tw-bg-[#121212] tw-p-0 lg:tw-pr-4"
           >
-            <q-tab-panel name="detail" class="tw-p-0 tw-pr-4">
+            <q-tab-panel name="detail">
               <TaskDetail
                 v-if="props.type === 'crontab'"
                 :id="props.id"
@@ -76,7 +76,7 @@
                 :project-id="props.projectId"
               />
             </q-tab-panel>
-            <q-tab-panel name="logs" class="tw-p-0 tw-pr-4">
+            <q-tab-panel name="logs">
               <TaskLogs
                 :id="props.id"
                 :project-id="props.projectId"
