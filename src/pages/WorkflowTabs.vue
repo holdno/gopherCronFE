@@ -81,7 +81,7 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import { useRoute } from 'vue-router';
-  import WorkflowDetail from './WorkflowDetail.vue';
+  import WorkflowDetail from './WorkflowGraph.vue';
   import WorkFlowLogs from '@/components/WorkFlowLogs.vue';
   import { useWindowSize } from 'vue-window-size';
 
