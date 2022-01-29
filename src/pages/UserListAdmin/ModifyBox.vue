@@ -83,8 +83,9 @@
 
 <script lang="ts" setup>
   import { PropType, computed, ref } from 'vue';
+
   import { User } from '@/api/request';
-  import { createUser, changePassword } from '@/api/user';
+  import { changePassword, createUser } from '@/api/user';
   import { store } from '@/store/index';
 
   const props = defineProps({

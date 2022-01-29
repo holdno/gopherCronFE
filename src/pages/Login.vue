@@ -69,8 +69,9 @@
 <script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { useStore } from '@/store/index';
+
   import LogoTpl from '@/components/LogoTpl.vue';
+  import { useStore } from '@/store/index';
 
   const username = ref('');
   const password = ref('');

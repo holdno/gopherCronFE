@@ -105,9 +105,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { useStore } from '@/store/index';
-  import ModifyBox from '@/pages/UserListAdmin/ModifyBox.vue';
   import { ref } from 'vue';
+
+  import ModifyBox from '@/pages/UserListAdmin/ModifyBox.vue';
+  import { useStore } from '@/store/index';
   import { generateAvatarName } from '@/utils/utils';
 
   const store = useStore();

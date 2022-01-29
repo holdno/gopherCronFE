@@ -23,7 +23,8 @@
 
 <script setup lang="ts">
   import { QSelect } from 'quasar';
-  import { computed, PropType, ref } from 'vue';
+  import { PropType, computed, ref } from 'vue';
+
   import { Project } from '@/api/request';
   import { useStore } from '@/store/index';
 

@@ -8,10 +8,12 @@
 </template>
 
 <script setup lang="ts">
-  import { useStore } from '@/store/index';
   import { computed } from 'vue';
   import { useRouter } from 'vue-router';
+
   import Confirm from './Confirm.vue';
+
+  import { useStore } from '@/store/index';
 
   const props = defineProps({
     projectId: {

@@ -18,7 +18,8 @@
 
 <script setup lang="ts">
   import { QSelect } from 'quasar';
-  import { computed, onMounted, PropType, ref, watch } from 'vue';
+  import { PropType, computed, onMounted, ref, watch } from 'vue';
+
   import { WorkFlowTask } from '@/api/request';
   import { useStore } from '@/store/index';
 

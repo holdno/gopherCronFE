@@ -43,8 +43,9 @@
 </template>
 
 <script setup lang="ts">
-  import { useStore } from '@/store/index';
   import { computed, onMounted, ref, watchEffect } from 'vue';
+
+  import { useStore } from '@/store/index';
 
   const props = defineProps({
     projectId: {

@@ -1,50 +1,49 @@
-import {
-  Project,
-  User,
-  Task,
-  RecentLogCount,
-  TaskLog,
-  WorkFlow,
-  WorkFlowEdge,
-  WorkflowTaskState,
-  WorkFlowLog,
-  WorkFlowTask,
-  login,
-  projectList,
-  userInfo,
-  fetchTasks,
-  saveTask,
-  recentLog,
-  createProject,
-  deleteProject,
-  fetchLogs,
-  fetchWorkflows,
-  fetchWorkflowEdges,
-  updateWorkflowEdges,
-  updateWorkflow,
-  createWorkflow,
-  fetchWorkFlowLogs,
-  deleteTask,
-  fetchProjectClients,
-  deleteWorkflow,
-  fetchWorkFlowTasks,
-  deleteWorkFlowTask,
-  saveWorkFlowTask,
-  createWorkFlowTask,
-  updateProject,
-} from '@/api/request';
-
-import {
-  createUser,
-  CreateUserRequest,
-  userList,
-  GetUserListRequest,
-} from '@/api/user';
-
-import Cookies from 'js-cookie';
 import { AxiosInstance } from 'axios';
+import Cookies from 'js-cookie';
 import { QVueGlobals } from 'quasar';
 import { ActionTree, GetterTree, Module, MutationTree } from 'vuex';
+
+import {
+  Project,
+  RecentLogCount,
+  Task,
+  TaskLog,
+  User,
+  WorkFlow,
+  WorkFlowEdge,
+  WorkFlowLog,
+  WorkFlowTask,
+  WorkflowTaskState,
+  createProject,
+  createWorkFlowTask,
+  createWorkflow,
+  deleteProject,
+  deleteTask,
+  deleteWorkFlowTask,
+  deleteWorkflow,
+  fetchLogs,
+  fetchProjectClients,
+  fetchTasks,
+  fetchWorkFlowLogs,
+  fetchWorkFlowTasks,
+  fetchWorkflowEdges,
+  fetchWorkflows,
+  login,
+  projectList,
+  recentLog,
+  saveTask,
+  saveWorkFlowTask,
+  updateProject,
+  updateWorkflow,
+  updateWorkflowEdges,
+  userInfo,
+} from '@/api/request';
+import {
+  CreateUserRequest,
+  GetUserListRequest,
+  createUser,
+  userList,
+} from '@/api/user';
 import { State as RootState } from '@/store/index';
 
 export interface EventTask {

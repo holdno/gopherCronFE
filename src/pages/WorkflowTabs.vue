@@ -81,10 +81,12 @@
 <script setup lang="ts">
   import { computed } from 'vue';
   import { useRoute } from 'vue-router';
-  import WorkflowGraph from './WorkflowGraph.vue';
-  import WorkFlowLogs from '@/components/WorkFlowLogs.vue';
-  import WorkFlowDetail from '@/components/WorkFlowDetail.vue';
   import { useWindowSize } from 'vue-window-size';
+
+  import WorkflowGraph from './WorkflowGraph.vue';
+
+  import WorkFlowDetail from '@/components/WorkFlowDetail.vue';
+  import WorkFlowLogs from '@/components/WorkFlowLogs.vue';
 
   const props = defineProps({
     id: {

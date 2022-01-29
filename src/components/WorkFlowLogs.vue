@@ -44,12 +44,13 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, nextTick, onMounted, ref, watchEffect } from 'vue';
-  import { useStore } from '@/store/index';
-  import { Pagination, TableRequestProp } from '@/utils/quasar';
-  import { formatTimestamp } from '@/utils/datetime';
-  import JSONViewer from '@/components/JSONViewer.vue';
   import { QTable } from 'quasar';
+  import { computed, nextTick, onMounted, ref, watchEffect } from 'vue';
+
+  import JSONViewer from '@/components/JSONViewer.vue';
+  import { useStore } from '@/store/index';
+  import { formatTimestamp } from '@/utils/datetime';
+  import { Pagination, TableRequestProp } from '@/utils/quasar';
 
   const props = defineProps({
     id: {

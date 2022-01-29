@@ -1,11 +1,12 @@
+import { InjectionKey } from 'vue';
+import { Store, useStore as baseUseStore, createStore } from 'vuex';
+
 import StoreRoot, { State as StateRoot } from '@/store/modules/root';
 import StoreWorkFlow, {
-  State as StateWorkFlow,
   NameSpace as NameSpaceWorkFlow,
+  State as StateWorkFlow,
 } from '@/store/modules/workflow';
 import { FireTowerPlugin } from '@/utils/FireTower';
-import { InjectionKey } from 'vue';
-import { createStore, Store, useStore as baseUseStore } from 'vuex';
 
 export interface State {
   Root: StateRoot;
@@ -20,6 +21,8 @@ export const store = createStore<State>({
   },
   devtools: import.meta.env.DEV,
   strict: import.meta.env.DEV,
+  // @ts-ignore:
+  state: {},
 });
 export const key: InjectionKey<Store<State>> = Symbol('Vuex Store');
 

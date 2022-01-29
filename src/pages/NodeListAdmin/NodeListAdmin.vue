@@ -31,10 +31,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { useStore } from '@/store/index';
   import { Ref, ref } from 'vue';
+
   import NodeItem from './NodeItem.vue';
-  import { getClientList, Node } from '@/api/node';
+
+  import { Node, getClientList } from '@/api/node';
+  import { useStore } from '@/store/index';
 
   const store = useStore();
 

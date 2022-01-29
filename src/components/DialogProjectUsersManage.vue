@@ -34,14 +34,15 @@
 </template>
 
 <script setup lang="ts">
+  import { computed, ref, watch } from 'vue';
+
   import {
+    User,
     addProjectUser,
     apiv1,
     fetchProjectUsers,
     removeProjectUser,
-    User,
   } from '@/api/request';
-  import { computed, ref, watch } from 'vue';
 
   const props = defineProps({
     projectId: {

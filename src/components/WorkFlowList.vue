@@ -76,11 +76,12 @@
 
 <script setup lang="ts">
   import { computed, onMounted, reactive, watch } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  import { WorkFlow } from '@/api/request';
   import { useStore } from '@/store/index';
   import { formatTimestamp } from '@/utils/datetime';
-  import { thumbStyle, barStyle } from '@/utils/thumbStyle';
-  import { WorkFlow } from '@/api/request';
-  import { useRoute } from 'vue-router';
+  import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
   const store = useStore();
   const route = useRoute();

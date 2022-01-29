@@ -50,11 +50,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { apiv1, fetchProjectUsers } from '@/api/request';
   import { onMounted, ref } from 'vue';
+
   import DialogProjectDeleteConfirm from './DialogProjectDeleteConfirm.vue';
   import DialogProjectForm from './DialogProjectForm.vue';
   import DialogProjectUsersManage from './DialogProjectUsersManage.vue';
+
+  import { apiv1, fetchProjectUsers } from '@/api/request';
 
   const show = ref(false);
   const props = defineProps({

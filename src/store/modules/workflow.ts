@@ -1,6 +1,7 @@
-import { WorkFlow } from '@/api/request';
-import { fetchWorkFlows } from '@/api/workflow';
 import { ActionTree, Module, MutationTree } from 'vuex';
+
+import { WorkFlow } from '@/api/request';
+import { fetchWorkFlowDetail, fetchWorkFlows } from '@/api/workflow';
 import { State as RootState } from '@/store/index';
 
 export const NameSpace = 'WorkFlow';
@@ -16,9 +17,16 @@ const actions: ActionTree<State, RootState> = {
     commit('appendWorkFlows', { workflows, total });
     return [workflows, total];
   },
+  async fetchWorkFlow({ commit }, { id }) {
+    const workflow = await fetchWorkFlowDetail(id);
+    commit('updateWorkFlow', { workflow });
+  },
 };
 
 const mutations: MutationTree<State> = {
+  updateWorkFlow(state, { workflow }: { workflow: WorkFlow }) {
+    state.workflows.set(workflow.id, workflow);
+  },
   appendWorkFlows(
     state,
     { workflows, total }: { workflows: WorkFlow[]; total: number },

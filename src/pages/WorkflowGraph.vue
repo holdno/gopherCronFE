@@ -143,18 +143,19 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue';
-  import WorkFlowGraph from '@/components/WorkFlowGraph.vue';
+  import { useWindowSize } from 'vue-window-size';
+
   import {
+    WorkFlow,
     WorkFlowEdge,
     WorkFlowTask,
     startWorkflow,
-    WorkFlow,
   } from '@/api/request';
+  import { fetchWorkFlowDetail } from '@/api/workflow';
+  import Confirm from '@/components/Confirm.vue';
+  import WorkFlowGraph from '@/components/WorkFlowGraph.vue';
   import { useStore } from '@/store/index';
   import { KahnTask } from '@/types';
-  import { useWindowSize } from 'vue-window-size';
-  import Confirm from '@/components/Confirm.vue';
-  import { fetchWorkFlowDetail } from '@/api/workflow';
 
   const { width } = useWindowSize();
   const isSmallScreen = computed(() => width.value < 1024);

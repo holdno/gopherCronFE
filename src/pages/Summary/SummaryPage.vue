@@ -16,10 +16,12 @@
 
 <script setup lang="ts">
   import { computed, onMounted } from 'vue';
-  import RecentLogCountChart from '@/components/RecentLogCountChart.vue';
-  import ProjectsPieChart from '@/components/ProjectsPieChart.vue';
-  import { useStore } from '@/store/index';
+
   import ErrTaskLog from './ErrTaskLogs.vue';
+
+  import ProjectsPieChart from '@/components/ProjectsPieChart.vue';
+  import RecentLogCountChart from '@/components/RecentLogCountChart.vue';
+  import { useStore } from '@/store/index';
 
   const store = useStore();
   const records = computed(() => store.state.Root.recentLogCountRecords);

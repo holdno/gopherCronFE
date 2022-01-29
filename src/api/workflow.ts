@@ -1,4 +1,4 @@
-import { apiv1, WorkFlow } from './request';
+import { WorkFlow, apiv1 } from './request';
 
 export async function fetchWorkFlows(
   page: number,

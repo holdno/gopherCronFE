@@ -70,12 +70,14 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, PropType } from 'vue';
+  import { PropType, ref } from 'vue';
+
+  import ModifyBox from './ModifyBox.vue';
+
   import { User } from '@/api/request';
   import { deleteUser as deleteUserRequest } from '@/api/user';
-  import { formatTimestamp } from '@/utils/datetime';
-  import ModifyBox from './ModifyBox.vue';
   import { useStore } from '@/store/index';
+  import { formatTimestamp } from '@/utils/datetime';
   import { generateAvatarName } from '@/utils/utils';
 
   const props = defineProps({

@@ -128,7 +128,8 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { startTask, WorkFlowTask } from '@/api/request';
+
+  import { WorkFlowTask, startTask } from '@/api/request';
   import { useStore } from '@/store/index';
 
   const props = defineProps({

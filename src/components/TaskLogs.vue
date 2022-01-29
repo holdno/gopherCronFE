@@ -49,12 +49,14 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, computed, ref, watchEffect, nextTick } from 'vue';
+  import { QTable } from 'quasar';
+  import { computed, nextTick, onMounted, ref, watchEffect } from 'vue';
+
+  import JSONViewer from '@/components/JSONViewer.vue';
   import { useStore } from '@/store/index';
   import { formatTimestamp } from '@/utils/datetime';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
-  import JSONViewer from '@/components/JSONViewer.vue';
-  import { QTable } from 'quasar';
+
   const props = defineProps({
     id: {
       type: String,

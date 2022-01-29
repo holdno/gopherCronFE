@@ -61,16 +61,17 @@
 </template>
 
 <script setup lang="ts">
+  import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+
   import {
-    createWorkflow,
     STATUS_WORK_FLOW_DISABLE,
-    updateWorkflow,
     WorkFlow,
+    createWorkflow,
+    updateWorkflow,
   } from '@/api/request';
   import { fetchWorkFlowDetail } from '@/api/workflow';
   import { useStore } from '@/store/index';
-  import { computed, onMounted, ref, watch, watchEffect } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
 
   const props = defineProps({
     id: {

@@ -74,12 +74,14 @@
 <script setup lang="ts">
   import { computed, onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router';
-  import { Project } from '@/api/request';
-  import { useStore } from '@/store/index';
-  import DropdownProjectManage from './DropdownProjectManage.vue';
+
   import DialogProjectDeleteConfirm from './DialogProjectDeleteConfirm.vue';
   import DialogProjectForm from './DialogProjectForm.vue';
-  import { thumbStyle, barStyle } from '@/utils/thumbStyle';
+  import DropdownProjectManage from './DropdownProjectManage.vue';
+
+  import { Project } from '@/api/request';
+  import { useStore } from '@/store/index';
+  import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
   const store = useStore();
   const loading = computed(() => store.state.Root.loadingProjects);

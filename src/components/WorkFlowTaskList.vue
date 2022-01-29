@@ -85,12 +85,13 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
-  import { useStore } from '@/store/index';
-  import { WorkFlowTask } from '@/api/request';
-  import { formatTimestamp } from '@/utils/datetime';
   import { useRoute, useRouter } from 'vue-router';
-  import { thumbStyle, barStyle } from '@/utils/thumbStyle';
+
+  import { WorkFlowTask } from '@/api/request';
   import Confirm from '@/components/Confirm.vue';
+  import { useStore } from '@/store/index';
+  import { formatTimestamp } from '@/utils/datetime';
+  import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
   const props = defineProps({
     projectId: {

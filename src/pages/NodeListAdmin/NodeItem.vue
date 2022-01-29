@@ -54,9 +54,10 @@
 </template>
 
 <script lang="ts" setup>
+  import { PropType, ref } from 'vue';
+
   import { Node, reloadNodeConfig } from '@/api/node';
   import { store } from '@/store/index';
-  import { PropType, ref } from 'vue';
 
   const props = defineProps({
     node: {

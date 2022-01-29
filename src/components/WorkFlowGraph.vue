@@ -90,35 +90,36 @@
 </template>
 
 <script setup lang="ts">
+  import { QMenu } from 'quasar';
   import {
-    PropType,
-    ref,
-    computed,
-    watch,
-    onMounted,
-    reactive,
-    toRaw,
-    watchEffect,
-    nextTick,
-  } from 'vue';
-  import {
-    Nodes,
     Edges,
-    NodePositions,
-    Layouts,
-    ViewEvent,
     EventHandlers,
-    UserConfigs,
+    Layouts,
     NodeLabelDirection,
+    NodePositions,
+    Nodes,
+    UserConfigs,
     VNetworkGraphInstance,
+    ViewEvent,
   } from 'v-network-graph';
   import { ForceLayout } from 'v-network-graph/force-layout';
-  import { cloneTask, KahnTask } from '@/types';
-  import { TaskInLevels } from '@/utils/kahn';
-  import { QMenu } from 'quasar';
+  import {
+    PropType,
+    computed,
+    nextTick,
+    onMounted,
+    reactive,
+    ref,
+    toRaw,
+    watch,
+    watchEffect,
+  } from 'vue';
+
+  import { Project, WorkFlowTask } from '@/api/request';
   import SelectProject from '@/components/SelectProject.vue';
   import SelectWorkFlowTask from '@/components/SelectWorkFlowTask.vue';
-  import { Project, WorkFlowTask } from '@/api/request';
+  import { KahnTask, cloneTask } from '@/types';
+  import { TaskInLevels } from '@/utils/kahn';
 
   const show = ref(false);
   const visual = ref(false);

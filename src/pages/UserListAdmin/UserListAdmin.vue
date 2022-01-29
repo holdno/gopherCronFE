@@ -49,10 +49,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { useStore } from '@/store/index';
-  import { ref, computed, watch } from 'vue';
-  import UserItem from './UserListItem.vue';
+  import { computed, ref, watch } from 'vue';
+
   import ModifyBox from './ModifyBox.vue';
+  import UserItem from './UserListItem.vue';
+
+  import { useStore } from '@/store/index';
 
   const page = ref(1);
   const pagesize = ref(10);

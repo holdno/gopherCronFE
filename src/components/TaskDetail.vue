@@ -152,10 +152,11 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
   import { startTask } from '@/api/request';
   import { killTask } from '@/api/task';
-  import { useStore } from '@/store/index';
   import Confirm from '@/components/Confirm.vue';
+  import { useStore } from '@/store/index';
 
   const props = defineProps({
     id: {

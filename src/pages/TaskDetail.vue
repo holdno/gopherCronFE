@@ -117,15 +117,16 @@
 </template>
 
 <script setup lang="ts">
+  import { QScrollArea } from 'quasar';
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-  import { useStore } from '@/store/index';
-  import TaskDetail from '@/components/TaskDetail.vue';
-  import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
-  import TaskLogs from '@/components/TaskLogs.vue';
   import { useRoute } from 'vue-router';
   import { useWindowSize } from 'vue-window-size';
-  import { thumbStyle, barStyle } from '@/utils/thumbStyle';
-  import { QScrollArea } from 'quasar';
+
+  import TaskDetail from '@/components/TaskDetail.vue';
+  import TaskLogs from '@/components/TaskLogs.vue';
+  import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
+  import { useStore } from '@/store/index';
+  import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
   const props = defineProps({
     id: {
