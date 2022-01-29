@@ -70,7 +70,6 @@
     createWorkflow,
     updateWorkflow,
   } from '@/api/request';
-  import { fetchWorkFlowDetail } from '@/api/workflow';
   import { useStore } from '@/store/index';
 
   const props = defineProps({
@@ -92,7 +91,9 @@
 
   const router = useRouter();
   const store = useStore();
-  const workflowInfo = ref<WorkFlow>();
+  const workflowInfo = computed(() =>
+    store.state.WorkFlow.workflows.get(props.id),
+  );
   const editable = ref(
     Object.assign({}, workflowInfo.value || DefaultTaskValues.value),
   );
@@ -134,7 +135,7 @@
 
   async function refreshInfo() {
     if (!isCreateMode.value)
-      workflowInfo.value = await fetchWorkFlowDetail(props.id);
+      store.dispatch('WorkFlow/fetchWorkFlow', { id: props.id });
   }
 
   const modified = computed(() => {
