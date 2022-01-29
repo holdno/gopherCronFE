@@ -6,6 +6,7 @@
     </div>
     <div class="tw-w-full tw-grow tw-overflow-hidden">
       <q-scroll-area
+        ref="scrollArea"
         visible
         :thumb-style="thumbStyle"
         :bar-style="barStyle"
@@ -75,7 +76,8 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, reactive, watch } from 'vue';
+  import { QInfiniteScroll, QScrollArea } from 'quasar';
+  import { computed, onMounted, reactive, ref, watch } from 'vue';
   import { useRoute } from 'vue-router';
 
   import { WorkFlow } from '@/api/request';
@@ -85,6 +87,7 @@
 
   const store = useStore();
   const route = useRoute();
+  const scrollArea = ref<QScrollArea>();
   const loading = computed(() => store.state.Root.loadingWorkflows);
 
   watch(
@@ -93,12 +96,39 @@
       if (current?.toString() === 'workflows') refresh();
     },
   );
+
+  function scrollTo(id: number) {
+    const s = scrollArea.value;
+    if (s === undefined) throw new Error('scroll-area instance is missing');
+    const ids = Array.from(workflows.value.keys());
+    const idx = ids.findIndex((x) => x === id);
+    setTimeout(() => {
+      if (idx < 0) {
+        // scroll to end
+        s.setScrollPercentage('vertical', 1.0);
+      } else {
+        const p = ((1.0 * idx) / ids.length) * s.getScroll().verticalSize - 50;
+        s.setScrollPosition('vertical', p);
+      }
+    }, 100);
+  }
+
   onMounted(async () => {
     store.watch(
       (state) => [state.Root.eventTask, state.Root.eventWorkFlowTask],
       (current) => {
         refresh();
       },
+    );
+    watch(
+      () => [workflows.value],
+      () => {
+        const id = Number(route.params.workflowId);
+        if (id !== 0) {
+          scrollTo(id);
+        }
+      },
+      { deep: true },
     );
   });
 
