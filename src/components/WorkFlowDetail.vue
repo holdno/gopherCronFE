@@ -63,12 +63,12 @@
 <script setup lang="ts">
   import {
     createWorkflow,
-    STATUS_WORKFLOW_DISABLE,
+    STATUS_WORK_FLOW_DISABLE,
     updateWorkflow,
-    Workflow,
+    WorkFlow,
   } from '@/api/request';
-  import { fetchWorkflowDetail } from '@/api/workflow';
-  import { useStore } from '@/store';
+  import { fetchWorkFlowDetail } from '@/api/workflow';
+  import { useStore } from '@/store/index';
   import { computed, onMounted, ref, watch, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
@@ -79,19 +79,19 @@
     },
   });
 
-  const DefaultTaskValues = computed<Workflow>(() => ({
+  const DefaultTaskValues = computed<WorkFlow>(() => ({
     id: 0,
     title: '',
     cronExpr: '0 0 0 * * * *',
     remark: '',
     createTime: 0,
-    status: STATUS_WORKFLOW_DISABLE,
+    status: STATUS_WORK_FLOW_DISABLE,
     state: null,
   }));
 
   const router = useRouter();
   const store = useStore();
-  const workflowInfo = ref<Workflow>();
+  const workflowInfo = ref<WorkFlow>();
   const editable = ref(
     Object.assign({}, workflowInfo.value || DefaultTaskValues.value),
   );
@@ -133,7 +133,7 @@
 
   async function refreshInfo() {
     if (!isCreateMode.value)
-      workflowInfo.value = await fetchWorkflowDetail(props.id);
+      workflowInfo.value = await fetchWorkFlowDetail(props.id);
   }
 
   const modified = computed(() => {

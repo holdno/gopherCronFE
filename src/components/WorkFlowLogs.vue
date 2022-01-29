@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
   import { computed, nextTick, onMounted, ref, watchEffect } from 'vue';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
   import { formatTimestamp } from '@/utils/datetime';
   import JSONViewer from '@/components/JSONViewer.vue';
@@ -58,9 +58,9 @@
     },
   });
   const store = useStore();
-  const logs = computed(() => store.state.workflowLogs);
-  const total = computed(() => store.state.workflowLogsTotal);
-  const loading = computed(() => store.state.loadingWorkflowLogs);
+  const logs = computed(() => store.state.Root.workflowLogs);
+  const total = computed(() => store.state.Root.workflowLogsTotal);
+  const loading = computed(() => store.state.Root.loadingWorkflowLogs);
   const pagination = ref<Pagination>({
     sortBy: '',
     descending: false,

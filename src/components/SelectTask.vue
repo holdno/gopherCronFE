@@ -20,7 +20,7 @@
   import { QSelect } from 'quasar';
   import { computed, onMounted, PropType, ref, watch } from 'vue';
   import { Task } from '@/api/request';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
 
   const props = defineProps({
     modelValue: {
@@ -48,7 +48,7 @@
   const filter = ref('');
   const store = useStore();
   const tasks = computed(() =>
-    store.state.tasks.filter(
+    store.state.Root.tasks.filter(
       (t: Task) =>
         t.name.indexOf(filter.value) >= 0 || t.id.indexOf(filter.value) >= 0,
     ),

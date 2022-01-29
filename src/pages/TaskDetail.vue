@@ -118,7 +118,7 @@
 
 <script setup lang="ts">
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import TaskDetail from '@/components/TaskDetail.vue';
   import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
   import TaskLogs from '@/components/TaskLogs.vue';
@@ -144,7 +144,7 @@
 
   const store = useStore();
   const project = computed(() =>
-    store.state.projects.find((p) => p.id === props.projectId),
+    store.state.Root.projects.find((p) => p.id === props.projectId),
   );
 
   const route = useRoute();
@@ -178,5 +178,5 @@
   onUnmounted(() => {
     store.commit('setProjectClients', { clients: [] });
   });
-  const projectClients = computed(() => store.state.projectClients);
+  const projectClients = computed(() => store.state.Root.projectClients);
 </script>

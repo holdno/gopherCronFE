@@ -69,7 +69,7 @@
 <script setup lang="ts">
   import { onBeforeMount, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import LogoTpl from '@/components/LogoTpl.vue';
 
   const username = ref('');
@@ -85,7 +85,7 @@
       username: username.value,
       password: password.value,
     });
-    if (store.state.logined) {
+    if (store.state.Root.logined) {
       const redirect = route.query.redirect;
       let to = '/';
       if (typeof redirect === 'string') {

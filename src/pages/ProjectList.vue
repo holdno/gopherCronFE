@@ -14,7 +14,7 @@
 <script setup lang="ts">
   import { computed, onBeforeMount } from 'vue';
   import { useRoute } from 'vue-router';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import ProjectList from '@/components/ProjectList.vue';
 
   const store = useStore();

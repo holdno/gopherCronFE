@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import { computed, onMounted, ref, watchEffect } from 'vue';
 
   const props = defineProps({
@@ -67,7 +67,7 @@
   const store = useStore();
 
   const project = computed(() =>
-    store.state.projects.find((p) => p.id === props.projectId),
+    store.state.Root.projects.find((p) => p.id === props.projectId),
   );
 
   const origin = computed(() => {
@@ -116,6 +116,6 @@
         remark: p.remark.trim(),
       });
     }
-    if (store.state.currentError === undefined) show.value = false;
+    if (store.state.Root.currentError === undefined) show.value = false;
   }
 </script>

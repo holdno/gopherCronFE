@@ -20,7 +20,7 @@
   import { QSelect } from 'quasar';
   import { computed, onMounted, PropType, ref, watch } from 'vue';
   import { WorkFlowTask } from '@/api/request';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
 
   const props = defineProps({
     modelValue: {
@@ -52,7 +52,7 @@
   const filter = ref('');
   const store = useStore();
   const tasks = computed(() =>
-    store.state.workFlowTasks.filter(
+    store.state.Root.workFlowTasks.filter(
       (t: WorkFlowTask) =>
         (t.workflowId === 0 || t.workflowId === props.workflowId) &&
         (t.name.indexOf(filter.value) >= 0 || t.id.indexOf(filter.value) >= 0),

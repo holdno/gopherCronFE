@@ -1,8 +1,34 @@
-import { apiv1, Workflow } from './request';
+import { apiv1, WorkFlow } from './request';
 
-export async function fetchWorkflowDetail(
+export async function fetchWorkFlows(
+  page: number,
+  pageSize: number,
+): Promise<[WorkFlow[], number]> {
+  const resp = await apiv1.get('/workflow/list', {
+    params: {
+      page: page,
+      pagesize: pageSize,
+    },
+  });
+  const data = resp.data;
+  const r = data.response;
+  return [
+    r.list?.map((v: any) => ({
+      id: v.id,
+      title: v.title,
+      remark: v.remark,
+      status: v.status,
+      state: v.state,
+      createTime: v.create_time,
+      cronExpr: v.cron,
+    })) || [],
+    r.total,
+  ];
+}
+
+export async function fetchWorkFlowDetail(
   workflowId: number,
-): Promise<Workflow> {
+): Promise<WorkFlow> {
   const resp = await apiv1.get('/workflow/detail', {
     params: {
       id: workflowId,

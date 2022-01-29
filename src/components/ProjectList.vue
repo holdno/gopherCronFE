@@ -75,14 +75,14 @@
   import { computed, onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router';
   import { Project } from '@/api/request';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import DropdownProjectManage from './DropdownProjectManage.vue';
   import DialogProjectDeleteConfirm from './DialogProjectDeleteConfirm.vue';
   import DialogProjectForm from './DialogProjectForm.vue';
   import { thumbStyle, barStyle } from '@/utils/thumbStyle';
 
   const store = useStore();
-  const loading = computed(() => store.state.loadingProjects);
+  const loading = computed(() => store.state.Root.loadingProjects);
   onMounted(async () => {
     await store.dispatch('fetchProjects');
   });
@@ -92,7 +92,7 @@
 
   const filter = ref('');
   const projects = computed(() =>
-    store.state.projects.filter(
+    store.state.Root.projects.filter(
       (p: Project) =>
         p.title.indexOf(filter.value) >= 0 ||
         p.id.toString().indexOf(filter.value) >= 0,

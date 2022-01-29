@@ -131,7 +131,7 @@
       </q-btn>
     </div>
     <div class="tw-grow tw-w-full tw-overflow-hidden">
-      <WorkFlow
+      <WorkFlowGraph
         ref="workflow"
         v-model="current"
         :workflow-id="props.id"
@@ -143,18 +143,18 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue';
-  import WorkFlow from '@/components/WorkFlow.vue';
+  import WorkFlowGraph from '@/components/WorkFlowGraph.vue';
   import {
     WorkFlowEdge,
     WorkFlowTask,
     startWorkflow,
-    Workflow,
+    WorkFlow,
   } from '@/api/request';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import { KahnTask } from '@/types';
   import { useWindowSize } from 'vue-window-size';
   import Confirm from '@/components/Confirm.vue';
-  import { fetchWorkflowDetail } from '@/api/workflow';
+  import { fetchWorkFlowDetail } from '@/api/workflow';
 
   const { width } = useWindowSize();
   const isSmallScreen = computed(() => width.value < 1024);
@@ -187,9 +187,9 @@
   const store = useStore();
 
   const showExecuteConfirm = ref(false);
-  const workflowInfo = ref<Workflow>();
+  const workflowInfo = ref<WorkFlow>();
   async function refreshInfo() {
-    workflowInfo.value = await fetchWorkflowDetail(props.id);
+    workflowInfo.value = await fetchWorkFlowDetail(props.id);
   }
   const isRunning = computed(
     () =>
@@ -208,7 +208,9 @@
         projectId: edge.projectId,
         cached: true,
       });
-      const tasks = store.state.fetchWorkFlowTasksCache.get(edge.projectId);
+      const tasks = store.state.Root.fetchWorkFlowTasksCache.get(
+        edge.projectId,
+      );
       if (tasks === undefined)
         throw new Error(`fetchTasksCache missing projectId=${edge.projectId}`);
 
@@ -239,7 +241,7 @@
         id: key,
         deps: childMapParents.get(key),
         origin: task,
-        state: store.state.workflowTaskStates.find(
+        state: store.state.Root.workflowTaskStates.find(
           (s) => s.projectId === task.projectId && s.taskId === task.id,
         ),
       };
@@ -291,7 +293,9 @@
     await store.dispatch('fetchWorkflowEdges', {
       workflowId: props.id,
     });
-    const kahnTasks = await workflowEdgesToKahnTasks(store.state.workflowEdges);
+    const kahnTasks = await workflowEdgesToKahnTasks(
+      store.state.Root.workflowEdges,
+    );
     if (!soft) {
       tasks.value = kahnTasks;
     } else {
@@ -310,7 +314,7 @@
       },
     );
     store.watch(
-      (state) => [state.eventWorkFlowTask, state.eventWorkFlow],
+      (state) => [state.Root.eventWorkFlowTask, state.Root.eventWorkFlow],
       async (current) => {
         await refreshInfo();
         await refresh(true);

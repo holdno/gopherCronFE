@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import { ref, computed, watch } from 'vue';
   import UserItem from './UserListItem.vue';
   import ModifyBox from './ModifyBox.vue';
@@ -60,10 +60,10 @@
   const store = useStore();
 
   const userList = computed(() => {
-    return store.state.users;
+    return store.state.Root.users;
   });
   const totalPage = computed((): number => {
-    const total = store.state.userTotal ? store.state.userTotal : 0;
+    const total = store.state.Root.userTotal || 0;
     return Math.ceil(total / pagesize.value);
   });
 

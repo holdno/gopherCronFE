@@ -75,16 +75,16 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, reactive, ref, watch } from 'vue';
-  import { useStore } from '@/store';
+  import { computed, onMounted, reactive, watch } from 'vue';
+  import { useStore } from '@/store/index';
   import { formatTimestamp } from '@/utils/datetime';
   import { thumbStyle, barStyle } from '@/utils/thumbStyle';
-  import { Workflow } from '@/api/request';
+  import { WorkFlow } from '@/api/request';
   import { useRoute } from 'vue-router';
 
   const store = useStore();
   const route = useRoute();
-  const loading = computed(() => store.state.loadingWorkflows);
+  const loading = computed(() => store.state.Root.loadingWorkflows);
 
   watch(
     () => route.name,
@@ -94,18 +94,18 @@
   );
   onMounted(async () => {
     store.watch(
-      (state) => [state.eventTask, state.eventWorkFlowTask],
+      (state) => [state.Root.eventTask, state.Root.eventWorkFlowTask],
       (current) => {
         refresh();
       },
     );
   });
 
-  const workflows = ref(new Map<number, Workflow>());
+  const workflows = computed(() => store.state.WorkFlow.workflows);
   async function onLoad(index: number, done: (stop: boolean) => void) {
     pagination.page = index;
-    await refresh();
-    if (store.state.workflows.length < pagination.pageSize) {
+    const workflows = await refresh();
+    if (workflows.length < pagination.pageSize) {
       done(true);
     } else {
       done(false);
@@ -118,15 +118,13 @@
   });
 
   async function refresh() {
-    await store.dispatch('fetchWorkflows', {
+    const [workflows] = await store.dispatch('WorkFlow/fetchWorkFlows', {
       ...pagination,
     });
-    for (const workflow of store.state.workflows) {
-      workflows.value.set(workflow.id, workflow);
-    }
+    return workflows;
   }
 
-  function activated(workflow: Workflow): boolean {
+  function activated(workflow: WorkFlow): boolean {
     return workflow.id === Number(route.params.workflowId || 0);
   }
 

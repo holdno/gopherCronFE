@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import { WorkFlowTask } from '@/api/request';
   import { formatTimestamp } from '@/utils/datetime';
   import { useRoute, useRouter } from 'vue-router';
@@ -100,14 +100,14 @@
   });
 
   const store = useStore();
-  const loading = computed(() => store.state.loadingWorkFlowTasks);
+  const loading = computed(() => store.state.Root.loadingWorkFlowTasks);
 
   onMounted(() => {
     watchEffect(async () => {
       await fetchTasks();
     });
     store.watch(
-      (state) => [state.eventTask, state.eventWorkFlowTask],
+      (state) => [state.Root.eventTask, state.Root.eventWorkFlowTask],
       (current) => {
         fetchTasks();
       },
@@ -119,7 +119,7 @@
 
   const filter = ref('');
   const tasks = computed(() =>
-    store.state.workFlowTasks.filter(
+    store.state.Root.workFlowTasks.filter(
       (t: WorkFlowTask) =>
         t.name.indexOf(filter.value) >= 0 ||
         t.id.toString().indexOf(filter.value) >= 0,
@@ -137,7 +137,7 @@
   async function deleteTask(projectId: number, taskId: string) {
     store.commit('clearError');
     await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
-    if (store.state.currentError === undefined) {
+    if (store.state.Root.currentError === undefined) {
       router.push({
         name: 'workflow_tasks',
         params: {

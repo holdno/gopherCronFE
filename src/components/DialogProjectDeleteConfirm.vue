@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import { computed } from 'vue';
   import { useRouter } from 'vue-router';
   import Confirm from './Confirm.vue';
@@ -33,12 +33,12 @@
   const router = useRouter();
   const store = useStore();
   const project = computed(() =>
-    store.state.projects.find((p) => p.id === props.projectId),
+    store.state.Root.projects.find((p) => p.id === props.projectId),
   );
   async function deleteProject(projectId: number) {
     store.commit('clearError');
     await store.dispatch('deleteProject', { projectId });
-    if (store.state.currentError === undefined) {
+    if (store.state.Root.currentError === undefined) {
       router.push({ name: 'projects' });
       show.value = false;
     }

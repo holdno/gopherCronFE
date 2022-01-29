@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
   import { onMounted, computed, ref, watchEffect, nextTick } from 'vue';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import { formatTimestamp } from '@/utils/datetime';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
   import JSONViewer from '@/components/JSONViewer.vue';
@@ -68,9 +68,9 @@
 
   const emits = defineEmits(['onpage']);
   const store = useStore();
-  const logs = computed(() => store.state.taskLogs);
-  const total = computed(() => store.state.taskLogsTotal);
-  const loading = computed(() => store.state.loadingTaskLogs);
+  const logs = computed(() => store.state.Root.taskLogs);
+  const total = computed(() => store.state.Root.taskLogsTotal);
+  const loading = computed(() => store.state.Root.loadingTaskLogs);
   const pagination = ref<Pagination>({
     sortBy: '',
     descending: false,

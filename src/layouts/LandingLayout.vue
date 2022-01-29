@@ -108,7 +108,7 @@
 <script setup lang="ts">
   import { ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
   import { getServiceVersion } from '@/api/version';
   import UserBaseInfo from './UserBaseInfo.vue';
 

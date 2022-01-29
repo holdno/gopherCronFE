@@ -28,7 +28,7 @@ import VNetworkGraph from 'v-network-graph';
 import { apiv1, installApiv1 } from '@/api/request';
 
 // Vuex
-import { store, key as storeKey } from '@/store';
+import { store, key as storeKey } from '@/store/index';
 
 // Router
 import router from '@/router';

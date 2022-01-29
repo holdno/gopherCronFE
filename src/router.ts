@@ -3,7 +3,7 @@ import {
   createRouter,
   RouteLocationNormalizedLoaded,
 } from 'vue-router';
-import { store } from '@/store';
+import { store } from '@/store/index';
 
 const TaskRoutes = (type: string) => [
   {
@@ -177,7 +177,7 @@ const Router = createRouter({
 Router.beforeEach(async (to, from) => {
   await store.dispatch('checkLogin');
 
-  if (to.meta.requiresAuth && !store.state.logined) {
+  if (to.meta.requiresAuth && !store.state.Root.logined) {
     // 此路由需要授权，请检查是否已登录
     // 如果没有，则重定向到登录页面
     return {
