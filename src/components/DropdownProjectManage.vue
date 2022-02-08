@@ -50,13 +50,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted, ref } from 'vue';
+  import { ref } from 'vue';
 
   import DialogProjectDeleteConfirm from './DialogProjectDeleteConfirm.vue';
   import DialogProjectForm from './DialogProjectForm.vue';
   import DialogProjectUsersManage from './DialogProjectUsersManage.vue';
-
-  import { apiv1, fetchProjectUsers } from '@/api/request';
 
   const show = ref(false);
   const props = defineProps({
@@ -69,8 +67,4 @@
   const showDeleteConfirm = ref(false);
   const showEditDialog = ref(false);
   const showUsersManageDialog = ref(false);
-
-  onMounted(() => {
-    fetchProjectUsers(apiv1, props.projectId);
-  });
 </script>
