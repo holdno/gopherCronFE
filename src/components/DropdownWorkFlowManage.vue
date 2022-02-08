@@ -3,6 +3,10 @@
     v-model="showDeleteConfirm"
     :workflow-id="props.workflowId"
   />
+  <DialogWorkFlowUsersManage
+    v-model="showUsersManageDialog"
+    :workflow-id="props.workflowId"
+  />
   <q-btn-dropdown
     v-model="show"
     dense
@@ -40,6 +44,7 @@
   import { ref } from 'vue';
 
   import DialogWorkFlowDeleteConfirm from './DialogWorkFlowDeleteConfirm.vue';
+  import DialogWorkFlowUsersManage from './DialogWorkFlowUsersManage.vue';
 
   const show = ref(false);
   const props = defineProps({

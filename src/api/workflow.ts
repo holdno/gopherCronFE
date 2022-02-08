@@ -1,4 +1,4 @@
-import { WorkFlow, apiv1 } from './request';
+import { User, WorkFlow, apiv1 } from './request';
 
 export async function fetchWorkFlows(
   page: number,
@@ -63,6 +63,45 @@ export async function deleteWorkFlow(workflowId: number) {
     id: workflowId,
   });
   return await apiv1.post('/workflow/delete', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
+
+export async function fetchWorkFlowUsers(workflowId: number): Promise<User[]> {
+  const resp = await apiv1.get('/workflow/manage/users', {
+    params: {
+      workflow_id: workflowId,
+    },
+  });
+  return resp.data.response.list.map((v: any) => ({
+    id: v.id,
+    name: v.name,
+    account: v.account,
+    permissions: v.permission.split(','),
+    createTime: v.create_time,
+  }));
+}
+
+export async function removeWorkFlowUser(workflowId: number, userId: number) {
+  const payload = JSON.stringify({
+    workflow_id: workflowId,
+    user_id: userId,
+  });
+  return await apiv1.post('/workflow/manage/remove_user', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
+
+export async function addWorkFlowUser(workflowId: number, userAccount: string) {
+  const payload = JSON.stringify({
+    workflow_id: workflowId,
+    user_account: userAccount,
+  });
+  return await apiv1.post('/workflow/manage/add_user', payload, {
     headers: {
       'content-type': 'application/json',
     },
