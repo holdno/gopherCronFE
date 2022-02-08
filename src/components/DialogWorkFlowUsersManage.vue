@@ -1,5 +1,11 @@
 <template>
   <q-dialog v-model="show">
+    <Confirm
+      v-model="showConfirm"
+      type="warning"
+      :content="`确定要移除用户 ${selected?.name} 吗？`"
+      @confirm="selected && removeUser(selected).then(closeRemoveUserConfirm)"
+    />
     <q-card class="tw-w-96 q-pa-sm">
       <q-card-section>
         <div class="text-h6">任务编排人员管理</div>
@@ -11,7 +17,7 @@
           removable
           color="primary"
           text-color="black"
-          @remove="removeUser(user)"
+          @remove="openRemoveUserConfirm(user)"
         >
           {{ user.name }}
         </q-chip>
@@ -41,6 +47,8 @@
 
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue';
+
+  import Confirm from './Confirm.vue';
 
   import { User } from '@/api/request';
   import {
@@ -91,6 +99,19 @@
     } finally {
       loading.value = false;
     }
+  }
+
+  const selected = ref<User>();
+  const showConfirm = ref(false);
+
+  function openRemoveUserConfirm(user: User) {
+    selected.value = user;
+    showConfirm.value = true;
+  }
+
+  function closeRemoveUserConfirm() {
+    selected.value = undefined;
+    showConfirm.value = false;
   }
 
   async function removeUser(user: User) {
