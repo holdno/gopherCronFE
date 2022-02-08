@@ -69,8 +69,9 @@
   }
   watch<[number, boolean]>(
     () => [props.projectId, show.value],
-    async ([projectId, show]) => {
+    async ([, show]) => {
       if (show) fetchUsers();
+      newUser.value = '';
     },
   );
 

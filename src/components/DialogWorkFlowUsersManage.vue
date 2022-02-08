@@ -68,8 +68,9 @@
   }
   watch<[number, boolean]>(
     () => [props.workflowId, show.value],
-    async ([projectId, show]) => {
+    async ([, show]) => {
       if (show) fetchUsers();
+      newUser.value = '';
     },
   );
 
