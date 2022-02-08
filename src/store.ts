@@ -205,7 +205,6 @@ export const store = createStore<State>({
       const api = state.apiv1;
       if (api) {
         delete api.defaults.headers.common[COOKIE_TOKEN];
-        // router.push({ name: 'login' });
       }
     },
     error(state, { error }) {

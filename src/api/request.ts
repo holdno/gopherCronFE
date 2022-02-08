@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosInstance } from 'axios';
 import { App, inject, InjectionKey } from 'vue';
 import { Store } from 'vuex';
 import { State, ErrHandled } from '@/store';
+import router from '@/router';
 
 export const apiv1 = axios.create({
   baseURL: import.meta.env.VITE_API_V1_BASE_URL,
@@ -41,6 +42,7 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
         switch (error.response.status) {
           case 401:
             store.commit('unauthed');
+            router.push({ name: 'login' });
             break;
           default:
         }

@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, defineProps, defineEmits, ref, Ref } from 'vue';
+  import { computed, defineEmits, ref, Ref } from 'vue';
   const props = defineProps({
     modelValue: {
       type: Boolean,
