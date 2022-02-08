@@ -23,7 +23,13 @@
           placeholder="请输入用户帐号"
         >
           <template #append>
-            <q-btn flat icon="add" text-color="primary" @click="onSubmit">
+            <q-btn
+              :loading="loading"
+              flat
+              icon="add"
+              text-color="primary"
+              @click="onSubmit"
+            >
               添加
             </q-btn>
           </template>
@@ -75,14 +81,25 @@
   );
 
   const newUser = ref('');
+  const loading = ref(false);
   async function onSubmit() {
-    await addWorkFlowUser(props.workflowId, newUser.value);
-    newUser.value = '';
-    await fetchUsers();
+    loading.value = true;
+    try {
+      await addWorkFlowUser(props.workflowId, newUser.value);
+      newUser.value = '';
+      await fetchUsers();
+    } finally {
+      loading.value = false;
+    }
   }
 
   async function removeUser(user: User) {
-    await removeWorkFlowUser(props.workflowId, user.id);
-    await fetchUsers();
+    loading.value = true;
+    try {
+      await removeWorkFlowUser(props.workflowId, user.id);
+      await fetchUsers();
+    } finally {
+      loading.value = false;
+    }
   }
 </script>
