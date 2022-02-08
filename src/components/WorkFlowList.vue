@@ -124,7 +124,7 @@
       () => [workflows.value],
       () => {
         const id = Number(route.params.workflowId);
-        if (id !== 0) {
+        if (id !== 0 && !isNaN(id)) {
           scrollTo(id);
         }
       },
