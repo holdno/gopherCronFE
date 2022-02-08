@@ -4,7 +4,7 @@
   >
     <div
       :class="
-        'xl:tw-basis-1/5 tw-basis-1/4  tw-h-full tw-w-full tw-shrink-0 ' +
+        'xl:tw-basis-1/5 lg:tw-basis-1/4  tw-h-full tw-w-full tw-shrink-0 ' +
         visibilyClass
       "
     >
