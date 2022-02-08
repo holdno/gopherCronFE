@@ -11,8 +11,21 @@
           })
       "
     />
+    <Confirm
+      v-model="showKillConfirm"
+      type="warning"
+      content="确定要停止执行吗？"
+      @confirm="
+        () =>
+          killWorkFlow(props.id).then(() => {
+            showKillConfirm = false;
+            refresh();
+          })
+      "
+    />
     <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap tw-grow-0">
       <q-btn
+        v-if="!isRunning"
         :dense="isSmallScreen"
         color="primary"
         text-color="black"
@@ -20,6 +33,14 @@
         @click="showExecuteConfirm = true"
       >
         运行
+      </q-btn>
+      <q-btn
+        v-else
+        :dense="isSmallScreen"
+        color="red"
+        @click="showKillConfirm = true"
+      >
+        Kill
       </q-btn>
       <q-btn
         :dense="isSmallScreen"
@@ -151,7 +172,7 @@
     WorkFlowTask,
     startWorkflow,
   } from '@/api/request';
-  import { fetchWorkFlowDetail } from '@/api/workflow';
+  import { fetchWorkFlowDetail, killWorkFlow } from '@/api/workflow';
   import Confirm from '@/components/Confirm.vue';
   import WorkFlowGraph from '@/components/WorkFlowGraph.vue';
   import { useStore } from '@/store/index';
@@ -188,6 +209,7 @@
   const store = useStore();
 
   const showExecuteConfirm = ref(false);
+  const showKillConfirm = ref(false);
   const workflowInfo = ref<WorkFlow>();
   async function refreshInfo() {
     workflowInfo.value = await fetchWorkFlowDetail(props.id);

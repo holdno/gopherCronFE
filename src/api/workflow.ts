@@ -45,3 +45,14 @@ export async function fetchWorkFlowDetail(
     createTime: v.create_time,
   };
 }
+
+export async function killWorkFlow(workflowId: number) {
+  const payload = JSON.stringify({
+    workflow_id: workflowId,
+  });
+  return await apiv1.post('/workflow/kill', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
