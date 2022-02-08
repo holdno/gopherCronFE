@@ -56,3 +56,15 @@ export async function killWorkFlow(workflowId: number) {
     },
   });
 }
+
+export async function deleteWorkFlow(workflowId: number) {
+  const payload = JSON.stringify({
+    // workflow_id: workflowId,
+    id: workflowId,
+  });
+  return await apiv1.post('/workflow/delete', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}

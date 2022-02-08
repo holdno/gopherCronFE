@@ -1,7 +1,11 @@
 import { ActionTree, Module, MutationTree } from 'vuex';
 
 import { WorkFlow } from '@/api/request';
-import { fetchWorkFlowDetail, fetchWorkFlows } from '@/api/workflow';
+import {
+  deleteWorkFlow,
+  fetchWorkFlowDetail,
+  fetchWorkFlows,
+} from '@/api/workflow';
 import { State as RootState } from '@/store/index';
 
 export const NameSpace = 'WorkFlow';
@@ -21,6 +25,14 @@ const actions: ActionTree<State, RootState> = {
     const workflow = await fetchWorkFlowDetail(id);
     commit('updateWorkFlow', { workflow });
   },
+  async deleteWorkFlow({ commit }, { id }) {
+    try {
+      await deleteWorkFlow(id);
+      commit('deleteWorkFlow', { id });
+    } catch (e) {
+      commit('error', { error: e }, { root: true });
+    }
+  },
 };
 
 const mutations: MutationTree<State> = {
@@ -39,6 +51,9 @@ const mutations: MutationTree<State> = {
   clearWorkFlows(state) {
     state.workflows.clear();
     state.totalCount = 0;
+  },
+  deleteWorkFlow(state, { id }: { id: number }) {
+    state.workflows.delete(id);
   },
 };
 

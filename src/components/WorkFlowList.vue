@@ -21,7 +21,10 @@
             <router-link
               v-for="[, workflow] in workflows"
               :key="workflow.id"
-              :to="{ name: 'workflow', params: { workflowId: workflow.id } }"
+              :to="{
+                name: 'workflow',
+                params: { workflowId: workflow.id },
+              }"
             >
               <div
                 :class="
@@ -58,6 +61,7 @@
                   <div class="task__bottom-time">
                     {{ formatTimestamp(workflow.createTime * 1000) }}
                   </div>
+                  <DropdownWorkFlowManage :workflow-id="workflow.id" />
                 </div>
               </div>
             </router-link>
@@ -79,6 +83,8 @@
   import { QInfiniteScroll, QScrollArea } from 'quasar';
   import { computed, onMounted, reactive, ref, watch } from 'vue';
   import { useRoute } from 'vue-router';
+
+  import DropdownWorkFlowManage from './DropdownWorkFlowManage.vue';
 
   import { WorkFlow } from '@/api/request';
   import { useStore } from '@/store/index';
@@ -197,11 +203,10 @@
   }
 
   .task__bottom-box {
-    height: 24px;
-    line-height: 24px;
+    height: min-content;
     margin-left: 15px;
-    margin-bottom: 5px;
     display: flex;
+    align-items: center;
     justify-content: space-between;
   }
 
