@@ -2,6 +2,7 @@ import axios, { AxiosError, AxiosInstance } from 'axios';
 import { App, InjectionKey, inject } from 'vue';
 import { Store } from 'vuex';
 
+import router from '@/router';
 import { State } from '@/store/index';
 import { ErrHandled } from '@/store/modules/root';
 
