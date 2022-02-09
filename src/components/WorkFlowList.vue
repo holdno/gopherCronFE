@@ -205,6 +205,7 @@
   .task__bottom-box {
     height: min-content;
     margin-left: 15px;
+    margin-right: 15px;
     display: flex;
     align-items: center;
     justify-content: space-between;
