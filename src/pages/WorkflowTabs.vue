@@ -12,7 +12,7 @@
       <q-route-tab
         name="graph"
         label="流程"
-        :to="{ name: 'workflow', params: { workflowId: props.id } }"
+        :to="{ name: 'workflow_graph', params: { workflowId: props.id } }"
         replace
       />
       <q-route-tab
@@ -57,7 +57,7 @@
           <q-route-tab
             name="graph"
             label="流程"
-            :to="{ name: 'workflow', params: { workflowId: props.id } }"
+            :to="{ name: 'workflow_graph', params: { workflowId: props.id } }"
             replace
           />
           <q-route-tab
@@ -106,7 +106,7 @@
     if (route.name) {
       const routeName = route.name.toString();
       if (routeName === 'workflow_logs') return 'logs';
-      else if (routeName === 'workflow') return 'graph';
+      else if (routeName === 'workflow_graph') return 'graph';
       else if (routeName === 'workflow_detail') return 'detail';
     }
     throw new Error(`Unknown route name ${route.name?.toString()}`);

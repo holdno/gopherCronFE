@@ -4,9 +4,40 @@ import {
   createWebHistory,
 } from 'vue-router';
 
+import { fetchWorkFlowDetail } from './api/workflow';
+
 import { store } from '@/store/index';
 
-const TaskRoutes = (type: string) => [
+function createBeforeEnter(type: 'crontab' | 'workflow') {
+  return async (to: RouteLocationNormalizedLoaded) => {
+    if (type === 'crontab') {
+      if (store.state.Root.tasks.length === 0) {
+        await store.dispatch('fetchTasks', {
+          projectId: Number(to.params.projectId),
+        });
+      }
+      const task = store.state.Root.tasks.find(
+        (v) => v.id === to.params.taskId,
+      );
+      if (task === undefined) {
+        return { name: 'notfound' };
+      }
+    } else if (type === 'workflow') {
+      if (store.state.Root.tasks.length === 0) {
+        await store.dispatch('fetchWorkFlowTasks', {
+          projectId: Number(to.params.projectId),
+        });
+      }
+      const task = store.state.Root.workFlowTasks.find(
+        (v) => v.id === to.params.taskId,
+      );
+      if (task === undefined) {
+        return { name: 'notfound' };
+      }
+    }
+  };
+}
+const TaskRoutes = (type: 'crontab' | 'workflow') => [
   {
     name: `${type}_task`,
     path: 'task/:taskId',
@@ -16,6 +47,7 @@ const TaskRoutes = (type: string) => [
       projectId: Number(route.params.projectId),
       type: type,
     }),
+    beforeEnter: createBeforeEnter(type),
   },
   {
     name: `${type}_task_logs`,
@@ -26,6 +58,7 @@ const TaskRoutes = (type: string) => [
       projectId: Number(route.params.projectId),
       type: type,
     }),
+    beforeEnter: createBeforeEnter(type),
   },
   {
     name: `create_${type}_task`,
@@ -35,6 +68,7 @@ const TaskRoutes = (type: string) => [
       projectId: Number(route.params.projectId),
       type: type,
     }),
+    beforeEnter: createBeforeEnter(type),
   },
 ];
 
@@ -59,6 +93,17 @@ const routes = [
             name: 'project',
             path: ':projectId(\\d+)',
             component: () => import('@/layouts/DummyContainer.vue'),
+            async beforeEnter(to: RouteLocationNormalizedLoaded) {
+              if (store.state.Root.projects.length === 0) {
+                await store.dispatch('fetchProjects');
+              }
+              const project = store.state.Root.projects.find(
+                (v) => v.id === Number(to.params.projectId),
+              );
+              if (project === undefined) {
+                return { name: 'notfound' };
+              }
+            },
             redirect: (from: RouteLocationNormalizedLoaded) => ({
               name: 'crontab_tasks',
               params: { ...from.params },
@@ -98,22 +143,43 @@ const routes = [
             props: (route: RouteLocationNormalizedLoaded) => ({
               id: Number(route.params.workflowId),
             }),
-          },
-          {
-            name: 'workflow_logs',
-            path: ':workflowId(\\d+)/logs',
-            component: () => import('@/pages/WorkFlowTabs.vue'),
-            props: (route: RouteLocationNormalizedLoaded) => ({
-              id: Number(route.params.workflowId),
+            async beforeEnter(to: RouteLocationNormalizedLoaded) {
+              try {
+                await fetchWorkFlowDetail(Number(to.params.workflowId));
+              } catch (e) {
+                return { name: 'notfound' };
+              }
+            },
+            redirect: (from: RouteLocationNormalizedLoaded) => ({
+              name: 'workflow_graph',
+              params: { ...from.params },
             }),
-          },
-          {
-            name: 'workflow_detail',
-            path: ':workflowId(\\d+)/detail',
-            component: () => import('@/pages/WorkFlowTabs.vue'),
-            props: (route: RouteLocationNormalizedLoaded) => ({
-              id: Number(route.params.workflowId),
-            }),
+            children: [
+              {
+                name: 'workflow_graph',
+                path: 'graph',
+                component: () => import('@/pages/WorkFlowTabs.vue'),
+                props: (route: RouteLocationNormalizedLoaded) => ({
+                  id: Number(route.params.workflowId),
+                }),
+              },
+              {
+                name: 'workflow_logs',
+                path: 'logs',
+                component: () => import('@/pages/WorkFlowTabs.vue'),
+                props: (route: RouteLocationNormalizedLoaded) => ({
+                  id: Number(route.params.workflowId),
+                }),
+              },
+              {
+                name: 'workflow_detail',
+                path: 'detail',
+                component: () => import('@/pages/WorkFlowTabs.vue'),
+                props: (route: RouteLocationNormalizedLoaded) => ({
+                  id: Number(route.params.workflowId),
+                }),
+              },
+            ],
           },
           {
             name: 'create_workflow',
