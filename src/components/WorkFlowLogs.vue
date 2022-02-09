@@ -35,7 +35,7 @@
 
         <q-separator />
 
-        <q-card-section>
+        <q-card-section class="tw-w-full tw-overflow-x-auto">
           <JSONViewer :json="scope.row.result" />
         </q-card-section>
       </q-card>
@@ -44,12 +44,13 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, nextTick, onMounted, ref, watchEffect } from 'vue';
-  import { useStore } from '@/store';
-  import { Pagination, TableRequestProp } from '@/utils/quasar';
-  import { formatTimestamp } from '@/utils/datetime';
-  import JSONViewer from '@/components/JSONViewer.vue';
   import { QTable } from 'quasar';
+  import { computed, nextTick, onMounted, ref, watchEffect } from 'vue';
+
+  import JSONViewer from '@/components/JSONViewer.vue';
+  import { useStore } from '@/store/index';
+  import { formatTimestamp } from '@/utils/datetime';
+  import { Pagination, TableRequestProp } from '@/utils/quasar';
 
   const props = defineProps({
     id: {
@@ -58,9 +59,9 @@
     },
   });
   const store = useStore();
-  const logs = computed(() => store.state.workflowLogs);
-  const total = computed(() => store.state.workflowLogsTotal);
-  const loading = computed(() => store.state.loadingWorkflowLogs);
+  const logs = computed(() => store.state.Root.workflowLogs);
+  const total = computed(() => store.state.Root.workflowLogsTotal);
+  const loading = computed(() => store.state.Root.loadingWorkflowLogs);
   const pagination = ref<Pagination>({
     sortBy: '',
     descending: false,
@@ -70,6 +71,14 @@
   });
 
   const table = ref<QTable>();
+  onMounted(() => {
+    // 设置 table fixed
+    nextTick(() => {
+      table.value?.$el
+        .querySelector('table.q-table')
+        .classList.add('tw-table-fixed');
+    });
+  });
   const pageChange = () => {
     nextTick(() => {
       const node: HTMLElement | null =

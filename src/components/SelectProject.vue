@@ -23,9 +23,10 @@
 
 <script setup lang="ts">
   import { QSelect } from 'quasar';
-  import { computed, PropType, ref } from 'vue';
+  import { PropType, computed, ref } from 'vue';
+
   import { Project } from '@/api/request';
-  import { useStore } from '@/store';
+  import { useStore } from '@/store/index';
 
   const props = defineProps({
     modelValue: {
@@ -45,7 +46,7 @@
   const filter = ref('');
   const store = useStore();
   const projects = computed(() =>
-    store.state.projects.filter(
+    store.state.Root.projects.filter(
       (p: Project) =>
         p.title.indexOf(filter.value) >= 0 ||
         p.id.toString().indexOf(filter.value) >= 0,

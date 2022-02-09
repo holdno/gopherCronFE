@@ -1,6 +1,6 @@
 <template>
   <q-table
-    ref="logtable"
+    ref="logTable"
     v-model:pagination="pagination"
     class="tw-w-full tw-h-full tw-bg-[#121212]"
     :rows-per-page-options="[5, 10, 15]"
@@ -49,12 +49,14 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, computed, ref, watchEffect, nextTick } from 'vue';
-  import { useStore } from '@/store';
+  import { QTable } from 'quasar';
+  import { computed, nextTick, onMounted, ref, watchEffect } from 'vue';
+
+  import JSONViewer from '@/components/JSONViewer.vue';
+  import { useStore } from '@/store/index';
   import { formatTimestamp } from '@/utils/datetime';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
-  import JSONViewer from '@/components/JSONViewer.vue';
-  import { QTable } from 'quasar';
+
   const props = defineProps({
     id: {
       type: String,
@@ -68,9 +70,9 @@
 
   const emits = defineEmits(['onpage']);
   const store = useStore();
-  const logs = computed(() => store.state.taskLogs);
-  const total = computed(() => store.state.taskLogsTotal);
-  const loading = computed(() => store.state.loadingTaskLogs);
+  const logs = computed(() => store.state.Root.taskLogs);
+  const total = computed(() => store.state.Root.taskLogsTotal);
+  const loading = computed(() => store.state.Root.loadingTaskLogs);
   const pagination = ref<Pagination>({
     sortBy: '',
     descending: false,
@@ -79,15 +81,13 @@
     rowsNumber: 0,
   });
 
-  const logtable = ref<QTable>();
+  const logTable = ref<QTable>();
   onMounted(() => {
-    // 设置talbe fixed
+    // 设置 table fixed
     nextTick(() => {
-      console.log(
-        logtable.value?.$el
-          .querySelector('table.q-table')
-          .classList.add('tw-table-fixed'),
-      );
+      logTable.value?.$el
+        .querySelector('table.q-table')
+        .classList.add('tw-table-fixed');
     });
   });
 

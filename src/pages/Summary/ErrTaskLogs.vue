@@ -74,12 +74,14 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watchEffect, Ref, nextTick, onMounted } from 'vue';
+  import { QTable } from 'quasar';
+  import { Ref, nextTick, onMounted, ref, watchEffect } from 'vue';
+
+  import { TaskLog, getSummaryErrorLogs } from '@/api/log';
+  import JSONViewer from '@/components/JSONViewer.vue';
   import { formatTimestamp } from '@/utils/datetime';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
-  import { getSummaryErrorLogs, TaskLog } from '@/api/log';
-  import JSONViewer from '@/components/JSONViewer.vue';
-  import { QTable } from 'quasar';
+
   const logs: Ref<TaskLog[]> = ref([]);
   const total = ref(0);
   const loading = ref(false);
@@ -111,13 +113,11 @@
 
   const table = ref<QTable>();
   onMounted(() => {
-    // 设置talbe fixed
+    // 设置 table fixed
     nextTick(() => {
-      console.log(
-        table.value?.$el
-          .querySelector('table.q-table')
-          .classList.add('tw-table-fixed'),
-      );
+      table.value?.$el
+        .querySelector('table.q-table')
+        .classList.add('tw-table-fixed');
     });
   });
 

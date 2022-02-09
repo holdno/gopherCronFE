@@ -108,9 +108,11 @@
 <script setup lang="ts">
   import { ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
-  import { useStore } from '@/store';
-  import { getServiceVersion } from '@/api/version';
+
   import UserBaseInfo from './UserBaseInfo.vue';
+
+  import { getServiceVersion } from '@/api/version';
+  import { useStore } from '@/store/index';
 
   const drawer = ref(true);
   const miniState = ref(true);

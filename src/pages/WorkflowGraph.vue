@@ -1,45 +1,88 @@
 <template>
   <div class="tw-w-full tw-h-full tw-flex tw-flex-col">
-    <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap">
+    <Confirm
+      v-model="showExecuteConfirm"
+      content="确定要立即执行吗？"
+      @confirm="
+        () =>
+          startWorkflow(store.getters.apiv1, props.id).then(() => {
+            showExecuteConfirm = false;
+            refresh();
+          })
+      "
+    />
+    <Confirm
+      v-model="showKillConfirm"
+      type="warning"
+      content="确定要停止执行吗？"
+      @confirm="
+        () =>
+          killWorkFlow(props.id).then(() => {
+            showKillConfirm = false;
+            refresh();
+          })
+      "
+    />
+    <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap tw-grow-0">
       <q-btn
+        v-if="!isRunning"
+        :dense="isSmallScreen"
+        color="primary"
+        text-color="black"
+        :loading="isRunning"
+        @click="showExecuteConfirm = true"
+      >
+        运行
+      </q-btn>
+      <q-btn
+        v-else
+        :dense="isSmallScreen"
+        color="red"
+        @click="showKillConfirm = true"
+      >
+        Kill
+      </q-btn>
+      <q-btn
+        :dense="isSmallScreen"
         :color="canUpdate ? 'primary' : ''"
         :text-color="canUpdate ? 'black' : 'white'"
         :disable="!canUpdate"
         :loading="saveLoading"
         @click="updateWorkFlow"
-        >保存</q-btn
       >
-      <q-btn flat icon="refresh" title="刷新" @click="() => refresh()"
-        >刷新</q-btn
-      >
+        保存
+      </q-btn>
       <q-btn
+        :dense="isSmallScreen"
+        flat
+        icon="refresh"
+        title="刷新"
+        @click="() => refresh()"
+      >
+        刷新
+      </q-btn>
+      <q-btn
+        :dense="isSmallScreen"
         flat
         icon="restart_alt"
         title="重置视图"
         @click="() => workflow.ResetView()"
-        >重置视图</q-btn
       >
+        重置视图
+      </q-btn>
       <q-btn
+        :dense="isSmallScreen"
         flat
         icon="add"
         title="添加新任务节点"
         @click="() => workflow.ShowAddNodeDialog()"
-        >添加新任务节点</q-btn
       >
+        添加新任务节点
+      </q-btn>
       <q-btn
-        flat
-        icon="delete"
-        title="删除已选的节点及节点关联关系"
-        :disable="canRemoveNodes"
-        @click="
-          () => {
-            workflow.SelectedNodes.length > 0 && workflow.RemoveSelectedNodes();
-            workflow.SelectedEdges.length > 0 && workflow.RemoveSelectedEdges();
-          }
-        "
-        >删除节点（关系）</q-btn
-      >
-      <q-btn
+        v-if="selectedTask !== undefined"
+        key="create_relationship"
+        :dense="isSmallScreen"
         flat
         icon="north_east"
         title="关联节点"
@@ -55,11 +98,30 @@
             });
           }
         "
-        >关联节点</q-btn
       >
+        关联节点
+      </q-btn>
+      <q-btn
+        v-if="selectedTask !== undefined"
+        key="delete_task_or_relationship"
+        :dense="isSmallScreen"
+        icon="delete"
+        :disable="canRemoveNodes"
+        title="删除已选的节点及节点关联关系"
+        flat
+        @click="
+          () => {
+            workflow.SelectedNodes.length > 0 && workflow.RemoveSelectedNodes();
+            workflow.SelectedEdges.length > 0 && workflow.RemoveSelectedEdges();
+          }
+        "
+      >
+        删除节点（关系）
+      </q-btn>
       <q-btn
         v-if="selectedTask !== undefined"
         key="jump_task_detail"
+        :dense="isSmallScreen"
         icon="task_alt"
         flat
         :to="{
@@ -69,11 +131,13 @@
             taskId: selectedTask.origin.id,
           },
         }"
-        >任务详情</q-btn
       >
+        任务详情
+      </q-btn>
       <q-btn
         v-if="selectedTask !== undefined"
         key="jump_task_logs"
+        :dense="isSmallScreen"
         icon="view_timeline"
         flat
         :to="{
@@ -83,24 +147,39 @@
             taskId: selectedTask.origin.id,
           },
         }"
-        >任务日志</q-btn
       >
+        任务日志
+      </q-btn>
     </div>
-    <WorkFlow
-      ref="workflow"
-      v-model="current"
-      :workflow-id="props.id"
-      :tasks="tasks"
-    />
+    <div class="tw-grow tw-w-full tw-overflow-hidden">
+      <WorkFlowGraph
+        ref="workflow"
+        v-model="current"
+        :workflow-id="props.id"
+        :tasks="tasks"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
-  import WorkFlow from '@/components/WorkFlow.vue';
-  import { WorkFlowEdge, WorkFlowTask } from '@/api/request';
-  import { useStore } from '@/store';
+  import { computed, onMounted, ref, watch } from 'vue';
+  import { useWindowSize } from 'vue-window-size';
+
+  import {
+    WorkFlow,
+    WorkFlowEdge,
+    WorkFlowTask,
+    startWorkflow,
+  } from '@/api/request';
+  import { fetchWorkFlowDetail, killWorkFlow } from '@/api/workflow';
+  import Confirm from '@/components/Confirm.vue';
+  import WorkFlowGraph from '@/components/WorkFlowGraph.vue';
+  import { useStore } from '@/store/index';
   import { KahnTask } from '@/types';
+
+  const { width } = useWindowSize();
+  const isSmallScreen = computed(() => width.value < 1024);
 
   const workflow = ref();
   const canRemoveNodes = computed(
@@ -129,6 +208,19 @@
   const current = ref<KahnTask[]>([]);
   const store = useStore();
 
+  const showExecuteConfirm = ref(false);
+  const showKillConfirm = ref(false);
+  const workflowInfo = ref<WorkFlow>();
+  async function refreshInfo() {
+    workflowInfo.value = await fetchWorkFlowDetail(props.id);
+  }
+  const isRunning = computed(
+    () =>
+      workflowInfo.value !== undefined &&
+      workflowInfo.value.state !== null &&
+      workflowInfo.value.state.status === 'running',
+  );
+
   async function workflowEdgesToKahnTasks(
     edges: WorkFlowEdge[],
   ): Promise<KahnTask[]> {
@@ -139,7 +231,9 @@
         projectId: edge.projectId,
         cached: true,
       });
-      const tasks = store.state.fetchWorkFlowTasksCache.get(edge.projectId);
+      const tasks = store.state.Root.fetchWorkFlowTasksCache.get(
+        edge.projectId,
+      );
       if (tasks === undefined)
         throw new Error(`fetchTasksCache missing projectId=${edge.projectId}`);
 
@@ -170,7 +264,7 @@
         id: key,
         deps: childMapParents.get(key),
         origin: task,
-        state: store.state.workflowTaskStates.find(
+        state: store.state.Root.workflowTaskStates.find(
           (s) => s.projectId === task.projectId && s.taskId === task.id,
         ),
       };
@@ -222,7 +316,9 @@
     await store.dispatch('fetchWorkflowEdges', {
       workflowId: props.id,
     });
-    const kahnTasks = await workflowEdgesToKahnTasks(store.state.workflowEdges);
+    const kahnTasks = await workflowEdgesToKahnTasks(
+      store.state.Root.workflowEdges,
+    );
     if (!soft) {
       tasks.value = kahnTasks;
     } else {
@@ -231,13 +327,20 @@
   }
 
   onMounted(() => {
-    watchEffect(async () => {
-      await refresh();
-    });
+    refreshInfo();
+    refresh();
+    watch(
+      () => props.id,
+      async (current) => {
+        await refreshInfo();
+        await refresh();
+      },
+    );
     store.watch(
-      (state) => [state.eventWorkFlowTask, state.eventWorkFlow],
-      (current) => {
-        refresh(true);
+      (state) => [state.Root.eventWorkFlowTask, state.Root.eventWorkFlow],
+      async (current) => {
+        await refreshInfo();
+        await refresh(true);
       },
     );
   });

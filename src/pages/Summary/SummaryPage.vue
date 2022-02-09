@@ -16,14 +16,16 @@
 
 <script setup lang="ts">
   import { computed, onMounted } from 'vue';
-  import RecentLogCountChart from '@/components/RecentLogCountChart.vue';
-  import ProjectsPieChart from '@/components/ProjectsPieChart.vue';
-  import { useStore } from '@/store';
+
   import ErrTaskLog from './ErrTaskLogs.vue';
 
+  import ProjectsPieChart from '@/components/ProjectsPieChart.vue';
+  import RecentLogCountChart from '@/components/RecentLogCountChart.vue';
+  import { useStore } from '@/store/index';
+
   const store = useStore();
-  const records = computed(() => store.state.recentLogCountRecords);
-  const projects = computed(() => store.state.projects);
+  const records = computed(() => store.state.Root.recentLogCountRecords);
+  const projects = computed(() => store.state.Root.projects);
 
   onMounted(async () => {
     await store.dispatch('recentLog');

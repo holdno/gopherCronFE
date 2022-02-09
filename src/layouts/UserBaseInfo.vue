@@ -33,10 +33,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { User } from '@/api/request';
-  import { useStore } from '@/store';
-  import { generateAvatarName } from '@/utils/utils';
   import { useRouter } from 'vue-router';
+
+  import { User } from '@/api/request';
+  import { useStore } from '@/store/index';
+  import { generateAvatarName } from '@/utils/utils';
 
   const store = useStore();
   const user: User = store.getters.currentUser;

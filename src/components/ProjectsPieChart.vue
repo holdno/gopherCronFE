@@ -3,18 +3,19 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref, PropType, computed, watchEffect, toRaw } from 'vue';
-  import * as echarts from 'echarts/core';
   import { PieChart } from 'echarts/charts';
   import {
+    DatasetComponent,
+    GridComponent,
     TitleComponent,
     TooltipComponent,
-    GridComponent,
-    DatasetComponent,
     TransformComponent,
   } from 'echarts/components';
+  import * as echarts from 'echarts/core';
   import { LabelLayout, UniversalTransition } from 'echarts/features';
   import { CanvasRenderer } from 'echarts/renderers';
+  import { PropType, computed, onMounted, ref, toRaw, watchEffect } from 'vue';
+
   import { Project } from '@/api/request';
 
   const props = defineProps({

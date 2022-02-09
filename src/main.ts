@@ -1,37 +1,28 @@
-import { createApp } from 'vue';
-import { Quasar, Notify } from 'quasar';
+import { Notify, Quasar } from 'quasar';
 import quasarLang from 'quasar/lang/zh-CN';
-
-// Import icon libraries
-import '@quasar/extras/roboto-font-latin-ext/roboto-font-latin-ext.css';
-import '@quasar/extras/material-icons/material-icons.css';
-
 // A few examples for animations from Animate.css:
 // import @quasar/extras/animate/fadeIn.css
 // import @quasar/extras/animate/fadeOut.css
-
 // Import Quasar css
 import 'quasar/src/css/index.sass';
-
-// Import Custom css
-import '@/index.css';
-
-// Assumes your root component is App.vue
-// and placed in same folder as main.js
-import App from '@/App.vue';
-
 // network graph
-import 'v-network-graph/lib/style.css';
 import VNetworkGraph from 'v-network-graph';
+import 'v-network-graph/lib/style.css';
+import { createApp } from 'vue';
 
+// Import icon libraries
+import '@quasar/extras/material-icons/material-icons.css';
+import '@quasar/extras/roboto-font-latin-ext/roboto-font-latin-ext.css';
+
+import App from '@/App.vue';
 // Axios
 import { apiv1, installApiv1 } from '@/api/request';
-
-// Vuex
-import { store, key as storeKey } from '@/store';
-
+// Import Custom css
+import '@/index.css';
 // Router
 import router from '@/router';
+// Vuex
+import { store, key as storeKey } from '@/store/index';
 
 const app = createApp(App);
 

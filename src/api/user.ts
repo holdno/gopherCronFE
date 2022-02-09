@@ -1,4 +1,4 @@
-import { apiv1, User } from './request';
+import { User, apiv1 } from './request';
 
 export interface CreateUserRequest {
   account: string;

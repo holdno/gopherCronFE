@@ -8,7 +8,7 @@
     />
     <q-card class="tw-w-96 q-pa-sm">
       <q-card-section>
-        <div class="text-h6">项目人员管理</div>
+        <div class="text-h6">任务编排人员管理</div>
       </q-card-section>
       <q-card-section>
         <q-chip
@@ -50,16 +50,15 @@
 
   import Confirm from './Confirm.vue';
 
+  import { User } from '@/api/request';
   import {
-    User,
-    addProjectUser,
-    apiv1,
-    fetchProjectUsers,
-    removeProjectUser,
-  } from '@/api/request';
+    addWorkFlowUser,
+    fetchWorkFlowUsers,
+    removeWorkFlowUser,
+  } from '@/api/workflow';
 
   const props = defineProps({
-    projectId: {
+    workflowId: {
       type: Number,
       default: 0,
     },
@@ -79,10 +78,10 @@
   const users = ref<User[]>([]);
 
   async function fetchUsers() {
-    users.value = await fetchProjectUsers(apiv1, props.projectId);
+    users.value = await fetchWorkFlowUsers(props.workflowId);
   }
   watch<[number, boolean]>(
-    () => [props.projectId, show.value],
+    () => [props.workflowId, show.value],
     async ([, show]) => {
       if (show) fetchUsers();
       newUser.value = '';
@@ -94,7 +93,7 @@
   async function onSubmit() {
     loading.value = true;
     try {
-      await addProjectUser(apiv1, props.projectId, newUser.value);
+      await addWorkFlowUser(props.workflowId, newUser.value);
       newUser.value = '';
       await fetchUsers();
     } finally {
@@ -118,7 +117,7 @@
   async function removeUser(user: User) {
     loading.value = true;
     try {
-      await removeProjectUser(apiv1, props.projectId, user.id);
+      await removeWorkFlowUser(props.workflowId, user.id);
       await fetchUsers();
     } finally {
       loading.value = false;

@@ -128,8 +128,9 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { startTask, WorkFlowTask } from '@/api/request';
-  import { useStore } from '@/store';
+
+  import { WorkFlowTask, startTask } from '@/api/request';
+  import { useStore } from '@/store/index';
 
   const props = defineProps({
     id: {
@@ -155,10 +156,10 @@
 
   const store = useStore();
   const task = computed(() =>
-    store.state.workFlowTasks.find((t) => t.id === props.id),
+    store.state.Root.workFlowTasks.find((t) => t.id === props.id),
   );
   const project = computed(() =>
-    store.state.projects.find((p) => p.id === props.projectId),
+    store.state.Root.projects.find((p) => p.id === props.projectId),
   );
   const editable = ref(
     Object.assign({}, task.value || DefaultTaskValues.value),
@@ -186,7 +187,7 @@
       projectId: props.projectId,
     });
     if (isCreateMode.value) {
-      const tasks = Object.assign([], store.state.workFlowTasks);
+      const tasks = Object.assign([], store.state.Root.workFlowTasks);
       tasks.sort((a: WorkFlowTask, b: WorkFlowTask) => {
         return a.createTime - b.createTime;
       });
@@ -208,7 +209,7 @@
   async function deleteTask(projectId: number, taskId: string) {
     store.commit('clearError');
     await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
-    if (store.state.currentError === undefined) {
+    if (store.state.Root.currentError === undefined) {
       store.dispatch('fetchWorkFlowTasks', { ...props });
       router.push({ name: 'workflow_tasks' });
       showDeleteConfirm.value = false;
@@ -232,7 +233,7 @@
 
   onMounted(() => {
     store.watch(
-      (state) => [state.eventWorkFlowTask],
+      (state) => [state.Root.eventWorkFlowTask],
       (current) => {
         store.dispatch('fetchWorkFlowTasks', {
           projectId: props.projectId,

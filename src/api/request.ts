@@ -1,8 +1,9 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
-import { App, inject, InjectionKey } from 'vue';
+import { App, InjectionKey, inject } from 'vue';
 import { Store } from 'vuex';
-import { State, ErrHandled } from '@/store';
-import router from '@/router';
+
+import { State } from '@/store/index';
+import { ErrHandled } from '@/store/modules/root';
 
 export const apiv1 = axios.create({
   baseURL: import.meta.env.VITE_API_V1_BASE_URL,
@@ -407,12 +408,19 @@ export async function fetchLogs(
   ];
 }
 
-export interface Workflow {
+export interface WorkFlowState {
+  status: string;
+}
+
+export type STATUS_WORK_FLOW = 1 | 2;
+export const STATUS_WORK_FLOW_ENABLE = 1;
+export const STATUS_WORK_FLOW_DISABLE = 2;
+export interface WorkFlow {
   id: number;
   title: string;
   remark: string;
-  status: number;
-  state: Object;
+  status: STATUS_WORK_FLOW;
+  state: WorkFlowState | null;
   createTime: number;
   cronExpr: string;
 }
@@ -421,7 +429,7 @@ export async function fetchWorkflows(
   api: AxiosInstance,
   page: number,
   pageSize: number,
-): Promise<[Workflow[], number]> {
+): Promise<[WorkFlow[], number]> {
   const resp = await api.get('/workflow/list', {
     params: {
       page: page,
@@ -449,11 +457,13 @@ export async function createWorkflow(
   title: string,
   remark: string,
   cronExpr: string,
+  status: STATUS_WORK_FLOW = STATUS_WORK_FLOW_DISABLE,
 ) {
   const payload = JSON.stringify({
     title: title,
     remark: remark,
     cron: cronExpr,
+    status: status,
   });
   return await api.post('/workflow/create', payload, {
     headers: {
@@ -462,7 +472,7 @@ export async function createWorkflow(
   });
 }
 
-export async function updateWorkflow(api: AxiosInstance, workflow: Workflow) {
+export async function updateWorkflow(api: AxiosInstance, workflow: WorkFlow) {
   const payload = JSON.stringify({
     id: workflow.id,
     title: workflow.title,

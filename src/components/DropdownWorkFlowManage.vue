@@ -1,30 +1,21 @@
 <template>
-  <DialogProjectDeleteConfirm
+  <DialogWorkFlowDeleteConfirm
     v-model="showDeleteConfirm"
-    :project-id="props.projectId"
+    :workflow-id="props.workflowId"
   />
-  <DialogProjectForm v-model="showEditDialog" :project-id="props.projectId" />
-  <DialogProjectUsersManage
+  <DialogWorkFlowUsersManage
     v-model="showUsersManageDialog"
-    :project-id="props.projectId"
+    :workflow-id="props.workflowId"
   />
   <q-btn-dropdown
     v-model="show"
+    dense
     flat
     dropdown-icon="more_horiz"
     no-icon-animation
+    @click.stop.prevent
   >
     <q-list dense>
-      <q-item
-        v-close-popup
-        clickable
-        class="hover:tw-bg-primary hover:tw-text-black"
-        @click.stop="showEditDialog = true"
-      >
-        <q-item-section>
-          <q-item-label>编辑</q-item-label>
-        </q-item-section>
-      </q-item>
       <q-item
         v-close-popup
         clickable
@@ -52,19 +43,17 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
 
-  import DialogProjectDeleteConfirm from './DialogProjectDeleteConfirm.vue';
-  import DialogProjectForm from './DialogProjectForm.vue';
-  import DialogProjectUsersManage from './DialogProjectUsersManage.vue';
+  import DialogWorkFlowDeleteConfirm from './DialogWorkFlowDeleteConfirm.vue';
+  import DialogWorkFlowUsersManage from './DialogWorkFlowUsersManage.vue';
 
   const show = ref(false);
   const props = defineProps({
-    projectId: {
+    workflowId: {
       type: Number,
       required: true,
     },
   });
 
   const showDeleteConfirm = ref(false);
-  const showEditDialog = ref(false);
   const showUsersManageDialog = ref(false);
 </script>

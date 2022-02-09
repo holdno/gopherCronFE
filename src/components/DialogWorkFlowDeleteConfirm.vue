@@ -1,9 +1,9 @@
 <template>
   <Confirm
     v-model="show"
-    :content="'是否要删除项目' + project?.title + '?'"
+    :content="'是否要删除任务编排 ' + workflow?.title + ' ?'"
     type="warning"
-    @confirm="project && deleteProject(project.id)"
+    @confirm="workflow && deleteWorkFlow(workflow.id)"
   ></Confirm>
 </template>
 
@@ -16,7 +16,7 @@
   import { useStore } from '@/store/index';
 
   const props = defineProps({
-    projectId: {
+    workflowId: {
       type: Number,
       required: true,
     },
@@ -34,14 +34,14 @@
   });
   const router = useRouter();
   const store = useStore();
-  const project = computed(() =>
-    store.state.Root.projects.find((p) => p.id === props.projectId),
+  const workflow = computed(() =>
+    store.state.WorkFlow.workflows.get(props.workflowId),
   );
-  async function deleteProject(projectId: number) {
+  async function deleteWorkFlow(workflowId: number) {
     store.commit('clearError');
-    await store.dispatch('deleteProject', { projectId });
+    await store.dispatch('WorkFlow/deleteWorkFlow', { id: workflowId });
     if (store.state.Root.currentError === undefined) {
-      router.push({ name: 'projects' });
+      router.push({ name: 'workflows' });
       show.value = false;
     }
   }

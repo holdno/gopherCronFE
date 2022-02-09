@@ -1,9 +1,10 @@
 import {
-  createWebHistory,
-  createRouter,
   RouteLocationNormalizedLoaded,
+  createRouter,
+  createWebHistory,
 } from 'vue-router';
-import { store } from '@/store';
+
+import { store } from '@/store/index';
 
 const TaskRoutes = (type: string) => [
   {
@@ -93,7 +94,7 @@ const routes = [
           {
             name: 'workflow',
             path: ':workflowId(\\d+)',
-            component: () => import('@/pages/WorkflowDetail.vue'),
+            component: () => import('@/pages/WorkFlowTabs.vue'),
             props: (route: RouteLocationNormalizedLoaded) => ({
               id: Number(route.params.workflowId),
             }),
@@ -101,10 +102,23 @@ const routes = [
           {
             name: 'workflow_logs',
             path: ':workflowId(\\d+)/logs',
-            component: () => import('@/pages/WorkFlowLogs.vue'),
+            component: () => import('@/pages/WorkFlowTabs.vue'),
             props: (route: RouteLocationNormalizedLoaded) => ({
               id: Number(route.params.workflowId),
             }),
+          },
+          {
+            name: 'workflow_detail',
+            path: ':workflowId(\\d+)/detail',
+            component: () => import('@/pages/WorkFlowTabs.vue'),
+            props: (route: RouteLocationNormalizedLoaded) => ({
+              id: Number(route.params.workflowId),
+            }),
+          },
+          {
+            name: 'create_workflow',
+            path: 'create',
+            component: () => import('@/pages/WorkFlowTabs.vue'),
           },
         ],
       },
@@ -164,7 +178,7 @@ const Router = createRouter({
 Router.beforeEach(async (to, from) => {
   await store.dispatch('checkLogin');
 
-  if (to.meta.requiresAuth && !store.state.logined) {
+  if (to.meta.requiresAuth && !store.state.Root.logined) {
     // 此路由需要授权，请检查是否已登录
     // 如果没有，则重定向到登录页面
     return {

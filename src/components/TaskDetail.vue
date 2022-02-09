@@ -152,10 +152,11 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+
   import { startTask } from '@/api/request';
   import { killTask } from '@/api/task';
-  import { useStore } from '@/store';
   import Confirm from '@/components/Confirm.vue';
+  import { useStore } from '@/store/index';
 
   const props = defineProps({
     id: {
@@ -186,9 +187,11 @@
   }));
 
   const store = useStore();
-  const task = computed(() => store.state.tasks.find((t) => t.id === props.id));
+  const task = computed(() =>
+    store.state.Root.tasks.find((t) => t.id === props.id),
+  );
   const project = computed(() =>
-    store.state.projects.find((p) => p.id === props.projectId),
+    store.state.Root.projects.find((p) => p.id === props.projectId),
   );
   const editable = ref(
     Object.assign({}, task.value || DefaultTaskValues.value),
@@ -229,7 +232,7 @@
   async function deleteTask(projectId: number, taskId: string) {
     store.commit('clearError');
     await store.dispatch('deleteTask', { projectId, taskId });
-    if (store.state.currentError === undefined) {
+    if (store.state.Root.currentError === undefined) {
       await store.dispatch('fetchTasks', { ...props });
       router.push({ name: 'crontab_tasks' });
       showDeleteConfirm.value = false;
