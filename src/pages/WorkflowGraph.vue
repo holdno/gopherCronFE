@@ -329,7 +329,13 @@
     );
     store.watch(
       (state) => [state.Root.eventWorkFlowTask, state.Root.eventWorkFlow],
-      async (current) => {
+      async ([eventWorkFlowTask, eventWorkFlow]) => {
+        if (
+          (eventWorkFlowTask === undefined ||
+            eventWorkFlowTask.workFlowId !== props.id) &&
+          (eventWorkFlow === undefined || eventWorkFlow.workFlowId !== props.id)
+        )
+          return;
         await refreshInfo();
         await refresh(true);
       },

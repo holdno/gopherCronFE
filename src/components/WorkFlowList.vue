@@ -121,8 +121,9 @@
 
   onMounted(async () => {
     store.watch(
-      (state) => [state.Root.eventTask, state.Root.eventWorkFlowTask],
-      (current) => {
+      (state) => [state.Root.eventWorkFlowTask],
+      ([eventWorkFlowTask]) => {
+        if (!eventWorkFlowTask) return;
         refresh();
       },
     );

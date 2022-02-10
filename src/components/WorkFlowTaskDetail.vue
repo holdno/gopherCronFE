@@ -239,7 +239,13 @@
   onMounted(() => {
     store.watch(
       (state) => [state.Root.eventWorkFlowTask],
-      (current) => {
+      ([eventWorkFlowTask]) => {
+        if (
+          !eventWorkFlowTask ||
+          eventWorkFlowTask.projectId !== props.projectId
+        )
+          return;
+
         store.dispatch('WorkFlowTask/fetchTasks', {
           projectId: props.projectId,
         });

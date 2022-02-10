@@ -259,7 +259,9 @@
   onMounted(() => {
     store.watch(
       (state) => [state.Root.eventTask],
-      (current) => {
+      ([eventTask]) => {
+        if (!eventTask || eventTask.projectId !== props.projectId) return;
+
         store.dispatch('Task/fetchTasks', {
           projectId: props.projectId,
         });

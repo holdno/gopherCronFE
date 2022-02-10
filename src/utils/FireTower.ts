@@ -126,11 +126,32 @@ export function FireTowerPlugin(store: Store<any>) {
       tower.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.topic === '/task/status') {
-          store.commit('emitEventTask', { event: data.data });
+          const v = data.data;
+          store.commit('emitEventTask', {
+            event: {
+              status: v.status,
+              taskId: v.task_id,
+              projectId: v.project_id,
+            },
+          });
         } else if (data.topic === '/workflow/status') {
-          store.commit('emitEventWorkFlow', { event: data.data });
+          const v = data.data;
+          store.commit('emitEventWorkFlow', {
+            event: {
+              status: v.status,
+              workFlowId: v.workflow_id,
+            },
+          });
         } else if (data.topic === '/workflow/task/status') {
-          store.commit('emitEventWorkFlowTask', { event: data.data });
+          const v = data.data;
+          store.commit('emitEventWorkFlowTask', {
+            event: {
+              status: v.status,
+              taskId: v.task_id,
+              projectId: v.project_id,
+              workFlowId: v.workflow_id,
+            },
+          });
         } else {
           console.log('unknown event', event);
         }

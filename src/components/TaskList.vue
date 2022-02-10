@@ -122,7 +122,13 @@
     });
     store.watch(
       (state) => [state.Root.eventTask, state.Root.eventWorkFlowTask],
-      (current) => {
+      ([eventTask, eventWorkFlowTask]) => {
+        if (
+          (!eventTask || eventTask.projectId !== props.projectId) &&
+          (!eventWorkFlowTask ||
+            eventWorkFlowTask.projectId !== props.projectId)
+        )
+          return;
         fetchTasks();
       },
     );
