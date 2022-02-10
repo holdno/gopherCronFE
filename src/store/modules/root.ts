@@ -10,6 +10,7 @@ import {
   WorkFlow,
   WorkFlowEdge,
   WorkFlowLog,
+  WorkFlowTask,
   WorkflowTaskState,
   createProject,
   createWorkFlowTask,
@@ -78,6 +79,7 @@ export interface State {
 
   workflowEdges: WorkFlowEdge[];
   workflowTaskStates: WorkflowTaskState[];
+  workflowTasks: WorkFlowTask[];
   loadingWorkflowEdges: boolean;
 
   workflowLogs: WorkFlowLog[];
@@ -181,9 +183,10 @@ const mutations: MutationTree<State> = {
   unloadingWorkflowEdges(state) {
     state.loadingWorkflowEdges = false;
   },
-  setWorkflowEdges(state, { edges, states }) {
+  setWorkflowEdges(state, { edges, states, tasks }) {
     state.workflowEdges = edges;
     state.workflowTaskStates = states;
+    state.workflowTasks = tasks;
   },
   loadingWorkflowLogs(state) {
     state.loadingWorkflowLogs = true;
@@ -364,8 +367,8 @@ const actions: ActionTree<State, RootState> = {
     commit('loadingWorkflowEdges');
     const api = this.getters.apiv1;
     try {
-      const [edges, states] = await fetchWorkflowEdges(api, workflowId);
-      commit('setWorkflowEdges', { edges, states });
+      const [edges, states, tasks] = await fetchWorkflowEdges(api, workflowId);
+      commit('setWorkflowEdges', { edges, states, tasks });
     } catch (e) {
       commit('error', { error: e });
     }
@@ -463,8 +466,11 @@ export const defaultState = {
   workflows: [],
   workflowsTotal: 0,
   loadingWorkflows: false,
+
   workflowEdges: [],
   workflowTaskStates: [],
+  workflowTasks: [],
+
   loadingWorkflowEdges: false,
   workflowLogs: [],
   workflowLogsTotal: 0,

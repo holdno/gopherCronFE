@@ -384,6 +384,18 @@ export interface WorkFlow {
   cronExpr: string;
 }
 
+export interface WorkFlowTask {
+  id: string;
+  name: string;
+  projectId: number;
+  workflowId: number;
+  command: string;
+  remark: string;
+  timeout: number;
+  createTime: number;
+  noseize: number;
+}
+
 export async function fetchWorkflows(
   api: AxiosInstance,
   page: number,
@@ -477,17 +489,18 @@ export interface WorkflowTaskState {
 export async function fetchWorkflowEdges(
   api: AxiosInstance,
   workflowId: number,
-): Promise<[WorkFlowEdge[], WorkflowTaskState[]]> {
+): Promise<[WorkFlowEdge[], WorkflowTaskState[], WorkFlowTask[]]> {
   const resp = await api.get('/workflow/task/list', {
     params: {
       workflow_id: workflowId,
     },
   });
   const data = resp.data;
-  if (!data.response) return [[], []];
+  if (!data.response) return [[], [], []];
   const edges = [];
   const stateMap = new Map<string, WorkflowTaskState>();
-  for (const { task: v, state: s } of data.response) {
+  const workflowTaskMap = new Map<string, WorkFlowTask>();
+  for (const { task: v, state: s, task_detail: d } of data.response) {
     edges.push({
       id: v.id,
       projectId: v.project_id,
@@ -498,6 +511,23 @@ export async function fetchWorkflowEdges(
       dependencyProjectId: v.dependency_project_id,
       dependencyTaskId: v.dependency_task_id,
     });
+
+    {
+      const key = `${d.project_id}_${d.task_id}`;
+      if (workflowTaskMap.has(key)) continue;
+      workflowTaskMap.set(key, {
+        id: d.task_id,
+        name: d.task_name,
+        projectId: d.project_id,
+        workflowId: d.workflow_id,
+        command: d.command,
+        remark: d.remark,
+        timeout: d.timeout,
+        createTime: d.create_time,
+        noseize: d.noseize,
+      });
+    }
+
     if (!s) continue;
     const key = `${s.project_id}_${s.task_id}`;
     if (stateMap.has(key)) continue;
@@ -516,7 +546,11 @@ export async function fetchWorkflowEdges(
       startTime: s.start_time,
     });
   }
-  return [edges, Array.from(stateMap.values())];
+  return [
+    edges,
+    Array.from(stateMap.values()),
+    Array.from(workflowTaskMap.values()),
+  ];
 }
 
 export async function updateWorkflowEdges(
@@ -633,17 +667,6 @@ export async function fetchWorkFlowLogs(
     })),
     r.total,
   ];
-}
-export interface WorkFlowTask {
-  id: string;
-  name: string;
-  projectId: number;
-  workflowId: number;
-  command: string;
-  remark: string;
-  timeout: number;
-  createTime: number;
-  noseize: number;
 }
 
 export async function createWorkFlowTask(

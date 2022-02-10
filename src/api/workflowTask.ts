@@ -1,8 +1,6 @@
 import { WorkFlowTask, apiv1 } from './request';
 
-export async function fetchTasks(
-  projectId: number,
-): Promise<WorkFlowTask[]> {
+export async function fetchTasks(projectId: number): Promise<WorkFlowTask[]> {
   const resp = await apiv1.get('/project/workflow/task/list', {
     params: {
       project_id: projectId,
