@@ -68,7 +68,6 @@ const TaskRoutes = (type: 'crontab' | 'workflow') => [
       projectId: Number(route.params.projectId),
       type: type,
     }),
-    beforeEnter: createBeforeEnter(type),
   },
 ];
 
