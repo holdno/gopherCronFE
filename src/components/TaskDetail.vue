@@ -258,7 +258,7 @@
 
   onMounted(() => {
     store.watch(
-      (state) => [state.eventTask],
+      (state) => [state.Root.eventTask],
       (current) => {
         store.dispatch('fetchTasks', {
           projectId: props.projectId,
