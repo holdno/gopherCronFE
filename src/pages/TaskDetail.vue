@@ -19,7 +19,7 @@
       <div>
         <div class="tw-pb-4">
           <q-icon name="hive" />
-          在线节点: {{ projectClients.length }}
+          在线节点: {{ projectClients?.length || 0 }}
         </div>
         <div
           class="tw-flex tw-flex-wrap tw-gap-3 tw-px-2 tw-py-1 tw-text-white tw-bg-black"
@@ -145,7 +145,7 @@
 
   const store = useStore();
   const project = computed(() =>
-    store.state.Root.projects.find((p) => p.id === props.projectId),
+    store.state.Project.projects.find((p) => p.id === props.projectId),
   );
 
   const route = useRoute();
@@ -174,10 +174,14 @@
   const { width } = useWindowSize();
 
   onMounted(() => {
-    store.dispatch('fetchProjectClients', { projectId: props.projectId });
+    store.dispatch('Project/fetchProjectClients', {
+      projectId: props.projectId,
+    });
   });
   onUnmounted(() => {
     store.commit('setProjectClients', { clients: [] });
   });
-  const projectClients = computed(() => store.state.Root.projectClients);
+  const projectClients = computed(() =>
+    store.state.Project.projectClients.get(props.projectId),
+  );
 </script>

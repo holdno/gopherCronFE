@@ -25,10 +25,10 @@
 
   const store = useStore();
   const records = computed(() => store.state.Root.recentLogCountRecords);
-  const projects = computed(() => store.state.Root.projects);
+  const projects = computed(() => store.state.Project.projects);
 
   onMounted(async () => {
     await store.dispatch('recentLog');
-    await store.dispatch('fetchProjects');
+    await store.dispatch('Project/fetchProjects');
   });
 </script>

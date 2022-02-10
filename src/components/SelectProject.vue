@@ -46,7 +46,7 @@
   const filter = ref('');
   const store = useStore();
   const projects = computed(() =>
-    store.state.Root.projects.filter(
+    store.state.Project.projects.filter(
       (p: Project) =>
         p.title.indexOf(filter.value) >= 0 ||
         p.id.toString().indexOf(filter.value) >= 0,
@@ -59,7 +59,7 @@
   ): void => {
     const update = () => (filter.value = inputValue);
     if (projects.value.length === 0) {
-      store.dispatch('fetchProjects').then(() => doneFn(update));
+      store.dispatch('Project/fetchProjects').then(() => doneFn(update));
     } else {
       doneFn(update);
     }

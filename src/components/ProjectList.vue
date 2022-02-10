@@ -84,17 +84,15 @@
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
   const store = useStore();
-  const loading = computed(() => store.state.Root.loadingProjects);
-  onMounted(async () => {
-    await store.dispatch('fetchProjects');
-  });
+  const loading = computed(() => store.state.Project.loadingProjects);
   async function fetchProjects() {
-    await store.dispatch('fetchProjects');
+    await store.dispatch('Project/fetchProjects');
   }
+  onMounted(fetchProjects);
 
   const filter = ref('');
   const projects = computed(() =>
-    store.state.Root.projects.filter(
+    store.state.Project.projects.filter(
       (p: Project) =>
         p.title.indexOf(filter.value) >= 0 ||
         p.id.toString().indexOf(filter.value) >= 0,

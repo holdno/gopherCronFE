@@ -4,7 +4,6 @@ import { QVueGlobals } from 'quasar';
 import { ActionTree, GetterTree, Module, MutationTree } from 'vuex';
 
 import {
-  Project,
   RecentLogCount,
   Task,
   TaskLog,
@@ -22,14 +21,12 @@ import {
   deleteWorkFlowTask,
   deleteWorkflow,
   fetchLogs,
-  fetchProjectClients,
   fetchTasks,
   fetchWorkFlowLogs,
   fetchWorkFlowTasks,
   fetchWorkflowEdges,
   fetchWorkflows,
   login,
-  projectList,
   recentLog,
   saveTask,
   saveWorkFlowTask,
@@ -72,12 +69,6 @@ export interface State {
   token?: string;
   apiv1?: AxiosInstance;
   $q?: QVueGlobals;
-
-  projects: Project[];
-  loadingProjects: boolean;
-
-  projectClients: string[];
-  loadingProjectClients: boolean;
 
   tasks: Task[];
   loadingTasks: boolean;
@@ -169,27 +160,9 @@ const mutations: MutationTree<State> = {
   clearError(state) {
     state.currentError = undefined;
   },
-  loadingProjects(state) {
-    state.loadingProjects = true;
-  },
-  unloadingProjects(state) {
-    state.loadingProjects = false;
-  },
-  setProjects(state, { projects }) {
-    state.projects = projects;
-  },
   setUsers(state, { list, total }) {
     state.users = list;
     state.userTotal = total;
-  },
-  loadingProjectClients(state) {
-    state.loadingProjectClients = true;
-  },
-  unloadingProjectClients(state) {
-    state.loadingProjectClients = false;
-  },
-  setProjectClients(state, { clients }) {
-    state.projectClients = clients;
   },
   loadingTasks(state) {
     state.loadingTasks = true;
@@ -322,28 +295,6 @@ const actions: ActionTree<State, RootState> = {
       commit('error', { error: e });
     }
   },
-  async fetchProjects({ commit }) {
-    commit('loadingProjects');
-    const api = this.getters.apiv1;
-    try {
-      const projects = await projectList(api);
-      commit('setProjects', { projects });
-    } catch (e) {
-      commit('error', { error: e });
-    }
-    commit('unloadingProjects');
-  },
-  async fetchProjectClients({ commit }, { projectId }) {
-    commit('loadingProjectClients');
-    const api = this.getters.apiv1;
-    try {
-      const clients = await fetchProjectClients(api, projectId);
-      commit('setProjectClients', { clients });
-    } catch (e) {
-      commit('error', { error: e });
-    }
-    commit('unloadingProjectClients');
-  },
   async fetchTasks({ commit, state }, { projectId, cached = false }) {
     commit('loadingTasks');
     const api = this.getters.apiv1;
@@ -433,7 +384,7 @@ const actions: ActionTree<State, RootState> = {
     const api = this.getters.apiv1;
     try {
       await createProject(api, title, remark);
-      await dispatch('fetchProjects');
+      await dispatch('Project/fetchProjects');
     } catch (e) {
       commit('error', { error: e });
     }
@@ -442,7 +393,7 @@ const actions: ActionTree<State, RootState> = {
     const api = this.getters.apiv1;
     try {
       await updateProject(api, projectId, title, remark);
-      await dispatch('fetchProjects');
+      await dispatch('Project/fetchProjects');
     } catch (e) {
       commit('error', { error: e });
     }
@@ -451,7 +402,7 @@ const actions: ActionTree<State, RootState> = {
     const api = this.getters.apiv1;
     try {
       await deleteProject(api, projectId);
-      await dispatch('fetchProjects');
+      await dispatch('Project/fetchProjects');
     } catch (e) {
       commit('error', { error: e });
     }
@@ -591,11 +542,6 @@ const getters: GetterTree<State, RootState> = {
 
 export const defaultState = {
   logined: false,
-  projects: [],
-  loadingProjects: false,
-
-  projectClients: [],
-  loadingProjectClients: false,
 
   tasks: [],
   loadingTasks: false,

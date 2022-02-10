@@ -159,7 +159,7 @@
     store.state.Root.workFlowTasks.find((t) => t.id === props.id),
   );
   const project = computed(() =>
-    store.state.Root.projects.find((p) => p.id === props.projectId),
+    store.state.Project.projects.find((p) => p.id === props.projectId),
   );
   const editable = ref(
     Object.assign({}, task.value || DefaultTaskValues.value),

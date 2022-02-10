@@ -35,7 +35,7 @@
   const router = useRouter();
   const store = useStore();
   const project = computed(() =>
-    store.state.Root.projects.find((p) => p.id === props.projectId),
+    store.state.Project.projects.find((p) => p.id === props.projectId),
   );
   async function deleteProject(projectId: number) {
     store.commit('clearError');

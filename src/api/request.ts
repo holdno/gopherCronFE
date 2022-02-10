@@ -120,19 +120,6 @@ export interface Project {
   uid: number;
 }
 
-export async function projectList(api: AxiosInstance): Promise<Project[]> {
-  const resp = await api.get('/project/list');
-  const data = resp.data;
-  const r = data.response;
-  return r.list.map((p: any) => ({
-    id: p.project_id,
-    remark: p.remark,
-    taskCount: p.task_count,
-    title: p.title,
-    uid: p.uid,
-  }));
-}
-
 export interface Task {
   id: string;
   name: string;
@@ -676,21 +663,6 @@ export async function fetchWorkFlowLogs(
     r.total,
   ];
 }
-
-export async function fetchProjectClients(
-  api: AxiosInstance,
-  projectId: number,
-): Promise<string[]> {
-  const resp = await api.get('/crontab/client_list', {
-    params: {
-      project_id: projectId,
-    },
-  });
-  const data = resp.data;
-  const r = data.response;
-  return r.list;
-}
-
 export interface WorkFlowTask {
   id: string;
   name: string;

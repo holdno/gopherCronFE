@@ -93,10 +93,10 @@ const routes = [
             path: ':projectId(\\d+)',
             component: () => import('@/layouts/DummyContainer.vue'),
             async beforeEnter(to: RouteLocationNormalizedLoaded) {
-              if (store.state.Root.projects.length === 0) {
-                await store.dispatch('fetchProjects');
+              if (store.state.Project.projects.length === 0) {
+                await store.dispatch('Project/fetchProjects');
               }
-              const project = store.state.Root.projects.find(
+              const project = store.state.Project.projects.find(
                 (v) => v.id === Number(to.params.projectId),
               );
               if (project === undefined) {
