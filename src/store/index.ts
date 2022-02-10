@@ -14,6 +14,10 @@ import StoreWorkFlow, {
   NameSpace as NameSpaceWorkFlow,
   State as StateWorkFlow,
 } from '@/store/modules/workflow';
+import StoreWorkFlowTask, {
+  NameSpace as NameSpaceWorkFlowTask,
+  State as StateWorkFlowTask,
+} from '@/store/modules/workflowTask';
 import { FireTowerPlugin } from '@/utils/FireTower';
 
 export interface State {
@@ -21,6 +25,7 @@ export interface State {
   [NameSpaceWorkFlow]: StateWorkFlow;
   [NameSpaceProject]: StateProject;
   [NameSpaceTask]: StateTask;
+  [NameSpaceWorkFlowTask]: StateWorkFlowTask;
 }
 
 export const store = createStore<State>({
@@ -30,6 +35,7 @@ export const store = createStore<State>({
     WorkFlow: StoreWorkFlow,
     Project: StoreProject,
     Task: StoreTask,
+    WorkFlowTask: StoreWorkFlowTask,
   },
   devtools: import.meta.env.DEV,
   strict: import.meta.env.DEV,

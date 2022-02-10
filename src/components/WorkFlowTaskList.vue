@@ -101,7 +101,7 @@
   });
 
   const store = useStore();
-  const loading = computed(() => store.state.Root.loadingWorkFlowTasks);
+  const loading = computed(() => store.state.WorkFlowTask.loadingTasks);
 
   onMounted(() => {
     watchEffect(async () => {
@@ -115,16 +115,19 @@
     );
   });
   async function fetchTasks() {
-    await store.dispatch('fetchWorkFlowTasks', { ...props });
+    await store.dispatch('WorkFlowTask/fetchTasks', { ...props });
   }
 
   const filter = ref('');
-  const tasks = computed(() =>
-    store.state.Root.workFlowTasks.filter(
-      (t: WorkFlowTask) =>
-        t.name.indexOf(filter.value) >= 0 ||
-        t.id.toString().indexOf(filter.value) >= 0,
-    ),
+  const tasks = computed(
+    () =>
+      store.state.WorkFlowTask.tasks
+        .get(props.projectId)
+        ?.filter(
+          (t: WorkFlowTask) =>
+            t.name.indexOf(filter.value) >= 0 ||
+            t.id.toString().indexOf(filter.value) >= 0,
+        ) || [],
   );
 
   function activated(task: WorkFlowTask): boolean {

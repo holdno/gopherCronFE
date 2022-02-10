@@ -52,12 +52,16 @@
   });
   const filter = ref('');
   const store = useStore();
-  const tasks = computed(() =>
-    store.state.Root.workFlowTasks.filter(
-      (t: WorkFlowTask) =>
-        (t.workflowId === 0 || t.workflowId === props.workflowId) &&
-        (t.name.indexOf(filter.value) >= 0 || t.id.indexOf(filter.value) >= 0),
-    ),
+  const tasks = computed(
+    () =>
+      store.state.WorkFlowTask.tasks
+        .get(props.projectId)
+        ?.filter(
+          (t: WorkFlowTask) =>
+            (t.workflowId === 0 || t.workflowId === props.workflowId) &&
+            (t.name.indexOf(filter.value) >= 0 ||
+              t.id.indexOf(filter.value) >= 0),
+        ) || [],
   );
   const filterTasks = (
     inputValue: string,
@@ -67,7 +71,7 @@
     const update = () => (filter.value = inputValue);
     if (tasks.value.length === 0) {
       store
-        .dispatch('fetchWorkFlowTasks', { projectId: props.projectId })
+        .dispatch('WorkFlowTask/fetchTasks', { projectId: props.projectId })
         .then(() => doneFn(update));
     } else {
       doneFn(update);
@@ -75,12 +79,10 @@
   };
 
   onMounted(() => {
-    store.commit('setWorkFlowTasks', { workFlowTasks: [] });
     watch(
       () => props.projectId,
       (current, previous) => {
         emits('update:modelValue', undefined);
-        store.commit('setWorkFlowTasks', { workFlowTasks: [] });
       },
     );
   });

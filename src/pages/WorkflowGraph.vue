@@ -227,13 +227,11 @@
     const childMapParents = new Map<string, string[]>();
     const keyMapTask = new Map<string, WorkFlowTask>();
     for (const edge of edges) {
-      await store.dispatch('fetchWorkFlowTasks', {
+      await store.dispatch('WorkFlowTask/fetchTasks', {
         projectId: edge.projectId,
         cached: true,
       });
-      const tasks = store.state.Root.fetchWorkFlowTasksCache.get(
-        edge.projectId,
-      );
+      const tasks = store.state.WorkFlowTask.tasks.get(edge.projectId);
       if (tasks === undefined)
         throw new Error(`fetchTasksCache missing projectId=${edge.projectId}`);
 

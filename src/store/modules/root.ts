@@ -10,7 +10,6 @@ import {
   WorkFlow,
   WorkFlowEdge,
   WorkFlowLog,
-  WorkFlowTask,
   WorkflowTaskState,
   createProject,
   createWorkFlowTask,
@@ -21,7 +20,6 @@ import {
   deleteWorkflow,
   fetchLogs,
   fetchWorkFlowLogs,
-  fetchWorkFlowTasks,
   fetchWorkflowEdges,
   fetchWorkflows,
   login,
@@ -67,10 +65,6 @@ export interface State {
   token?: string;
   apiv1?: AxiosInstance;
   $q?: QVueGlobals;
-
-  workFlowTasks: WorkFlowTask[];
-  loadingWorkFlowTasks: boolean;
-  fetchWorkFlowTasksCache: Map<number, WorkFlowTask[]>;
 
   recentLogCountRecords: RecentLogCount[];
 
@@ -158,31 +152,6 @@ const mutations: MutationTree<State> = {
     state.users = list;
     state.userTotal = total;
   },
-  loadingWorkFlowTasks(state) {
-    state.loadingWorkFlowTasks = true;
-  },
-  unloadingWorkFlowTasks(state) {
-    state.loadingWorkFlowTasks = false;
-  },
-  setWorkFlowTasks(state, { projectId, workFlowTasks }) {
-    if (projectId !== undefined)
-      state.fetchWorkFlowTasksCache.set(projectId, workFlowTasks);
-    state.workFlowTasks = workFlowTasks;
-  },
-  setWorkFlowTasksByCache(state, { projectId }) {
-    const tasks = state.fetchWorkFlowTasksCache.get(projectId);
-    if (tasks === undefined) {
-      throw new Error(`fetchTasks Cache missing projectId=${projectId}`);
-    }
-    state.workFlowTasks = tasks;
-  },
-  updateWorkFlowTask(state, { task }) {
-    const idx = state.workFlowTasks.findIndex((t) => t.id === task.id);
-    if (idx === -1) {
-      return;
-    }
-    state.workFlowTasks[idx] = task;
-  },
   setRecentLogCount(state, { records }) {
     state.recentLogCountRecords = records;
   },
@@ -265,21 +234,6 @@ const actions: ActionTree<State, RootState> = {
       commit('error', { error: e });
     }
   },
-  async fetchWorkFlowTasks({ commit, state }, { projectId, cached = false }) {
-    commit('loadingWorkFlowTasks');
-    const api = this.getters.apiv1;
-    try {
-      if (!cached || !state.fetchWorkFlowTasksCache.has(projectId)) {
-        const workFlowTasks = await fetchWorkFlowTasks(api, projectId);
-        commit('setWorkFlowTasks', { projectId, workFlowTasks });
-      } else {
-        commit('setWorkFlowTasksByCache', { projectId });
-      }
-    } catch (e) {
-      commit('error', { error: e });
-    }
-    commit('unloadingWorkFlowTasks');
-  },
   async saveTask({ commit }, { task }) {
     const api = this.getters.apiv1;
     try {
@@ -305,7 +259,7 @@ const actions: ActionTree<State, RootState> = {
           task.timeout,
         );
       }
-      commit('updateWorkFlowTask', { task });
+      commit('WorkFlowTask/updateTask', { task });
     } catch (e) {
       commit('error', { error: e });
     }

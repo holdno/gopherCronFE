@@ -23,12 +23,16 @@ function createBeforeEnter(type: 'crontab' | 'workflow') {
         return { name: 'notfound' };
       }
     } else if (type === 'workflow') {
-      await store.dispatch('fetchWorkFlowTasks', {
-        projectId: Number(to.params.projectId),
-      });
-      const task = store.state.Root.workFlowTasks.find(
-        (v) => v.id === to.params.taskId,
-      );
+      const projectId = Number(to.params.projectId);
+      const tasks = store.state.WorkFlowTask.tasks.get(projectId);
+      if (!tasks || tasks.length === 0) {
+        await store.dispatch('WorkFlowTask/fetchTasks', {
+          projectId: Number(to.params.projectId),
+        });
+      }
+      const task = store.state.WorkFlowTask.tasks
+        .get(projectId)
+        ?.find((v) => v.id === to.params.taskId);
       if (task === undefined) {
         return { name: 'notfound' };
       }

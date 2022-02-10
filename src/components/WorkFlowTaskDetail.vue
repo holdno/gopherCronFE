@@ -156,7 +156,9 @@
 
   const store = useStore();
   const task = computed(() =>
-    store.state.Root.workFlowTasks.find((t) => t.id === props.id),
+    store.state.WorkFlowTask.tasks
+      .get(props.projectId)
+      ?.find((t) => t.id === props.id),
   );
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
@@ -183,11 +185,14 @@
         timeout: Number(editable.value.timeout),
       },
     });
-    await store.dispatch('fetchWorkFlowTasks', {
+    await store.dispatch('WorkFlowTask/fetchTasks', {
       projectId: props.projectId,
     });
     if (isCreateMode.value) {
-      const tasks = Object.assign([], store.state.Root.workFlowTasks);
+      const tasks: WorkFlowTask[] = Object.assign(
+        [],
+        store.state.WorkFlowTask.tasks.get(props.projectId) || [],
+      );
       tasks.sort((a: WorkFlowTask, b: WorkFlowTask) => {
         return a.createTime - b.createTime;
       });
@@ -210,7 +215,7 @@
     store.commit('clearError');
     await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
     if (store.state.Root.currentError === undefined) {
-      store.dispatch('fetchWorkFlowTasks', { ...props });
+      store.dispatch('WorkFlowTask/fetchTasks', { ...props });
       router.push({ name: 'workflow_tasks' });
       showDeleteConfirm.value = false;
     }
@@ -235,7 +240,7 @@
     store.watch(
       (state) => [state.Root.eventWorkFlowTask],
       (current) => {
-        store.dispatch('fetchWorkFlowTasks', {
+        store.dispatch('WorkFlowTask/fetchTasks', {
           projectId: props.projectId,
         });
       },
