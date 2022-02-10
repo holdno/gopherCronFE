@@ -188,7 +188,7 @@
 
   const store = useStore();
   const task = computed(() =>
-    store.state.Root.tasks.find((t) => t.id === props.id),
+    store.state.Task.tasks.get(props.projectId)?.find((t) => t.id === props.id),
   );
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
@@ -212,7 +212,7 @@
     const newTask = await store.dispatch('saveTask', {
       task: editable.value,
     });
-    await store.dispatch('fetchTasks', {
+    await store.dispatch('Task/fetchTasks', {
       projectId: props.projectId,
     });
     if (isCreateMode.value) {
@@ -233,7 +233,7 @@
     store.commit('clearError');
     await store.dispatch('deleteTask', { projectId, taskId });
     if (store.state.Root.currentError === undefined) {
-      await store.dispatch('fetchTasks', { ...props });
+      await store.dispatch('Task/fetchTasks', { ...props });
       router.push({ name: 'crontab_tasks' });
       showDeleteConfirm.value = false;
     }
@@ -260,7 +260,7 @@
     store.watch(
       (state) => [state.Root.eventTask],
       (current) => {
-        store.dispatch('fetchTasks', {
+        store.dispatch('Task/fetchTasks', {
           projectId: props.projectId,
         });
       },

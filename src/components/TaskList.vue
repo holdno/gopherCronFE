@@ -114,7 +114,7 @@
   });
 
   const store = useStore();
-  const loading = computed(() => store.state.Root.loadingTasks);
+  const loading = computed(() => store.state.Task.loadingTasks);
 
   onMounted(() => {
     watchEffect(async () => {
@@ -128,16 +128,19 @@
     );
   });
   async function fetchTasks() {
-    await store.dispatch('fetchTasks', { ...props });
+    await store.dispatch('Task/fetchTasks', { ...props });
   }
 
   const filter = ref('');
-  const tasks = computed(() =>
-    store.state.Root.tasks.filter(
-      (t: Task) =>
-        t.name.indexOf(filter.value) >= 0 ||
-        t.id.toString().indexOf(filter.value) >= 0,
-    ),
+  const tasks = computed(
+    () =>
+      store.state.Task.tasks
+        .get(props.projectId)
+        ?.filter(
+          (t: Task) =>
+            t.name.indexOf(filter.value) >= 0 ||
+            t.id.toString().indexOf(filter.value) >= 0,
+        ) || [],
   );
 
   function activated(task: Task): boolean {

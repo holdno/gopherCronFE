@@ -5,7 +5,6 @@ import { ActionTree, GetterTree, Module, MutationTree } from 'vuex';
 
 import {
   RecentLogCount,
-  Task,
   TaskLog,
   User,
   WorkFlow,
@@ -21,7 +20,6 @@ import {
   deleteWorkFlowTask,
   deleteWorkflow,
   fetchLogs,
-  fetchTasks,
   fetchWorkFlowLogs,
   fetchWorkFlowTasks,
   fetchWorkflowEdges,
@@ -69,10 +67,6 @@ export interface State {
   token?: string;
   apiv1?: AxiosInstance;
   $q?: QVueGlobals;
-
-  tasks: Task[];
-  loadingTasks: boolean;
-  fetchTasksCache: Map<number, Task[]>;
 
   workFlowTasks: WorkFlowTask[];
   loadingWorkFlowTasks: boolean;
@@ -164,23 +158,6 @@ const mutations: MutationTree<State> = {
     state.users = list;
     state.userTotal = total;
   },
-  loadingTasks(state) {
-    state.loadingTasks = true;
-  },
-  unloadingTasks(state) {
-    state.loadingTasks = false;
-  },
-  setTasks(state, { projectId, tasks }) {
-    if (projectId !== undefined) state.fetchTasksCache.set(projectId, tasks);
-    state.tasks = tasks;
-  },
-  setTasksByCache(state, { projectId }) {
-    const tasks = state.fetchTasksCache.get(projectId);
-    if (tasks === undefined) {
-      throw new Error(`fetchTasks Cache missing projectId=${projectId}`);
-    }
-    state.tasks = tasks;
-  },
   loadingWorkFlowTasks(state) {
     state.loadingWorkFlowTasks = true;
   },
@@ -198,13 +175,6 @@ const mutations: MutationTree<State> = {
       throw new Error(`fetchTasks Cache missing projectId=${projectId}`);
     }
     state.workFlowTasks = tasks;
-  },
-  updateTask(state, { task }) {
-    const idx = state.tasks.findIndex((t) => t.id === task.id);
-    if (idx === -1) {
-      return;
-    }
-    state.tasks[idx] = task;
   },
   updateWorkFlowTask(state, { task }) {
     const idx = state.workFlowTasks.findIndex((t) => t.id === task.id);
@@ -295,21 +265,6 @@ const actions: ActionTree<State, RootState> = {
       commit('error', { error: e });
     }
   },
-  async fetchTasks({ commit, state }, { projectId, cached = false }) {
-    commit('loadingTasks');
-    const api = this.getters.apiv1;
-    try {
-      if (!cached || !state.fetchTasksCache.has(projectId)) {
-        const tasks = await fetchTasks(api, projectId);
-        commit('setTasks', { tasks, projectId });
-      } else {
-        commit('setTasksByCache', { projectId });
-      }
-    } catch (e) {
-      commit('error', { error: e });
-    }
-    commit('unloadingTasks');
-  },
   async fetchWorkFlowTasks({ commit, state }, { projectId, cached = false }) {
     commit('loadingWorkFlowTasks');
     const api = this.getters.apiv1;
@@ -329,7 +284,7 @@ const actions: ActionTree<State, RootState> = {
     const api = this.getters.apiv1;
     try {
       const oldOrNew = await saveTask(api, task);
-      commit('updateTask', { task });
+      commit('Task/updateTask', { task });
       return oldOrNew;
     } catch (e) {
       commit('error', { error: e });
@@ -542,10 +497,6 @@ const getters: GetterTree<State, RootState> = {
 
 export const defaultState = {
   logined: false,
-
-  tasks: [],
-  loadingTasks: false,
-  fetchTasksCache: new Map(),
 
   workFlowTasks: [],
   loadingWorkFlowTasks: false,

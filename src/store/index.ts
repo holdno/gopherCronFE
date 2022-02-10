@@ -6,6 +6,10 @@ import StoreProject, {
   State as StateProject,
 } from '@/store/modules/project';
 import StoreRoot, { State as StateRoot } from '@/store/modules/root';
+import StoreTask, {
+  NameSpace as NameSpaceTask,
+  State as StateTask,
+} from '@/store/modules/task';
 import StoreWorkFlow, {
   NameSpace as NameSpaceWorkFlow,
   State as StateWorkFlow,
@@ -16,6 +20,7 @@ export interface State {
   Root: StateRoot;
   [NameSpaceWorkFlow]: StateWorkFlow;
   [NameSpaceProject]: StateProject;
+  [NameSpaceTask]: StateTask;
 }
 
 export const store = createStore<State>({
@@ -24,6 +29,7 @@ export const store = createStore<State>({
     Root: StoreRoot,
     WorkFlow: StoreWorkFlow,
     Project: StoreProject,
+    Task: StoreTask,
   },
   devtools: import.meta.env.DEV,
   strict: import.meta.env.DEV,

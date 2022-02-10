@@ -12,14 +12,10 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onBeforeMount } from 'vue';
+  import { computed } from 'vue';
   import { useRoute } from 'vue-router';
 
   import ProjectList from '@/components/ProjectList.vue';
-  import { useStore } from '@/store/index';
-
-  const store = useStore();
-  onBeforeMount(() => store.commit('setTasks', { tasks: [] }));
 
   const route = useRoute();
   const visibilyClass = computed(() =>

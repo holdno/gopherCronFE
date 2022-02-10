@@ -11,23 +11,21 @@ import { store } from '@/store/index';
 function createBeforeEnter(type: 'crontab' | 'workflow') {
   return async (to: RouteLocationNormalizedLoaded) => {
     if (type === 'crontab') {
-      if (store.state.Root.tasks.length === 0) {
-        await store.dispatch('fetchTasks', {
-          projectId: Number(to.params.projectId),
-        });
+      const projectId = Number(to.params.projectId);
+      const tasks = store.state.Task.tasks.get(projectId);
+      if (!tasks || tasks.length === 0) {
+        await store.dispatch('Task/fetchTasks', { projectId });
       }
-      const task = store.state.Root.tasks.find(
-        (v) => v.id === to.params.taskId,
-      );
+      const task = store.state.Task.tasks
+        .get(projectId)
+        ?.find((v) => v.id === to.params.taskId);
       if (task === undefined) {
         return { name: 'notfound' };
       }
     } else if (type === 'workflow') {
-      if (store.state.Root.tasks.length === 0) {
-        await store.dispatch('fetchWorkFlowTasks', {
-          projectId: Number(to.params.projectId),
-        });
-      }
+      await store.dispatch('fetchWorkFlowTasks', {
+        projectId: Number(to.params.projectId),
+      });
       const task = store.state.Root.workFlowTasks.find(
         (v) => v.id === to.params.taskId,
       );

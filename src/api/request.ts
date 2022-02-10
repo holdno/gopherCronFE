@@ -137,35 +137,6 @@ export interface Task {
   tmpId: string;
 }
 
-export async function fetchTasks(
-  api: AxiosInstance,
-  projectId: number,
-): Promise<Task[]> {
-  const resp = await api.get('/crontab/list', {
-    params: {
-      project_id: projectId,
-    },
-  });
-  const data = resp.data;
-  const r = data.response;
-  return r.list.map((v: any) => ({
-    id: v.task_id,
-    name: v.name,
-    projectId: v.project_id,
-    command: v.command,
-    cronExpr: v.cron,
-    remark: v.remark,
-    timeout: v.timeout,
-    createTime: v.create_time,
-    status: v.status,
-    isRunning: v.is_running,
-    noseize: v.noseize,
-    exclusion: v.exclusion,
-    clientIp: v.client_ip,
-    tmpId: v.tmp_id,
-  }));
-}
-
 export async function saveTask(api: AxiosInstance, task: Task) {
   const payload = JSON.stringify({
     project_id: task.projectId,

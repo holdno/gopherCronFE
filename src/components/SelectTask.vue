@@ -48,11 +48,15 @@
   });
   const filter = ref('');
   const store = useStore();
-  const tasks = computed(() =>
-    store.state.Root.tasks.filter(
-      (t: Task) =>
-        t.name.indexOf(filter.value) >= 0 || t.id.indexOf(filter.value) >= 0,
-    ),
+  const tasks = computed(
+    () =>
+      store.state.Task.tasks
+        .get(props.projectId)
+        ?.filter(
+          (t: Task) =>
+            t.name.indexOf(filter.value) >= 0 ||
+            t.id.indexOf(filter.value) >= 0,
+        ) || [],
   );
   const filterTasks = (
     inputValue: string,
@@ -62,7 +66,7 @@
     const update = () => (filter.value = inputValue);
     if (tasks.value.length === 0) {
       store
-        .dispatch('fetchTasks', { projectId: props.projectId })
+        .dispatch('Task/fetchTasks', { projectId: props.projectId })
         .then(() => doneFn(update));
     } else {
       doneFn(update);
@@ -70,12 +74,10 @@
   };
 
   onMounted(() => {
-    store.commit('setTasks', { tasks: [] });
     watch(
       () => props.projectId,
       (current, previous) => {
         emits('update:modelValue', undefined);
-        store.commit('setTasks', { tasks: [] });
       },
     );
   });

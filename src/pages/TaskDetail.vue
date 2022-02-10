@@ -179,7 +179,7 @@
     });
   });
   onUnmounted(() => {
-    store.commit('setProjectClients', { clients: [] });
+    store.commit('Project/setProjectClients', { clients: [] });
   });
   const projectClients = computed(() =>
     store.state.Project.projectClients.get(props.projectId),
