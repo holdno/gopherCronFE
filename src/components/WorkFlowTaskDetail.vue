@@ -68,7 +68,7 @@
     />
     <q-input
       key="timeout"
-      v-model="editable.timeout"
+      v-model.number="editable.timeout"
       type="number"
       label="超时时间 (单位:秒 s 0则不限制)"
       square
@@ -180,10 +180,7 @@
   const router = useRouter();
   async function onSubmit() {
     await store.dispatch('saveWorkFlowTask', {
-      task: {
-        ...editable.value,
-        timeout: Number(editable.value.timeout),
-      },
+      task: editable.value,
     });
     await store.dispatch('WorkFlowTask/fetchTasks', {
       projectId: props.projectId,
