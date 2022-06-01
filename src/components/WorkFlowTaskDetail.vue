@@ -70,7 +70,7 @@
       key="timeout"
       v-model.number="editable.timeout"
       type="number"
-      label="超时时间 (单位:秒 s 0则不限制)"
+      label="超时时间 (单位:秒 s)"
       square
       filled
       class="tw-mb-4"
