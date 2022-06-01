@@ -110,7 +110,7 @@
         text-color="black"
         type="submit"
         label="保存"
-        :disable="!modified || !canSave"
+        :disable="!modified"
         class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
       />
       <q-btn
@@ -176,9 +176,25 @@
     const { name, command, timeout } = editable.value;
     return name !== '' && command !== '' && timeout > 0;
   });
-
+  const cantSaveReason = computed(() => {
+    const { name, command, timeout } = editable.value;
+    if (name === '') {
+      return '任务名称不能为空';
+    } else if (command === '') {
+      return '执行指令不能为空';
+    } else if (timeout <= 0) {
+      return '超时时间未指定';
+    }
+    return '';
+  });
   const router = useRouter();
   async function onSubmit() {
+    store.commit('cleanError');
+    if (!canSave.value) {
+      store.commit('error', { error: { message: cantSaveReason.value } });
+      return;
+    }
+
     await store.dispatch('saveWorkFlowTask', {
       task: editable.value,
     });

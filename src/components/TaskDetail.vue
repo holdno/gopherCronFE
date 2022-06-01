@@ -86,7 +86,7 @@
       key="timeout"
       v-model.number="editable.timeout"
       type="number"
-      label="超时时间 (单位:秒 s 0则不限制)"
+      label="超时时间 (单位:秒 s)"
       square
       filled
       class="tw-mb-4"
@@ -134,7 +134,7 @@
         text-color="black"
         type="submit"
         label="保存"
-        :disable="!modified || !canSave"
+        :disable="!modified"
         class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
       />
       <q-btn
@@ -176,7 +176,7 @@
     command: '',
     cronExpr: '0 0 0 * * * *',
     remark: '',
-    timeout: 0,
+    timeout: 300,
     createTime: 0,
     status: 0,
     isRunning: 0,
@@ -204,11 +204,29 @@
   });
   const canSave = computed(() => {
     const { name, command, timeout, cronExpr } = editable.value;
-    return name !== '' && command !== '' && timeout >= 0 && cronExpr !== '';
+    return name !== '' && command !== '' && timeout > 0 && cronExpr !== '';
+  });
+  const cantSaveReason = computed(() => {
+    const { name, command, timeout, cronExpr } = editable.value;
+    if (name === '') {
+      return '任务名称不能为空';
+    } else if (command === '') {
+      return '执行指令不能为空';
+    } else if (timeout <= 0) {
+      return '超时时间未指定';
+    } else if (cronExpr === '') {
+      return '调度计划未指定';
+    }
+    return '';
   });
 
   const router = useRouter();
   async function onSubmit() {
+    store.commit('cleanError');
+    if (!canSave.value) {
+      store.commit('error', { error: { message: cantSaveReason.value } });
+      return;
+    }
     const newTask = await store.dispatch('saveTask', {
       task: editable.value,
     });
