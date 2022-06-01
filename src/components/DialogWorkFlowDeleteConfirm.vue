@@ -38,7 +38,7 @@
     store.state.WorkFlow.workflows.get(props.workflowId),
   );
   async function deleteWorkFlow(workflowId: number) {
-    store.commit('clearError');
+    store.commit('cleanError');
     await store.dispatch('WorkFlow/deleteWorkFlow', { id: workflowId });
     if (store.state.Root.currentError === undefined) {
       router.push({ name: 'workflows' });

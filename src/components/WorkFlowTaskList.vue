@@ -144,7 +144,7 @@
   const router = useRouter();
   const showDeleteConfirm = ref(false);
   async function deleteTask(projectId: number, taskId: string) {
-    store.commit('clearError');
+    store.commit('cleanError');
     await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
     if (store.state.Root.currentError === undefined) {
       router.push({

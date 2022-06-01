@@ -147,7 +147,7 @@ const mutations: MutationTree<State> = {
       });
     }
   },
-  clearError(state) {
+  cleanError(state) {
     state.currentError = undefined;
   },
   setUsers(state, { list, total }) {

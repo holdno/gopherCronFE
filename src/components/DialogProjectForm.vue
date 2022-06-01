@@ -104,7 +104,7 @@
 
   async function onSubmit() {
     const p = editable.value;
-    store.commit('clearError');
+    store.commit('cleanError');
     if (props.projectId > 0) {
       await store.dispatch('updateProject', {
         projectId: props.projectId,

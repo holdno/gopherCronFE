@@ -209,7 +209,7 @@
 
   const showDeleteConfirm = ref(false);
   async function deleteTask(projectId: number, taskId: string) {
-    store.commit('clearError');
+    store.commit('cleanError');
     await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
     if (store.state.Root.currentError === undefined) {
       store.dispatch('WorkFlowTask/fetchTasks', { ...props });

@@ -38,7 +38,7 @@
     store.state.Project.projects.find((p) => p.id === props.projectId),
   );
   async function deleteProject(projectId: number) {
-    store.commit('clearError');
+    store.commit('cleanError');
     await store.dispatch('deleteProject', { projectId });
     if (store.state.Root.currentError === undefined) {
       router.push({ name: 'projects' });
