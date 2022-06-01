@@ -102,7 +102,7 @@
     VNetworkGraphInstance,
     ViewEvent,
   } from 'v-network-graph';
-  import { ForceLayout } from 'v-network-graph/force-layout';
+  import { ForceLayout } from 'v-network-graph/lib/force-layout';
   import {
     PropType,
     computed,

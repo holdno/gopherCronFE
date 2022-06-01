@@ -23,7 +23,7 @@
     >
       <q-scroll-area style="margin-bottom: 80px; height: calc(100% - 80px)">
         <q-list padding>
-          <q-item v-ripple clickable :to="{ name: 'summary' }">
+          <q-item clickable :to="{ name: 'summary' }">
             <q-item-section avatar>
               <q-icon name="timeline" />
             </q-item-section>
@@ -31,7 +31,7 @@
             <q-item-section class="tw-font-medium">看板</q-item-section>
           </q-item>
 
-          <q-item v-ripple clickable :to="{ name: 'projects' }">
+          <q-item clickable :to="{ name: 'projects' }">
             <q-item-section avatar>
               <q-icon name="view_list" />
             </q-item-section>
@@ -39,7 +39,7 @@
             <q-item-section class="tw-font-medium">项目管理</q-item-section>
           </q-item>
 
-          <q-item v-ripple clickable :to="{ name: 'workflows' }">
+          <q-item clickable :to="{ name: 'workflows' }">
             <q-item-section avatar>
               <q-icon name="mediation" />
             </q-item-section>
@@ -56,24 +56,14 @@
             header-class="tw-font-medium"
             icon="admin_panel_settings"
           >
-            <q-item
-              v-ripple
-              clickable
-              :inset-level="0.2"
-              :to="{ name: 'user-admin' }"
-            >
+            <q-item clickable :inset-level="0.2" :to="{ name: 'user-admin' }">
               <q-item-section avatar>
                 <q-icon name="supervisor_account" />
               </q-item-section>
 
               <q-item-section class="tw-font-medium">用户管理</q-item-section>
             </q-item>
-            <q-item
-              v-ripple
-              clickable
-              :inset-level="0.2"
-              :to="{ name: 'node-admin' }"
-            >
+            <q-item clickable :inset-level="0.2" :to="{ name: 'node-admin' }">
               <q-item-section avatar>
                 <q-icon name="dynamic_form" />
               </q-item-section>
@@ -83,7 +73,7 @@
           </q-expansion-item>
           <q-separator class="tw-bg-stone-800" />
 
-          <q-item v-ripple clickable :to="{ name: 'logout' }">
+          <q-item clickable :to="{ name: 'logout' }">
             <q-item-section avatar>
               <q-icon name="logout" />
             </q-item-section>
