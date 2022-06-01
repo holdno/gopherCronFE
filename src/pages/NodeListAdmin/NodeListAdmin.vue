@@ -49,7 +49,7 @@
       if (res.meta.code === 0) {
         nodeList.value = res.nodeList;
       } else {
-        store.commit('error', { message: res.meta.message });
+        store.commit('error', { error: { message: res.meta.message } });
       }
     } catch (e) {
       console.log(e);

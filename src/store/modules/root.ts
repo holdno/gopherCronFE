@@ -225,7 +225,7 @@ const actions: ActionTree<State, RootState> = {
       commit('authed', { user, token });
     } catch (e) {
       commit('unauthed');
-      commit('error', { message: e });
+      commit('error', { error: { message: e } });
     }
   },
   async login({ commit }, { username, password }) {

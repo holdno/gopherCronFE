@@ -82,7 +82,7 @@
     try {
       const resp = await reloadNodeConfig({ clientIP: props.node.clientIP });
       if (resp.code !== 0) {
-        store.commit('error', { message: resp.message });
+        store.commit('error', { error: { message: resp.message } });
       } else {
         showReload.value = false;
       }
