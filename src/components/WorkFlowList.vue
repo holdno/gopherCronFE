@@ -124,6 +124,14 @@
       (state) => [state.Root.eventWorkFlowTask],
       ([eventWorkFlowTask]) => {
         if (!eventWorkFlowTask) return;
+
+        const flow = workflows.value.get(eventWorkFlowTask.workFlowId);
+        if (flow !== undefined) {
+          store.commit('success', {
+            message: `任务编排 ${flow.title} 当前状态: ${flow.status}`,
+          });
+        }
+
         refresh();
       },
     );

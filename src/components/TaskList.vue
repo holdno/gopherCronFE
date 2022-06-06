@@ -121,14 +121,17 @@
       await fetchTasks();
     });
     store.watch(
-      (state) => [state.Root.eventTask, state.Root.eventWorkFlowTask],
-      ([eventTask, eventWorkFlowTask]) => {
-        if (
-          (!eventTask || eventTask.projectId !== props.projectId) &&
-          (!eventWorkFlowTask ||
-            eventWorkFlowTask.projectId !== props.projectId)
-        )
-          return;
+      (state) => [state.Root.eventTask],
+      ([eventTask]) => {
+        if (!eventTask || eventTask.projectId !== props.projectId) return;
+
+        const task = tasks.value.find((t) => t.id === eventTask.taskId);
+        if (task !== undefined) {
+          store.commit('success', {
+            message: `任务 ${task.name} 当前状态: ${eventTask.status}`,
+          });
+        }
+
         fetchTasks();
       },
     );

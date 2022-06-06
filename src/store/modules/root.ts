@@ -132,7 +132,7 @@ const mutations: MutationTree<State> = {
         color: 'red',
         icon: 'announcement',
         position: 'top-right',
-        classes: 'tw-mt-14',
+        classes: 'first:tw-mt-14',
       });
     else throw error;
   },
@@ -143,7 +143,7 @@ const mutations: MutationTree<State> = {
         message: message,
         type: type || 'info',
         position: 'top-right',
-        classes: 'tw-mt-14',
+        classes: 'first:tw-mt-14',
       });
     }
   },

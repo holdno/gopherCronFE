@@ -115,6 +115,14 @@
           eventWorkFlowTask.projectId !== props.projectId
         )
           return;
+
+        const task = tasks.value.find((t) => t.id === eventWorkFlowTask.taskId);
+        if (task !== undefined) {
+          store.commit('success', {
+            message: `任务 ${task.name} 当前状态: ${eventWorkFlowTask.status}`,
+          });
+        }
+
         fetchTasks();
       },
     );
