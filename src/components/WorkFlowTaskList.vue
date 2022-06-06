@@ -197,6 +197,7 @@
     margin: 10px 15px;
     max-height: 60px;
     overflow: hidden;
+    word-break: break-all;
   }
 
   .task__bottom-box {
