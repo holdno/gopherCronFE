@@ -38,7 +38,7 @@
         :thumb-style="thumbStyle"
         :bar-style="barStyle"
       >
-        <q-list class="tw-flex tw-flex-col tw-gap-2 tw-pb-4">
+        <q-list class="tw-w-full tw-flex tw-flex-col tw-gap-2 tw-pb-4">
           <router-link
             v-for="task in tasks"
             :key="task.id"
