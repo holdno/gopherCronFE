@@ -126,15 +126,19 @@ const mutations: MutationTree<State> = {
     if (error === ErrHandled) return;
     state.currentError = error;
     const q = state.$q;
-    if (q)
+    if (q) {
+      let message = error.message;
+      if (!message) {
+        message = error;
+      }
       q.notify({
-        message: error.message,
+        message: message,
         color: 'red',
         icon: 'announcement',
         position: 'top-right',
         classes: 'first:tw-mt-14',
       });
-    else throw error;
+    } else throw error;
   },
   success(state, { message, type = '' }: { message: string; type: string }) {
     if (message && state.$q) {
@@ -225,7 +229,7 @@ const actions: ActionTree<State, RootState> = {
       commit('authed', { user, token });
     } catch (e) {
       commit('unauthed');
-      commit('error', { error: { message: e } });
+      commit('error', { error: e });
     }
   },
   async login({ commit }, { username, password }) {
