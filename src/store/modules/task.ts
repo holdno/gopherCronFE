@@ -1,7 +1,7 @@
 import { ActionTree, Module, MutationTree } from 'vuex';
 
-import { Task } from '@/api/request';
-import { fetchTasks } from '@/api/task';
+import { Task, TemporaryTask } from '@/api/request';
+import { fetchTasks, fetchTemporaryTasks } from '@/api/task';
 import { State as RootState } from '@/store/index';
 
 export const NameSpace = 'Task';
@@ -9,6 +9,8 @@ export const NameSpace = 'Task';
 export interface State {
   tasks: Map<number, Task[]>;
   loadingTasks: boolean;
+  temporaryTasks: Map<number, TemporaryTask[]>;
+  loadingTemporaryTasks: boolean;
 }
 
 const actions: ActionTree<State, RootState> = {
@@ -24,8 +26,19 @@ const actions: ActionTree<State, RootState> = {
     }
     commit('unloadingTasks');
   },
+  async fetchTemporaryTasks({ commit, state }, { projectId, cached = false }) {
+    commit('loadingTemporaryTasks');
+    try {
+      if (!cached || !state.temporaryTasks.has(projectId)) {
+        const tasks = await fetchTemporaryTasks(projectId);
+        commit('setTemporaryTasks', { tasks, projectId });
+      }
+    } catch (e) {
+      commit('error', { error: e }, { root: true });
+    }
+    commit('unloadingTemporaryTasks');
+  },
 };
-
 const mutations: MutationTree<State> = {
   loadingTasks(state) {
     state.loadingTasks = true;
@@ -35,6 +48,15 @@ const mutations: MutationTree<State> = {
   },
   setTasks(state, { projectId, tasks }) {
     state.tasks.set(projectId, tasks);
+  },
+  loadingTemporaryTasks(state) {
+    state.loadingTemporaryTasks = true;
+  },
+  unloadingTemporaryTasks(state) {
+    state.loadingTemporaryTasks = false;
+  },
+  setTemporaryTasks(state, { projectId, tasks }) {
+    state.temporaryTasks.set(projectId, tasks);
   },
   clearTasks(state, { projectId }) {
     if (projectId !== undefined) state.tasks.delete(projectId);
@@ -58,6 +80,8 @@ const store: Module<State, RootState> = {
   state: () => ({
     tasks: new Map(),
     loadingTasks: false,
+    temporaryTasks: new Map(),
+    loadingTemporaryTasks: false,
   }),
   actions,
   mutations,

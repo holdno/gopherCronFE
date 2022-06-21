@@ -120,6 +120,14 @@ const routes = [
                 children: TaskRoutes('crontab'),
               },
               {
+                name: 'temporary_tasks',
+                path: 'temporary_tasks',
+                component: () => import('@/pages/TaskList.vue'),
+                props: (route: RouteLocationNormalizedLoaded) => ({
+                  projectId: Number(route.params.projectId),
+                }),
+              },
+              {
                 name: 'workflow_tasks',
                 path: 'workflow_tasks',
                 component: () => import('@/pages/TaskList.vue'),

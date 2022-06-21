@@ -17,6 +17,15 @@
           replace
         />
         <q-route-tab
+          name="temporary"
+          label="临时"
+          :to="{
+            name: 'temporary_tasks',
+            params: { projectId: props.projectId },
+          }"
+          replace
+        />
+        <q-route-tab
           name="workflow"
           label="任务流"
           :to="{
@@ -29,6 +38,9 @@
       <q-tab-panels :model-value="tab" animated class="tw-w-full tw-grow">
         <q-tab-panel name="normal" class="tw-p-0">
           <TaskList :project-id="props.projectId" />
+        </q-tab-panel>
+        <q-tab-panel name="temporary" class="tw-p-0">
+          <TemporaryTaskList :project-id="props.projectId" />
         </q-tab-panel>
         <q-tab-panel name="workflow" class="tw-p-0">
           <WorkFlowTaskList :project-id="props.projectId" />
@@ -51,6 +63,7 @@
   import { useRoute } from 'vue-router';
 
   import TaskList from '@/components/TaskList.vue';
+  import TemporaryTaskList from '@/components/TemporaryTaskList.vue';
   import WorkFlowTaskList from '@/components/WorkFlowTaskList.vue';
 
   const props = defineProps({
@@ -72,6 +85,7 @@
       const routeName = route.name.toString();
       if (routeName.search('crontab') >= 0) return 'normal';
       else if (routeName.search('workflow') >= 0) return 'workflow';
+      else if (routeName.search('temporary') >= 0) return 'temporary';
     }
     throw new Error(`Unknown route name ${route.name?.toString()}`);
   });

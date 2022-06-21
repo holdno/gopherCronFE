@@ -1,13 +1,5 @@
 <template>
   <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
-    <Confirm
-      v-model="showDeleteConfirm"
-      :content="'是否要删除任务' + selectedTask?.name + '?'"
-      type="warning"
-      @confirm="
-        selectedTask && deleteTask(selectedTask.projectId, selectedTask.id)
-      "
-    ></Confirm>
     <div class="q-pa-md tw-flex tw-justify-around">
       <q-input
         v-model="filter"
@@ -21,7 +13,6 @@
         </template>
       </q-input>
       <q-btn flat dense :loading="loading" icon="refresh" @click="fetchTasks" />
-      <q-btn flat dense :to="{ name: 'create_crontab_task' }" icon="add" />
       <q-btn
         flat
         dense
@@ -39,11 +30,7 @@
         :bar-style="barStyle"
       >
         <q-list class="tw-w-full tw-flex tw-flex-col tw-gap-2 tw-pb-4">
-          <router-link
-            v-for="task in tasks"
-            :key="task.id"
-            :to="{ name: 'crontab_task', params: { taskId: task.id } }"
-          >
+          <template v-for="task in tasks" :key="task.id">
             <div
               :class="
                 (!activated(task)
@@ -52,14 +39,8 @@
                 'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
               "
             >
-              <div :class="'task__status' + task.status">
-                {{
-                  task.isRunning
-                    ? '执行中'
-                    : task.status == 1
-                    ? '调度中'
-                    : '已暂停'
-                }}
+              <div :class="'task__status' + task.scheduleStatus">
+                {{ task.scheduleStatus == 1 ? '调度中' : '已完成' }}
               </div>
               <div
                 :class="
@@ -69,28 +50,20 @@
               >
                 <div class="task__cron">
                   <q-icon name="schedule" />
-                  {{ task.cronExpr }}
+                  {{ formatTimestamp(task.scheduleTime * 1000) }}
                 </div>
                 <q-icon name="numbers" />
-                {{ task.name }}
+                {{ getOriginal(task.taskId).name }}
               </div>
-              <div class="task__remark">{{ task.remark || '-' }}</div>
+              <div class="task__remark">创建人：{{ task.userName || '-' }}</div>
               <div class="task__bottom-box">
                 <div class="task__bottom-time">
                   {{ formatTimestamp(task.createTime * 1000) }}
                 </div>
               </div>
             </div>
-          </router-link>
+          </template>
         </q-list>
-
-        <div
-          v-if="!loading && (!tasks || tasks.length === 0)"
-          class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
-        >
-          <q-icon name="outlet" style="font-size: 3rem" />
-          暂无数据
-        </div>
       </q-scroll-area>
     </div>
   </div>
@@ -98,10 +71,9 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
+  import { useRoute } from 'vue-router';
 
-  import { Task } from '@/api/request';
-  import Confirm from '@/components/Confirm.vue';
+  import { Task, TemporaryTask } from '@/api/request';
   import { useStore } from '@/store/index';
   import { formatTimestamp } from '@/utils/datetime';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
@@ -113,67 +85,41 @@
     },
   });
 
+  const filter = ref('');
+
   const store = useStore();
   const loading = computed(() => store.state.Task.loadingTasks);
 
+  async function fetchTasks() {
+    await store.dispatch('Task/fetchTasks', { ...props });
+    await store.dispatch('Task/fetchTemporaryTasks', { ...props });
+  }
   onMounted(() => {
     watchEffect(async () => {
       await fetchTasks();
     });
-    store.watch(
-      (state) => [state.Root.eventTask],
-      ([eventTask]) => {
-        if (!eventTask || eventTask.projectId !== props.projectId) return;
-
-        const task = tasks.value.find((t) => t.id === eventTask.taskId);
-        if (task !== undefined) {
-          store.commit('success', {
-            message: `任务 ${task.name} 当前状态: ${eventTask.status}`,
-          });
-        }
-
-        fetchTasks();
-      },
-    );
   });
-  async function fetchTasks() {
-    await store.dispatch('Task/fetchTasks', { ...props });
-  }
-
-  const filter = ref('');
   const tasks = computed(
     () =>
-      store.state.Task.tasks
+      store.state.Task.temporaryTasks
         .get(props.projectId)
         ?.filter(
-          (t: Task) =>
-            t.name.indexOf(filter.value) >= 0 ||
-            t.id.toString().indexOf(filter.value) >= 0,
+          (t: TemporaryTask) => t.id.toString().indexOf(filter.value) >= 0,
         ) || [],
   );
-
-  function activated(task: Task): boolean {
+  function activated(task: TemporaryTask): boolean {
     const route = useRoute();
     return route.params.taskId === task.id;
   }
-
-  const selectedTask = computed(() => tasks.value.filter(activated).pop());
-  const router = useRouter();
-  const showDeleteConfirm = ref(false);
-  async function deleteTask(projectId: number, taskId: string) {
-    store.commit('cleanError');
-    await store.dispatch('deleteTask', { projectId, taskId });
-    if (store.state.Root.currentError === undefined) {
-      router.push({
-        name: 'project',
-        params: {
-          projectId: projectId,
-        },
-      });
-      showDeleteConfirm.value = false;
-      await fetchTasks();
-    }
+  function getOriginal(taskId: string): Task {
+    const task = store.state.Task.tasks
+      .get(props.projectId)
+      ?.find((t: Task) => t.id === taskId);
+    if (task === undefined) throw new Error('Original task not found');
+    return task;
   }
+  const selectedTask = computed(() => tasks.value.filter(activated).pop());
+  const showDeleteConfirm = ref(false);
 </script>
 
 <style scoped>
@@ -193,9 +139,9 @@
   .task__cron {
     font-size: 14px;
     position: absolute;
-    line-height: 20px;
+    line-height: 30px;
     width: 200px;
-    height: 20px;
+    height: 30px;
     top: -30px;
     left: 20px;
   }
@@ -218,7 +164,7 @@
     justify-content: space-between;
   }
 
-  .task__status0 {
+  .task__status1 {
     position: absolute;
     top: 10px;
     right: 15px;
@@ -231,7 +177,7 @@
     background-color: rgba(255, 0, 0, 0.2);
   }
 
-  .task__status1 {
+  .task__status2 {
     position: absolute;
     top: 10px;
     right: 15px;

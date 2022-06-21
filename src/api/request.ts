@@ -722,3 +722,15 @@ export async function saveWorkFlowTask(api: AxiosInstance, task: WorkFlowTask) {
     },
   });
 }
+
+export interface TemporaryTask {
+  command: string;
+  createTime: number;
+  id: string;
+  projectId: number;
+  scheduleStatus: number;
+  scheduleTime: number;
+  taskId: string;
+  userId: number;
+  userName: string;
+}
