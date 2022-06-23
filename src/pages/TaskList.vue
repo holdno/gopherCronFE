@@ -18,7 +18,7 @@
         />
         <q-route-tab
           name="temporary"
-          label=临时"
+          label="临时"
           :to="{
             name: 'temporary_tasks',
             params: { projectId: props.projectId },
