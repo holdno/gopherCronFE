@@ -1,152 +1,172 @@
 <template>
-  <Confirm
-    v-model="showDeleteConfirm"
-    :content="'是否要删除任务' + task?.name + '?'"
-    type="warning"
-    @confirm="project && task && deleteTask(project.id, task.id)"
-  ></Confirm>
-  <Confirm
-    v-model="showKillConfirm"
-    content="确定要结束进程吗？"
-    type="warning"
-    @confirm="kill"
-  ></Confirm>
-  <Confirm
-    v-model="showExecuteConfirm"
-    content="确定要立即执行吗？"
-    @confirm="task && execute(projectId, task.id)"
-  ></Confirm>
-  <div
-    v-if="!isCreateMode"
-    class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-1"
-  >
-    <q-btn
-      flat
-      class="tw-w-24 tw-text-red-300 lg:tw-hidden"
-      icon="delete"
-      @click="showDeleteConfirm = true"
-    />
-    <q-btn
-      v-if="task?.isRunning === 1"
-      flat
-      text-color="red"
-      :disable="task?.isRunning !== 1"
-      class="tw-w-24 tw-ml-1"
-      :loading="waitingKill"
-      @click="showKillConfirm = true"
-      >结束进程</q-btn
+  <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
+    <DialogTemporaryTaskForm
+      v-model="showCreateTemporaryTask"
+      :task="task"
+    ></DialogTemporaryTaskForm>
+    <Confirm
+      v-model="showDeleteConfirm"
+      :content="'是否要删除任务' + task?.name + '?'"
+      type="warning"
+      @confirm="project && task && deleteTask(project.id, task.id)"
+    ></Confirm>
+    <Confirm
+      v-model="showKillConfirm"
+      content="确定要结束进程吗？"
+      type="warning"
+      @confirm="kill"
+    ></Confirm>
+    <Confirm
+      v-model="showExecuteConfirm"
+      content="确定要立即执行吗？"
+      @confirm="task && execute(projectId, task.id)"
+    ></Confirm>
+    <div
+      v-if="!isCreateMode"
+      class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-2"
     >
-    <q-btn
-      color="primary"
-      text-color="black"
-      :disable="modified || task?.isRunning === 1"
-      class="tw-w-24"
-      :loading="executing || task?.isRunning === 1"
-      @click="showExecuteConfirm = true"
-      >立即执行</q-btn
-    >
-  </div>
-  <q-form class="tw-w-full" @submit="onSubmit" @reset="onReset">
-    <q-input
-      v-if="task"
-      key="id"
-      :model-value="task.id"
-      disable
-      label="任务 ID"
-      square
-      filled
-      class="tw-mb-4"
-    />
-    <q-input
-      key="project"
-      :model-value="project ? project.title : ''"
-      disable
-      label="所属项目"
-      square
-      filled
-      class="tw-mb-4"
-    />
-    <q-input
-      key="name"
-      v-model="editable.name"
-      label="任务名称"
-      square
-      filled
-      class="tw-mb-4"
-    />
-    <q-input
-      key="cron"
-      v-model="editable.cronExpr"
-      label="调度计划 (*秒 *分 *时 *日 *月 *周 *年)"
-      square
-      filled
-      class="tw-mb-4"
-    />
-    <q-input
-      key="timeout"
-      v-model.number="editable.timeout"
-      type="number"
-      label="超时时间 (单位:秒 s)"
-      square
-      filled
-      class="tw-mb-4"
-    />
-    <q-input
-      key="command"
-      v-model="editable.command"
-      placeholder='echo "hello word"'
-      type="textarea"
-      label="执行指令"
-      autogrow
-      square
-      filled
-      class="tw-mb-4"
-    />
-    <q-input
-      key="remark"
-      v-model="editable.remark"
-      type="textarea"
-      label="任务备注"
-      autogrow
-      square
-      filled
-      class="tw-mb-4"
-    />
-    <q-toggle
-      key="noseize"
-      v-model="editable.noseize"
-      :false-value="0"
-      :true-value="1"
-      label="并行调度"
-      class="tw-mb-4"
-    />
-    <q-toggle
-      key="status"
-      v-model="editable.status"
-      :false-value="0"
-      :true-value="1"
-      label="是否启用"
-      class="tw-mb-4"
-    />
-    <div class="q-pa-sm">
+      <q-btn
+        flat
+        class="tw-w-24 tw-text-red-300 lg:tw-hidden"
+        icon="delete"
+        @click="showDeleteConfirm = true"
+      />
+
+      <q-btn
+        v-if="task?.isRunning === 1"
+        flat
+        text-color="red"
+        :disable="task?.isRunning !== 1"
+        class="tw-w-24 tw-ml-1"
+        :loading="waitingKill"
+        @click="showKillConfirm = true"
+        >结束进程</q-btn
+      >
       <q-btn
         color="primary"
         text-color="black"
-        type="submit"
-        label="保存"
-        :disable="!modified"
-        class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
-      />
+        :disable="modified || task?.isRunning === 1"
+        class="tw-w-24"
+        :loading="executing || task?.isRunning === 1"
+        @click="showExecuteConfirm = true"
+        >立即执行</q-btn
+      >
+
       <q-btn
-        color="primary"
-        type="reset"
-        label="重置"
-        flat
-        :disable="!modified"
-        class="lg:tw-w-24 tw-w-full"
-      />
+        color="warning"
+        text-color="black"
+        :disable="modified || task?.isRunning === 1"
+        class="tw-w-24 tw-opacity-90"
+        :loading="executing || task?.isRunning === 1"
+        @click="showCreateTemporaryTask = true"
+        >临时调度
+        <q-tooltip class="bg-warning tw-text-black" :offset="[10, 10]">
+          指定时间调度一次的任务
+        </q-tooltip>
+      </q-btn>
     </div>
-  </q-form>
+    <q-form class="tw-w-full" @submit="onSubmit" @reset="onReset">
+      <q-input
+        v-if="task"
+        key="id"
+        :model-value="task.id"
+        disable
+        label="任务 ID"
+        square
+        filled
+        class="tw-mb-4"
+      />
+      <q-input
+        key="project"
+        :model-value="project ? project.title : ''"
+        disable
+        label="所属项目"
+        square
+        filled
+        class="tw-mb-4"
+      />
+      <q-input
+        key="name"
+        v-model="editable.name"
+        label="任务名称"
+        square
+        filled
+        class="tw-mb-4"
+      />
+      <q-input
+        key="cron"
+        v-model="editable.cronExpr"
+        label="调度计划 (*秒 *分 *时 *日 *月 *周 *年)"
+        square
+        filled
+        class="tw-mb-4"
+      />
+      <q-input
+        key="timeout"
+        v-model.number="editable.timeout"
+        type="number"
+        label="超时时间 (单位:秒 s)"
+        square
+        filled
+        class="tw-mb-4"
+      />
+      <q-input
+        key="command"
+        v-model="editable.command"
+        placeholder='echo "hello word"'
+        type="textarea"
+        label="执行指令"
+        autogrow
+        square
+        filled
+        class="tw-mb-4"
+      />
+      <q-input
+        key="remark"
+        v-model="editable.remark"
+        type="textarea"
+        label="任务备注"
+        autogrow
+        square
+        filled
+        class="tw-mb-4"
+      />
+      <q-toggle
+        key="noseize"
+        v-model="editable.noseize"
+        :false-value="0"
+        :true-value="1"
+        label="并行调度"
+        class="tw-mb-4"
+      />
+      <q-toggle
+        key="status"
+        v-model="editable.status"
+        :false-value="0"
+        :true-value="1"
+        label="是否启用"
+        class="tw-mb-4"
+      />
+      <div class="q-pa-sm">
+        <q-btn
+          color="primary"
+          text-color="black"
+          type="submit"
+          label="保存"
+          :disable="!modified"
+          class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
+        />
+        <q-btn
+          color="primary"
+          type="reset"
+          label="重置"
+          flat
+          :disable="!modified"
+          class="lg:tw-w-24 tw-w-full"
+        />
+      </div>
+    </q-form>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -156,6 +176,7 @@
   import { startTask } from '@/api/request';
   import { killTask } from '@/api/task';
   import Confirm from '@/components/Confirm.vue';
+  import DialogTemporaryTaskForm from '@/components/DialogTemporaryTaskForm.vue';
   import { useStore } from '@/store/index';
 
   const props = defineProps({
@@ -293,10 +314,12 @@
     showKillConfirm.value = false;
     waitingKill.value = true;
     try {
-      await killTask({ projectID: props.projectId, taskID: props.id });
+      await killTask({ projectId: props.projectId, taskId: props.id });
     } catch (e) {
       console.log(e);
     }
     waitingKill.value = false;
   };
+
+  const showCreateTemporaryTask = ref(false);
 </script>

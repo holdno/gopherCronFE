@@ -18,13 +18,17 @@
         />
         <q-route-tab
           name="temporary"
-          label="临时"
+          label=临时"
           :to="{
             name: 'temporary_tasks',
             params: { projectId: props.projectId },
           }"
           replace
-        />
+        >
+          <q-tooltip class="bg-warning tw-text-black" :offset="[10, 10]">
+            指定时间调度一次的任务
+          </q-tooltip>
+        </q-route-tab>
         <q-route-tab
           name="workflow"
           label="任务流"

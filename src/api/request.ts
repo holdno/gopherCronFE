@@ -726,11 +726,16 @@ export async function saveWorkFlowTask(api: AxiosInstance, task: WorkFlowTask) {
 export interface TemporaryTask {
   command: string;
   createTime: number;
-  id: string;
+  id?: number;
   projectId: number;
-  scheduleStatus: number;
+  scheduleStatus?: number;
   scheduleTime: number;
   taskId: string;
   userId: number;
   userName: string;
+  noseize: number;
+  timeout: number;
+  remark: string;
+  isRunning: number;
+  tmpId: string;
 }

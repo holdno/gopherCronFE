@@ -36,6 +36,9 @@ export async function fetchTemporaryTasks(
   });
   const data = resp.data;
   const r = data.response;
+  if (!r) {
+    return [];
+  }
   return r.map((v: any) => ({
     command: v.command,
     createTime: v.create_time,
@@ -46,18 +49,51 @@ export async function fetchTemporaryTasks(
     taskId: v.task_id,
     userId: v.user_id,
     userName: v.user_name,
+    tmpId: v.tmp_id,
+    isRunning: v.is_running,
+    timeout: v.timeout,
   }));
 }
 
 export interface KillTaskRequest {
-  projectID: number;
-  taskID: string;
+  projectId: number;
+  taskId: string;
 }
 
 export async function killTask(args: KillTaskRequest) {
   const resp = await apiv1.post('/crontab/kill', {
-    project_id: args.projectID,
-    task_id: args.taskID,
+    project_id: args.projectId,
+    task_id: args.taskId,
   });
   return resp.data;
+}
+
+export interface CreateTemporaryTaskRequest {
+  projectId: number;
+  taskId: string;
+  command: string;
+  noseize: number;
+  remark: string;
+  scheduleTime: number;
+  timeout: number;
+}
+
+export interface CreateTemporaryTaskResponse {
+  code: number;
+  message: string;
+}
+
+export async function CreateTemporaryTask(
+  args: CreateTemporaryTaskRequest,
+): Promise<CreateTemporaryTaskResponse> {
+  const resp = await apiv1.post('/temporary_task/create', {
+    project_id: args.projectId,
+    task_id: args.taskId,
+    command: args.command,
+    noseize: args.noseize,
+    remark: args.remark,
+    schedule_time: args.scheduleTime,
+    timeout: args.timeout,
+  });
+  return resp.data.meta;
 }

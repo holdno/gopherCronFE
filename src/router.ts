@@ -8,7 +8,7 @@ import { fetchWorkFlowDetail } from './api/workflow';
 
 import { store } from '@/store/index';
 
-function createBeforeEnter(type: 'crontab' | 'workflow') {
+function createBeforeEnter(type: 'crontab' | 'workflow' | 'temporary') {
   return async (to: RouteLocationNormalizedLoaded) => {
     if (type === 'crontab') {
       const projectId = Number(to.params.projectId);
@@ -36,10 +36,23 @@ function createBeforeEnter(type: 'crontab' | 'workflow') {
       if (task === undefined) {
         return { name: 'notfound' };
       }
+    } else if (type === 'temporary') {
+      const projectId = Number(to.params.projectId);
+      const tasks = store.state.Task.temporaryTasks.get(projectId);
+      if (!tasks || tasks.length === 0) {
+        await store.dispatch('Task/fetchTemporaryTasks', { projectId });
+      }
+      const task = store.state.Task.temporaryTasks.get(projectId)?.find((v) => {
+        return v.id === Number(to.params.taskId);
+      });
+      console.log(to.params.taskId, task);
+      if (task === undefined) {
+        return { name: 'notfound' };
+      }
     }
   };
 }
-const TaskRoutes = (type: 'crontab' | 'workflow') => [
+const TaskRoutes = (type: 'crontab' | 'workflow' | 'temporary') => [
   {
     name: `${type}_task`,
     path: 'task/:taskId',
@@ -126,6 +139,7 @@ const routes = [
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   projectId: Number(route.params.projectId),
                 }),
+                children: TaskRoutes('temporary'),
               },
               {
                 name: 'workflow_tasks',

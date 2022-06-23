@@ -7,16 +7,52 @@ export interface GetSummaryErrorLogsRequest {
 
 export interface TaskLog {
   id: number;
-  clientIP: string;
+  clientIp: string;
   command: string;
   endTime: number;
   taskName: string;
   projectName: string;
-  projectID: number;
+  projectId: number;
   result: string;
   startTime: number;
-  taskID: string;
-  tmpID: string;
+  taskId: string;
+  tmpId: string;
+}
+
+export interface GetTemporaryTaskLogDetailRequest {
+  tmpId: string;
+  projectId: number;
+  taskId: string;
+}
+
+export async function GetTemporaryTaskLogDetail(
+  args: GetTemporaryTaskLogDetailRequest,
+): Promise<TaskLog | null> {
+  const resp = await apiv1.get('/log/detail', {
+    params: {
+      project_id: args.projectId,
+      task_id: args.taskId,
+      tmp_id: args.tmpId,
+    },
+  });
+
+  const v = resp.data.response;
+  if (!v) {
+    return null;
+  }
+  return {
+    id: v.id,
+    taskId: v.task_id,
+    projectId: v.project_id,
+    projectName: v.project,
+    taskName: v.name,
+    result: v.result,
+    startTime: v.start_time,
+    endTime: v.end_time,
+    command: v.command,
+    clientIp: v.client_ip,
+    tmpId: v.tmp_id,
+  };
 }
 
 export interface GetSummaryErrorLogsResponse {
@@ -39,16 +75,16 @@ export async function getSummaryErrorLogs(
     resp.data.response.list.forEach((v: any, i: number) => {
       result.push({
         id: v.id,
-        clientIP: v.client_ip,
+        clientIp: v.client_ip,
         command: v.command,
         endTime: v.end_time,
         taskName: v.name,
         projectName: v.project,
-        projectID: v.project_id,
+        projectId: v.project_id,
         result: v.result,
         startTime: v.start_time,
-        taskID: v.task_id,
-        tmpID: v.tmp_id,
+        taskId: v.task_id,
+        tmpId: v.tmp_id,
       });
     });
   }

@@ -64,7 +64,7 @@
             :vertical="width >= 1024"
             class="tw-w-full tw-h-full tw-bg-[#121212] tw-p-0 lg:tw-pr-4"
           >
-            <q-tab-panel name="detail">
+            <q-tab-panel name="detail" class="tw-px-0">
               <TaskDetail
                 v-if="props.type === 'crontab'"
                 :id="props.id"
@@ -75,8 +75,13 @@
                 :id="props.id"
                 :project-id="props.projectId"
               />
+              <TemporaryTaskDetail
+                v-if="props.type === 'temporary'"
+                :id="props.id"
+                :project-id="props.projectId"
+              />
             </q-tab-panel>
-            <q-tab-panel name="logs">
+            <q-tab-panel name="logs" class="tw-px-0">
               <TaskLogs
                 :id="props.id"
                 :project-id="props.projectId"
@@ -86,7 +91,7 @@
           </q-tab-panels>
         </q-scroll-area>
       </div>
-      <div class="tw-hidden lg:tw-block">
+      <div v-if="props.type != 'temporary'" class="tw-hidden lg:tw-block">
         <q-tabs
           v-if="!isCreateMode"
           :model-value="tab"
@@ -124,6 +129,7 @@
 
   import TaskDetail from '@/components/TaskDetail.vue';
   import TaskLogs from '@/components/TaskLogs.vue';
+  import TemporaryTaskDetail from '@/components/TemporaryTaskDetail.vue';
   import WorkFlowTaskDetail from '@/components/WorkFlowTaskDetail.vue';
   import { useStore } from '@/store/index';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';

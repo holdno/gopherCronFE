@@ -13,14 +13,6 @@
         </template>
       </q-input>
       <q-btn flat dense :loading="loading" icon="refresh" @click="fetchTasks" />
-      <q-btn
-        flat
-        dense
-        class="tw-text-red-300 lg:tw-flex tw-hidden"
-        icon="delete"
-        :disable="!selectedTask"
-        @click="showDeleteConfirm = true"
-      />
     </div>
     <div class="tw-w-full tw-grow">
       <q-scroll-area
@@ -29,8 +21,15 @@
         :thumb-style="thumbStyle"
         :bar-style="barStyle"
       >
-        <q-list class="tw-w-full tw-flex tw-flex-col tw-gap-2 tw-pb-4">
-          <template v-for="task in tasks" :key="task.id">
+        <q-list
+          v-if="tasks"
+          class="tw-w-full tw-flex tw-flex-col tw-gap-2 tw-pb-4"
+        >
+          <router-link
+            v-for="task in temporaryTasks"
+            :key="task.id"
+            :to="{ name: 'temporary_task', params: { taskId: task.id } }"
+          >
             <div
               :class="
                 (!activated(task)
@@ -40,7 +39,7 @@
               "
             >
               <div :class="'task__status' + task.scheduleStatus">
-                {{ task.scheduleStatus == 1 ? '调度中' : '已完成' }}
+                {{ task.scheduleStatus == 1 ? '等待中' : '已完成' }}
               </div>
               <div
                 :class="
@@ -53,7 +52,7 @@
                   {{ formatTimestamp(task.scheduleTime * 1000) }}
                 </div>
                 <q-icon name="numbers" />
-                {{ getOriginal(task.taskId).name }}
+                {{ task.remark }}
               </div>
               <div class="task__remark">创建人：{{ task.userName || '-' }}</div>
               <div class="task__bottom-box">
@@ -62,8 +61,15 @@
                 </div>
               </div>
             </div>
-          </template>
+          </router-link>
         </q-list>
+        <div
+          v-if="!loading && (!temporaryTasks || temporaryTasks.length === 0)"
+          class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
+        >
+          <q-icon name="outlet" style="font-size: 3rem" />
+          暂无数据
+        </div>
       </q-scroll-area>
     </div>
   </div>
@@ -73,7 +79,7 @@
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
 
-  import { Task, TemporaryTask } from '@/api/request';
+  import { TemporaryTask } from '@/api/request';
   import { useStore } from '@/store/index';
   import { formatTimestamp } from '@/utils/datetime';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
@@ -94,32 +100,29 @@
     await store.dispatch('Task/fetchTasks', { ...props });
     await store.dispatch('Task/fetchTemporaryTasks', { ...props });
   }
-  onMounted(() => {
+  onMounted(async () => {
     watchEffect(async () => {
       await fetchTasks();
     });
+
+    if (!store.state.Task.tasks) {
+      await store.dispatch('Task/fetchTasks', { projectId: props.projectId });
+    }
   });
-  const tasks = computed(
+  const tasks = computed(() => store.state.Task.tasks.get(props.projectId));
+  const temporaryTasks = computed(
     () =>
       store.state.Task.temporaryTasks
         .get(props.projectId)
         ?.filter(
-          (t: TemporaryTask) => t.id.toString().indexOf(filter.value) >= 0,
+          (t: TemporaryTask) => t.taskId.toString().indexOf(filter.value) >= 0,
         ) || [],
   );
+
   function activated(task: TemporaryTask): boolean {
     const route = useRoute();
-    return route.params.taskId === task.id;
+    return Number(route.params.taskId) === task.id;
   }
-  function getOriginal(taskId: string): Task {
-    const task = store.state.Task.tasks
-      .get(props.projectId)
-      ?.find((t: Task) => t.id === taskId);
-    if (task === undefined) throw new Error('Original task not found');
-    return task;
-  }
-  const selectedTask = computed(() => tasks.value.filter(activated).pop());
-  const showDeleteConfirm = ref(false);
 </script>
 
 <style scoped>
@@ -139,11 +142,11 @@
   .task__cron {
     font-size: 14px;
     position: absolute;
-    line-height: 30px;
+    line-height: 20px;
     width: 200px;
     height: 30px;
     top: -30px;
-    left: 20px;
+    left: 15px;
   }
 
   .task__remark {
