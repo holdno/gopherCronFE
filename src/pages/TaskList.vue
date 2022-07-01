@@ -81,7 +81,9 @@
   const inList = computed(
     () =>
       route.name &&
-      !['crontab_tasks', 'workflow_tasks'].includes(route.name.toString()),
+      !['crontab_tasks', 'workflow_tasks', 'temporary_tasks'].includes(
+        route.name.toString(),
+      ),
   );
 
   const tab = computed(() => {

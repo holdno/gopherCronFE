@@ -52,6 +52,7 @@ export async function fetchTemporaryTasks(
     tmpId: v.tmp_id,
     isRunning: v.is_running,
     timeout: v.timeout,
+    remark: v.remark,
   }));
 }
 

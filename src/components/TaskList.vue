@@ -54,7 +54,7 @@
             >
               <div :class="'task__status' + task.status">
                 {{
-                  task.isRunning
+                  task.isRunning == 1
                     ? '执行中'
                     : task.status == 1
                     ? '调度中'

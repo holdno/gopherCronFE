@@ -72,7 +72,9 @@
     />
     <q-input
       key="cron"
-      v-model="editable.scheduleTime"
+      :model-value="
+        formatTimestamp(editable.scheduleTime * 1000, 'YYYY-MM-DD HH:mm')
+      "
       label="调度时间"
       square
       disable
@@ -143,12 +145,14 @@
       .get(props.projectId)
       ?.find((t) => t.id === Number(props.id)),
   );
+
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
   );
   const editable = ref(Object.assign({}, task.value));
   watchEffect(() => {
     editable.value = Object.assign({}, task.value);
+
     getCurrentTaskLog();
   });
   onMounted(() => {

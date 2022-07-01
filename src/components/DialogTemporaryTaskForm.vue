@@ -25,6 +25,37 @@
           filled
           class="tw-mb-4"
         />
+
+        <div class="tw-flex tw-gap-2 tw-justify-end tw-mb-2">
+          <q-btn
+            dense
+            unelevated
+            class="tw-text-xs tw-h-6"
+            color="warning"
+            text-color="black"
+            label="一分钟后"
+            @click="afterTime(1)"
+          ></q-btn>
+          <q-btn
+            dense
+            unelevated
+            class="tw-text-xs tw-h-6"
+            color="warning"
+            text-color="black"
+            label="五分钟后"
+            @click="afterTime(5)"
+          ></q-btn>
+          <q-btn
+            dense
+            unelevated
+            class="tw-text-xs tw-h-6"
+            color="warning"
+            text-color="black"
+            label="一小时后"
+            @click="afterTime(60)"
+          ></q-btn>
+        </div>
+
         <q-input
           v-model="scheduleTime"
           filled
@@ -129,6 +160,7 @@
   import { CreateTemporaryTask, CreateTemporaryTaskRequest } from '@/api/task';
   import router from '@/router';
   import { useStore } from '@/store/index';
+  import { afterTimeStr } from '@/utils/datetime';
 
   const props = defineProps({
     modelValue: {
@@ -162,6 +194,9 @@
     timeout: props.task.timeout,
   });
   const scheduleTime = ref('');
+  function afterTime(t: number) {
+    scheduleTime.value = afterTimeStr(t * 60, 'YYYY-MM-DD HH:mm');
+  }
 
   onMounted(() => {
     watchEffect(() => {
