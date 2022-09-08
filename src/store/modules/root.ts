@@ -246,6 +246,7 @@ const actions: ActionTree<State, RootState> = {
     try {
       const oldOrNew = await saveTask(api, task);
       commit('Task/updateTask', { task });
+      commit('success', { message: '更新成功' });
       return oldOrNew;
     } catch (e) {
       commit('error', { error: e });

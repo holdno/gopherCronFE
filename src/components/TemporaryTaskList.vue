@@ -39,7 +39,13 @@
               "
             >
               <div :class="'task__status' + task.scheduleStatus">
-                {{ task.scheduleStatus == 1 ? '等待中' : '已完成' }}
+                {{
+                  task.isRunning == 1
+                    ? '执行中'
+                    : task.scheduleStatus == 1
+                    ? '等待中'
+                    : '已完成'
+                }}
               </div>
               <div
                 :class="

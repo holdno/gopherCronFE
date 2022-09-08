@@ -121,14 +121,14 @@
 
   onMounted(async () => {
     store.watch(
-      (state) => [state.Root.eventWorkFlowTask],
-      ([eventWorkFlowTask]) => {
-        if (!eventWorkFlowTask) return;
+      (state) => [state.Root.eventWorkFlow],
+      ([eventWorkFlow]) => {
+        if (!eventWorkFlow) return;
 
-        const flow = workflows.value.get(eventWorkFlowTask.workFlowId);
+        const flow = workflows.value.get(eventWorkFlow.workFlowId);
         if (flow !== undefined) {
           store.commit('success', {
-            message: `任务编排 ${flow.title} 当前状态: ${flow.status}`,
+            message: `任务编排 ${flow.title} 当前状态: ${eventWorkFlow.status}`,
           });
         }
 

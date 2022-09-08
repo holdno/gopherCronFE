@@ -251,9 +251,6 @@
     const newTask = await store.dispatch('saveTask', {
       task: editable.value,
     });
-    await store.dispatch('Task/fetchTasks', {
-      projectId: props.projectId,
-    });
     if (isCreateMode.value) {
       router.push({
         name: 'crontab_task',
