@@ -165,7 +165,7 @@
     await store.dispatch('deleteTask', { projectId, taskId });
     if (store.state.Root.currentError === undefined) {
       router.push({
-        name: 'temporary_tasks',
+        name: 'crontab_tasks',
         params: {
           projectId: projectId,
         },
