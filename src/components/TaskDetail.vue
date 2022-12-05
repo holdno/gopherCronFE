@@ -255,6 +255,7 @@
       router.push({
         name: 'crontab_task',
         params: {
+          projectId: route.params.projectId,
           taskId: newTask.id,
         },
       });
@@ -270,7 +271,12 @@
     await store.dispatch('deleteTask', { projectId, taskId });
     if (store.state.Root.currentError === undefined) {
       await store.dispatch('Task/fetchTasks', { ...props });
-      router.push({ name: 'crontab_tasks' });
+      router.push({
+        name: 'crontab_tasks',
+        params: {
+          projectId: route.params.projectId,
+        },
+      });
       showDeleteConfirm.value = false;
     }
   }
