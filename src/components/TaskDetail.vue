@@ -252,10 +252,12 @@
       task: editable.value,
     });
     if (isCreateMode.value) {
+      const projectId = props.projectId;
+      await store.dispatch('Task/fetchTasks', { projectId });
       router.push({
         name: 'crontab_task',
         params: {
-          projectId: route.params.projectId,
+          projectId: projectId,
           taskId: newTask.id,
         },
       });
@@ -270,7 +272,8 @@
     store.commit('cleanError');
     await store.dispatch('deleteTask', { projectId, taskId });
     if (store.state.Root.currentError === undefined) {
-      await store.dispatch('Task/fetchTasks', { ...props });
+      const projectId = props.projectId;
+      await store.dispatch('Task/fetchTasks', { projectId });
       router.push({
         name: 'crontab_tasks',
         params: {
