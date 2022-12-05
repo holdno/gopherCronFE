@@ -162,7 +162,7 @@ const routes = [
           {
             name: 'workflow',
             path: ':workflowId(\\d+)',
-            component: () => import('@/pages/WorkFlowTabs.vue'),
+            component: () => import('@/pages/WorkflowTabs.vue'),
             props: (route: RouteLocationNormalizedLoaded) => ({
               id: Number(route.params.workflowId),
             }),
@@ -181,7 +181,7 @@ const routes = [
               {
                 name: 'workflow_graph',
                 path: 'graph',
-                component: () => import('@/pages/WorkFlowTabs.vue'),
+                component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
                 }),
@@ -189,7 +189,7 @@ const routes = [
               {
                 name: 'workflow_logs',
                 path: 'logs',
-                component: () => import('@/pages/WorkFlowTabs.vue'),
+                component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
                 }),
@@ -197,7 +197,7 @@ const routes = [
               {
                 name: 'workflow_detail',
                 path: 'detail',
-                component: () => import('@/pages/WorkFlowTabs.vue'),
+                component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
                 }),
@@ -207,7 +207,7 @@ const routes = [
           {
             name: 'create_workflow',
             path: 'create',
-            component: () => import('@/pages/WorkFlowTabs.vue'),
+            component: () => import('@/pages/WorkflowTabs.vue'),
           },
         ],
       },
