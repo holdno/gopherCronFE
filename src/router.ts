@@ -89,7 +89,7 @@ const TaskRoutes = (type: 'crontab' | 'workflow' | 'temporary') => [
 const routes = [
   {
     path: '/',
-    redirect: 'summary',
+    redirect: { name: 'summary' },
     component: () => import('@/layouts/LandingLayout.vue'),
     meta: { requiresAuth: true },
     children: [
@@ -238,7 +238,7 @@ const routes = [
   {
     name: 'logout',
     path: '/logout',
-    redirect: '/login',
+    redirect: { name: 'login' },
   },
   {
     name: 'forbidden',
@@ -261,7 +261,7 @@ const routes = [
 
 const Router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes: routes,
 });
 
 Router.beforeEach(async (to, from) => {

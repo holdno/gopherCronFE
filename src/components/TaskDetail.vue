@@ -296,7 +296,7 @@
     executing.value = true;
     try {
       await startTask(store.getters.apiv1, projectId, taskId);
-    } finally {
+    } catch (e: any) {
       executing.value = false;
     }
   }
@@ -306,10 +306,14 @@
       (state) => [state.Root.eventTask],
       ([eventTask]) => {
         if (!eventTask || eventTask.projectId !== props.projectId) return;
-
-        store.dispatch('Task/fetchTasks', {
-          projectId: props.projectId,
-        });
+        if (eventTask.status === 'starting') {
+          executing.value = true;
+        } else {
+          store.dispatch('Task/fetchTasks', {
+            projectId: props.projectId,
+          });
+          executing.value = false;
+        }
       },
     );
   });

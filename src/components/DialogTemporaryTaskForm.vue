@@ -220,7 +220,6 @@
   const loading = ref(false);
   async function onSubmit() {
     const p = editable.value;
-    loading.value = true;
     if (!p.remark) {
       store.commit('error', { error: { message: '任务说明必填' } });
       return;
@@ -229,6 +228,7 @@
       store.commit('error', { error: { message: '执行命令必填' } });
       return;
     }
+    loading.value = true;
     try {
       const res = await CreateTemporaryTask({
         projectId: p.projectId,

@@ -40,9 +40,7 @@ export class FireTower {
         this.logInfo('new message:' + JSON.stringify(event.data));
       }
 
-      const data = JSON.parse(event.data);
-
-      if (data.data === 'heartbeat') {
+      if (event.data === 'heartbeat') {
         return;
       }
 
@@ -122,51 +120,64 @@ export class FireTower {
 
 export function FireTowerPlugin(store: Store<any>) {
   try {
-    const tower = new FireTower(
-      import.meta.env.VITE_API_V1_WS_URL,
-      () => {
-        console.log('connected');
-        tower.subscribe([
-          '/task/status',
-          '/workflow/status',
-          '/workflow/task/status',
-        ]);
-        tower.onmessage = (event) => {
-          const data = JSON.parse(event.data);
-          if (data.topic === '/task/status') {
-            const v = data.data;
-            store.commit('emitEventTask', {
-              event: {
-                status: v.status,
-                taskId: v.task_id,
-                projectId: v.project_id,
-              },
-            });
-          } else if (data.topic === '/workflow/status') {
-            const v = data.data;
-            store.commit('emitEventWorkFlow', {
-              event: {
-                status: v.status,
-                workFlowId: v.workflow_id,
-              },
-            });
-          } else if (data.topic === '/workflow/task/status') {
-            const v = data.data;
-            store.commit('emitEventWorkFlowTask', {
-              event: {
-                status: v.status,
-                taskId: v.task_id,
-                projectId: v.project_id,
-                workFlowId: v.workflow_id,
-              },
-            });
-          } else {
-            console.log('unknown event', event);
-          }
-        };
-      },
-      () => {},
-    );
+    const buildTower = () => {
+      const endpoint = import.meta.env.VITE_API_V1_WS_URL;
+      if (!endpoint) {
+        console.warn('firetower not allowed');
+        return;
+      }
+      const tower = new FireTower(
+        import.meta.env.VITE_API_V1_WS_URL,
+        () => {
+          console.log('connected');
+          tower.subscribe([
+            '/task/status',
+            '/workflow/status',
+            '/workflow/task/status',
+          ]);
+          tower.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            const data = msg.data;
+            if (data.topic === '/task/status') {
+              const v = data.data;
+              store.commit('emitEventTask', {
+                event: {
+                  status: v.status,
+                  taskId: v.task_id,
+                  projectId: v.project_id,
+                },
+              });
+            } else if (data.topic === '/workflow/status') {
+              const v = data.data;
+              store.commit('emitEventWorkFlow', {
+                event: {
+                  status: v.status,
+                  workFlowId: v.workflow_id,
+                },
+              });
+            } else if (data.topic === '/workflow/task/status') {
+              const v = data.data;
+              store.commit('emitEventWorkFlowTask', {
+                event: {
+                  status: v.status,
+                  taskId: v.task_id,
+                  projectId: v.project_id,
+                  workFlowId: v.workflow_id,
+                },
+              });
+            } else {
+              console.log('unknown event', event);
+            }
+          };
+        },
+        () => {
+          setTimeout(() => {
+            buildTower();
+          }, 1000);
+        },
+      );
+    };
+    buildTower();
   } catch (e) {
     console.log(e);
   }
