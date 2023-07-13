@@ -16,7 +16,7 @@
     "js-cookie": "^3.0.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.34",
-    "quasar": "^2.7.1",
+    "quasar": "^2.12.2",
     "v-network-graph": "^0.3.11",
     "vue": "^3.2.25",
     "vue-router": "^4.0.12",

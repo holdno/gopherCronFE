@@ -6,3 +6,7 @@
 .q-notifications__list--top {
     height: 50vh;
 }
+
+.q-scrollarea__content {
+    width: 100%;
+}

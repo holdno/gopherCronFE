@@ -497,12 +497,14 @@ export const defaultState = {
     const localSetting = localStorage.getItem('gc_notification_setting');
     if (localSetting) {
       try {
-        return JSON.parse(localSetting).status || true;
+        const ls = JSON.parse(localSetting);
+        if (ls.status !== undefined) {
+          return ls.status;
+        }
       } catch (e: any) {
         console.error(e);
       }
     }
-
     return true;
   })(),
   logined: false,

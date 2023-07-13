@@ -210,9 +210,6 @@
   }
 
   .task__status0 {
-    position: absolute;
-    top: 10px;
-    right: 15px;
     border: 1px solid #f00;
     color: #f00;
     padding: 0 6px;
@@ -223,9 +220,6 @@
   }
 
   .task__status1 {
-    position: absolute;
-    top: 10px;
-    right: 15px;
     border: 1px solid #67c23a;
     color: #67c23a;
     padding: 0 6px;

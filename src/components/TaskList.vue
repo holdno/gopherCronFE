@@ -38,7 +38,9 @@
         :thumb-style="thumbStyle"
         :bar-style="barStyle"
       >
-        <q-list class="tw-w-full tw-flex tw-flex-col tw-gap-2 tw-pb-4">
+        <q-list
+          class="tw-w-full tw-flex tw-flex-col tw-gap-2 tw-pb-4 tw-overflow-hidden tw-relative"
+        >
           <router-link
             v-for="task in tasks"
             :key="task.id"
@@ -49,28 +51,39 @@
                 (!activated(task)
                   ? 'tw-bg-[#27272a] '
                   : 'tw-bg-primary tw-text-black ') +
-                'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
+                'tw-w-full tw-min-h-[130px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
               "
             >
-              <div :class="'task__status' + task.status">
-                {{
-                  task.isRunning == 1
-                    ? '执行中'
-                    : task.status == 1
-                    ? '调度中'
-                    : '已暂停'
-                }}
+              <div
+                class="tw-w-full tw-flex tw-gap-4 tw-overflow-hidden tw-px-[10px] tw-pt-[10px]"
+              >
+                <div class="tw-text-ellipsis tw-w-auto tw-truncate tw-gap-1">
+                  <q-icon name="schedule" class="tw-inline" />
+                  {{ task.cronExpr }}
+                </div>
+
+                <q-space></q-space>
+                <q-badge
+                  outline
+                  :color="task.status === 1 ? 'green' : 'red'"
+                  class="tw-w-[50px]"
+                >
+                  {{
+                    task.isRunning == 1
+                      ? '执行中'
+                      : task.status == 1
+                      ? '调度中'
+                      : '已终止'
+                  }}
+                </q-badge>
+                <!-- <div :class="'tw-w-[50px] task__status' + task.status"></div> -->
               </div>
               <div
                 :class="
                   (activated(task) ? 'active ' : '') +
-                  'task__title tw-inline-flex tw-items-center'
+                  'task__title tw-flex-col tw-items-center tw-w-full'
                 "
               >
-                <div class="task__cron">
-                  <q-icon name="schedule" />
-                  {{ task.cronExpr }}
-                </div>
                 <q-icon name="numbers" />
                 {{ task.name }}
               </div>
@@ -179,7 +192,6 @@
 <style scoped>
   .task__title {
     margin-top: 10px;
-    padding: 5px 10px;
     background-color: rgba(60, 59, 59, 0.6);
     font-size: 16px;
     line-height: 20px;
@@ -192,12 +204,13 @@
 
   .task__cron {
     font-size: 14px;
-    position: absolute;
+
     line-height: 20px;
     width: 200px;
     height: 20px;
+    /* position: absolute;
     top: -30px;
-    left: 20px;
+    left: 20px; */
   }
 
   .task__remark {
@@ -219,9 +232,9 @@
   }
 
   .task__status0 {
-    position: absolute;
+    /* position: absolute;
     top: 10px;
-    right: 15px;
+    right: 15px; */
     border: 1px solid #f00;
     color: #f00;
     padding: 0 6px;
@@ -232,9 +245,6 @@
   }
 
   .task__status1 {
-    position: absolute;
-    top: 10px;
-    right: 15px;
     border: 1px solid #67c23a;
     color: #67c23a;
     padding: 0 6px;
