@@ -127,7 +127,7 @@
 
         const flow = workflows.value.get(eventWorkFlow.workFlowId);
         if (flow !== undefined) {
-          store.commit('success', {
+          store.commit('notifySuccess', {
             message: `任务编排 ${flow.title} 当前状态: ${eventWorkFlow.status}`,
           });
         }

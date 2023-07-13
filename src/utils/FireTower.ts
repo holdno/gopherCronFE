@@ -129,7 +129,7 @@ export function FireTowerPlugin(store: Store<any>) {
       const tower = new FireTower(
         import.meta.env.VITE_API_V1_WS_URL,
         () => {
-          console.log('connected');
+          console.log('firetower connected');
           tower.subscribe([
             '/task/status',
             '/workflow/status',

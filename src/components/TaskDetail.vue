@@ -218,7 +218,9 @@
     Object.assign({}, task.value || DefaultTaskValues.value),
   );
   watchEffect(() => {
-    editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
+    if (props.id !== editable.value.id) {
+      editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
+    }
   });
   const modified = computed(() => {
     return JSON.stringify(task.value) !== JSON.stringify(editable.value);

@@ -4,12 +4,29 @@
     class="rounded-borders tw-flex tw-flex-no-wrap tw-h-full tw-w-full"
   >
     <q-header elevated class="bg-black">
-      <q-toolbar>
+      <q-toolbar class="tw-gap-4">
         <q-btn flat round dense icon="menu" @click="drawer = !drawer" />
         <q-toolbar-title>
           GopherCron
           <span v-if="version" class="tw-text-sm">({{ version }})</span>
         </q-toolbar-title>
+        <q-btn
+          flat
+          round
+          dense
+          :icon="
+            notificationSetting.status ? 'notifications' : 'notifications_off'
+          "
+          @click="switchNotificationSetting"
+        >
+          <q-tooltip>
+            {{
+              notificationSetting.status
+                ? '点击关闭任务状态通知'
+                : '点击开启任务状态通知'
+            }}
+          </q-tooltip>
+        </q-btn>
         <q-btn
           flat
           round
@@ -115,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watchEffect } from 'vue';
+  import { computed, ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
 
   import UserBaseInfo from './UserBaseInfo.vue';
@@ -142,4 +159,10 @@
     version.value = v;
   };
   getVersion();
+
+  const notificationSetting = computed(() => store.getters.notificationSetting);
+  console.log(notificationSetting.value);
+  function switchNotificationSetting() {
+    store.dispatch('changeNotificationStatus');
+  }
 </script>

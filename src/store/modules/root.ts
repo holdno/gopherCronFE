@@ -59,6 +59,7 @@ export interface EventWorkFlowTask {
 }
 
 export interface State {
+  notificationSwitch: boolean;
   logined: boolean;
   users?: User[];
   userTotal?: number;
@@ -104,6 +105,9 @@ const mutations: MutationTree<State> = {
   setQuasar(state, { $q }) {
     state.$q = $q;
   },
+  setNotificationSwitch(state, { status }) {
+    state.notificationSwitch = status;
+  },
   authed(state, { user, token }) {
     state.user = user;
     state.token = token;
@@ -135,7 +139,7 @@ const mutations: MutationTree<State> = {
         message: message,
         color: 'red',
         icon: 'announcement',
-        position: 'top-right',
+        position: 'bottom-right',
         classes: 'first:tw-mt-14',
       });
     } else throw error;
@@ -146,7 +150,24 @@ const mutations: MutationTree<State> = {
       state.$q.notify({
         message: message,
         type: type || 'info',
-        position: 'top-right',
+        position: 'bottom-right',
+        classes: 'first:tw-mt-14',
+      });
+    }
+  },
+  notifySuccess(
+    state,
+    { message, type = '' }: { message: string; type: string },
+  ) {
+    if (!state.notificationSwitch) {
+      return;
+    }
+    if (message && state.$q) {
+      // type: 'positive', 'negative', 'warning', 'info', 'ongoing'
+      state.$q.notify({
+        message: message,
+        type: type || 'info',
+        position: 'bottom-right',
         classes: 'first:tw-mt-14',
       });
     }
@@ -214,6 +235,16 @@ const mutations: MutationTree<State> = {
 };
 
 const actions: ActionTree<State, RootState> = {
+  changeNotificationStatus({ commit, state }) {
+    console.log('set setting', state.notificationSwitch);
+    commit('setNotificationSwitch', {
+      status: !state.notificationSwitch,
+    });
+    localStorage.setItem(
+      'gc_notification_setting',
+      JSON.stringify({ status: state.notificationSwitch }),
+    );
+  },
   async checkLogin({ commit, state }) {
     if (state.logined) return;
 
@@ -431,6 +462,9 @@ const actions: ActionTree<State, RootState> = {
 };
 
 const getters: GetterTree<State, RootState> = {
+  notificationSetting(state): { status: boolean } {
+    return { status: state.notificationSwitch };
+  },
   apiv1(state): AxiosInstance {
     const api = state.apiv1;
     if (api === undefined) {
@@ -458,6 +492,18 @@ const getters: GetterTree<State, RootState> = {
 };
 
 export const defaultState = {
+  notificationSwitch: (() => {
+    const localSetting = localStorage.getItem('gc_notification_setting');
+    if (localSetting) {
+      try {
+        return JSON.parse(localSetting).status || true;
+      } catch (e: any) {
+        console.error(e);
+      }
+    }
+
+    return true;
+  })(),
   logined: false,
 
   workFlowTasks: [],
