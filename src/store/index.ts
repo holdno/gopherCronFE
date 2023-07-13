@@ -18,7 +18,6 @@ import StoreWorkFlowTask, {
   NameSpace as NameSpaceWorkFlowTask,
   State as StateWorkFlowTask,
 } from '@/store/modules/workflowTask';
-import { FireTowerPlugin } from '@/utils/FireTower';
 
 export interface State {
   Root: StateRoot;
@@ -29,7 +28,7 @@ export interface State {
 }
 
 export const store = createStore<State>({
-  plugins: [FireTowerPlugin],
+  // plugins: [FireTowerPlugin], // 登录后再建立websocket连接
   modules: {
     Root: StoreRoot,
     WorkFlow: StoreWorkFlow,

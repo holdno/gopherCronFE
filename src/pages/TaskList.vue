@@ -1,7 +1,7 @@
 <template>
   <div
     :class="
-      'xl:tw-basis-1/5 tw-basis-1/4 tw-w-full tw-h-full tw-bg-[#1E1E1E]' +
+      'xl:tw-basis-1/5 tw-basis-1/4 tw-w-full tw-h-full tw-bg-[#1E1E1E] tw-min-w-[280px]' +
       (inList ? ' tw-hidden lg:tw-block' : '')
     "
   >

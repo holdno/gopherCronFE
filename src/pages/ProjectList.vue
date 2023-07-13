@@ -2,7 +2,8 @@
   <div class="lg:tw-flex lg:tw-flex-row tw-w-full tw-h-full">
     <div
       :class="
-        'xl:tw-basis-1/5 tw-basis-1/4 tw-h-full tw-w-full ' + visibilyClass
+        'xl:tw-basis-1/5 tw-basis-1/4 tw-h-full tw-w-full tw-min-w-[280px] ' +
+        visibilyClass
       "
     >
       <ProjectList />

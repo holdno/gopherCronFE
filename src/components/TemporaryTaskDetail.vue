@@ -5,6 +5,12 @@
     type="warning"
     @confirm="kill"
   ></Confirm>
+  <Confirm
+    v-model="showRemoveConfirm"
+    content="确定要删除该临时任务吗？"
+    type="warning"
+    @confirm="remove"
+  ></Confirm>
   <q-card v-if="log" class="tw-mb-4" flat bordered>
     <q-item>
       <q-item-section>
@@ -29,8 +35,17 @@
   </q-card>
   <div class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-1">
     <q-btn
+      v-if="task?.isRunning !== 1 && !log?.result"
+      text-color="red"
+      outline
+      class="tw-w-24 tw-ml-1"
+      :loading="waitingRemove"
+      @click="showRemoveConfirm = true"
+      >删除任务</q-btn
+    >
+    <q-btn
       v-if="task?.isRunning === 1"
-      flat
+      outline
       text-color="red"
       :disable="task?.isRunning !== 1"
       class="tw-w-24 tw-ml-1"
@@ -120,9 +135,10 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
+  import { useRouter } from 'vue-router';
 
   import { GetTemporaryTaskLogDetail, TaskLog } from '@/api/log';
-  import { killTask } from '@/api/task';
+  import { killTask, removeTemporaryTask } from '@/api/task';
   import Confirm from '@/components/Confirm.vue';
   import JSONViewer from '@/components/JSONViewer.vue';
   import { useStore } from '@/store/index';
@@ -130,8 +146,9 @@
 
   const props = defineProps({
     id: {
-      type: String,
-      default: '',
+      type: Number,
+      default: 0,
+      required: true,
     },
     projectId: {
       type: Number,
@@ -152,7 +169,6 @@
   const editable = ref(Object.assign({}, task.value));
   watchEffect(() => {
     editable.value = Object.assign({}, task.value);
-
     getCurrentTaskLog();
   });
   onMounted(() => {
@@ -172,14 +188,38 @@
   const waitingKill = ref(false);
   const showKillConfirm = ref(false);
   const kill = async () => {
+    if (!task.value) {
+      return;
+    }
     showKillConfirm.value = false;
     waitingKill.value = true;
     try {
-      await killTask({ projectId: props.projectId, taskId: props.id });
+      await killTask({
+        projectId: props.projectId,
+        taskId: task.value.taskId,
+      });
     } catch (e) {
       console.log(e);
     }
     waitingKill.value = false;
+  };
+
+  const waitingRemove = ref(false);
+  const showRemoveConfirm = ref(false);
+  const router = useRouter();
+  const remove = async () => {
+    showRemoveConfirm.value = false;
+    waitingRemove.value = true;
+    try {
+      await removeTemporaryTask(Number(props.id));
+      await store.dispatch('Task/fetchTemporaryTasks', {
+        projectId: props.projectId,
+      });
+      router.back();
+    } catch (e) {
+      console.log(e);
+    }
+    waitingRemove.value = false;
   };
 
   const log = ref<TaskLog | null>();

@@ -77,7 +77,7 @@
               />
               <TemporaryTaskDetail
                 v-if="props.type === 'temporary'"
-                :id="props.id"
+                :id="Number(props.id)"
                 :project-id="props.projectId"
               />
             </q-tab-panel>

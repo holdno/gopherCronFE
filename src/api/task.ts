@@ -69,6 +69,13 @@ export async function killTask(args: KillTaskRequest) {
   return resp.data;
 }
 
+export async function removeTemporaryTask(id: number) {
+  const resp = await apiv1.post('/temporary_task/delete', {
+    id,
+  });
+  return resp.data;
+}
+
 export interface CreateTemporaryTaskRequest {
   projectId: number;
   taskId: string;

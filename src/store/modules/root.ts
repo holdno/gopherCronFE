@@ -39,6 +39,7 @@ import {
   userList,
 } from '@/api/user';
 import { State as RootState } from '@/store/index';
+import { FireTowerPlugin } from '@/utils/FireTower';
 
 export interface EventTask {
   status: string;
@@ -139,7 +140,7 @@ const mutations: MutationTree<State> = {
         message: message,
         color: 'red',
         icon: 'announcement',
-        position: 'bottom-right',
+        position: 'top-right',
         classes: 'first:tw-mt-14',
       });
     } else throw error;
@@ -150,7 +151,7 @@ const mutations: MutationTree<State> = {
       state.$q.notify({
         message: message,
         type: type || 'info',
-        position: 'bottom-right',
+        position: 'top-right',
         classes: 'first:tw-mt-14',
       });
     }
@@ -168,7 +169,6 @@ const mutations: MutationTree<State> = {
         message: message,
         type: type || 'info',
         position: 'bottom-right',
-        classes: 'first:tw-mt-14',
       });
     }
   },
@@ -258,6 +258,7 @@ const actions: ActionTree<State, RootState> = {
       api.defaults.headers.common[COOKIE_TOKEN] = token;
       const user = await userInfo(api);
       commit('authed', { user, token });
+      FireTowerPlugin(this);
     } catch (e) {
       commit('unauthed');
       commit('error', { error: e });

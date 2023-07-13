@@ -155,7 +155,8 @@
           label="保存"
           :disable="!modified"
           class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
-        />
+        >
+        </q-btn>
         <q-btn
           color="primary"
           type="reset"
@@ -200,7 +201,7 @@
     timeout: 300,
     createTime: 0,
     status: 0,
-    isRunning: 0,
+    isRunning: -1,
     noseize: 0,
     exclusion: 0,
     clientIp: '',
@@ -217,12 +218,17 @@
   const editable = ref(
     Object.assign({}, task.value || DefaultTaskValues.value),
   );
+  editable.value.isRunning = -1;
   watchEffect(() => {
     if (props.id !== editable.value.id) {
       editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
+      editable.value.isRunning = -1;
     }
   });
   const modified = computed(() => {
+    if (task.value?.isRunning === 1) {
+      return false;
+    }
     return JSON.stringify(task.value) !== JSON.stringify(editable.value);
   });
   const canSave = computed(() => {
@@ -328,7 +334,7 @@
     try {
       await killTask({ projectId: props.projectId, taskId: props.id });
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     waitingKill.value = false;
   };
