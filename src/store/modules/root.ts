@@ -24,6 +24,7 @@ import {
   fetchWorkflowEdges,
   fetchWorkflows,
   login,
+  loginWithOIDC,
   recentLog,
   saveTask,
   saveWorkFlowTask,
@@ -268,6 +269,15 @@ const actions: ActionTree<State, RootState> = {
     const api = this.getters.apiv1;
     try {
       const [user, token] = await login(api, username, password);
+      commit('authed', { user, token });
+    } catch (e) {
+      commit('error', { error: e });
+    }
+  },
+  async loginWithOIDC({ commit }, { code, state }) {
+    const api = this.getters.apiv1;
+    try {
+      const [user, token] = await loginWithOIDC(api, code, state);
       commit('authed', { user, token });
     } catch (e) {
       commit('error', { error: e });

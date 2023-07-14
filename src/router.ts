@@ -233,7 +233,7 @@ const routes = [
   {
     name: 'login',
     path: '/login',
-    component: () => import('@/pages/Login.vue'),
+    component: () => import('@/pages/LoginPage.vue'),
   },
   {
     name: 'logout',

@@ -4,7 +4,7 @@
       <q-btn flat :loading="loading" icon="refresh" @click="refresh" />
       <q-btn flat icon="add" :to="{ name: 'create_workflow' }" />
     </div>
-    <div class="tw-w-full tw-grow tw-overflow-hidden">
+    <div class="tw-w-full tw-grow tw-overflow-hidden tw-min-w-[280px]">
       <q-scroll-area
         ref="scrollArea"
         visible
@@ -31,28 +31,40 @@
                   (!activated(workflow)
                     ? 'tw-bg-[#27272a] '
                     : 'tw-bg-primary tw-text-black ') +
-                  'tw-w-full tw-min-h-[130px] tw-pt-[30px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
+                  'tw-w-full tw-min-h-[130px] tw-rounded-md tw-box-border tw-relative tw-overflow-hidden tw-block hover:tw-bg-primary hover:tw-text-black'
                 "
               >
-                <div :class="'task__status' + workflow.status">
-                  {{
-                    isRunning(workflow)
-                      ? '执行中'
-                      : workflow.status == 1
-                      ? '调度中'
-                      : '已暂停'
-                  }}
+                <div
+                  class="tw-w-full tw-flex tw-gap-4 tw-overflow-hidden tw-px-[10px] tw-pt-[10px]"
+                >
+                  <div class="tw-text-ellipsis tw-w-auto tw-truncate tw-gap-1">
+                    <q-icon name="schedule" class="tw-inline" />
+                    {{ workflow.cronExpr }}
+                  </div>
+
+                  <q-space></q-space>
+                  <q-badge
+                    outline
+                    :color="workflow.status === 1 ? 'green' : 'red'"
+                    class="tw-w-[50px]"
+                  >
+                    {{
+                      isRunning(workflow)
+                        ? '执行中'
+                        : workflow.status == 1
+                        ? '调度中'
+                        : '已终止'
+                    }}
+                  </q-badge>
+                  <!-- <div :class="'tw-w-[50px] task__status' + task.status"></div> -->
                 </div>
+
                 <div
                   :class="
                     (activated(workflow) ? 'active ' : '') +
                     'task__title tw-inline-flex tw-items-center'
                   "
                 >
-                  <div class="task__cron">
-                    <q-icon name="schedule" />
-                    {{ workflow.cronExpr }}
-                  </div>
                   <q-icon name="numbers" />
                   {{ workflow.title }}
                 </div>

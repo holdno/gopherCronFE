@@ -71,7 +71,7 @@ export async function getSummaryErrorLogs(
   });
 
   const result = [] as Array<TaskLog>;
-  if (resp.data.meta.code === 0) {
+  if (resp.data.meta.code === 0 && resp.data.response.list) {
     resp.data.response.list.forEach((v: any, i: number) => {
       result.push({
         id: v.id,

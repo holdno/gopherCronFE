@@ -99,6 +99,36 @@ export async function login(
   ];
 }
 
+export async function getOIDCAuthURL(): Promise<string> {
+  const resp = await apiv1.get('/oidc/auth_url');
+  const data = resp.data;
+  const r = data.response;
+  return r;
+}
+
+export async function loginWithOIDC(
+  api: AxiosInstance,
+  code: string,
+  state: string,
+): Promise<[User, string]> {
+  const resp = await api.post('/oidc/login', {
+    code: code,
+    state: state,
+  });
+  const data = resp.data;
+  const r = data.response;
+  return [
+    {
+      id: r.id,
+      name: r.name,
+      account: r.account,
+      permissions: r.permission.split(','),
+      createTime: r.create_time,
+    },
+    r.token,
+  ];
+}
+
 export async function userInfo(api: AxiosInstance): Promise<User> {
   const resp = await api.get('/user/info');
   const data = resp.data;

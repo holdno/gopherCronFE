@@ -9,6 +9,16 @@
       <div
         class="tw-bg-[#1D1D1D] tw-shadow tw-rounded tw-max-w-md lg:tw-w-1/3 sm:tw-w-2/3 tw-w-full tw-p-10 md:tw-mt-6 tw-mt-2"
       >
+        <q-btn
+          outline
+          text-color="white"
+          :loading="oidcLoading"
+          :disable="oidcLoading || loading"
+          class="focus:tw-ring-2 tw-mb-6 focus:tw-ring-offset-2 tw-font-semibold tw-leading-none tw-text-black tw-outline-non tw-border tw-rounded tw-py-2 tw-w-full"
+          @click="getAuthURL"
+        >
+          使用 OIDC 登录
+        </q-btn>
         <p
           tabindex="0"
           class="focus:tw-outline-none tw-text-2xl tw-font-extrabold tw-leading-6"
@@ -50,6 +60,7 @@
               label="登录"
               text-color="black"
               :loading="loading"
+              :disable="oidcLoading || loading"
               class="focus:tw-ring-2 focus:tw-ring-offset-2 tw-font-semibold tw-leading-none tw-text-black tw-outline-non tw-border tw-rounded tw-py-2 tw-w-full"
             />
             <q-btn
@@ -70,6 +81,7 @@
   import { onBeforeMount, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
+  import { getOIDCAuthURL } from '@/api/request';
   import LogoTpl from '@/components/LogoTpl.vue';
   import { useStore } from '@/store/index';
 
@@ -79,6 +91,37 @@
   const router = useRouter();
   const route = useRoute();
   const loading = ref(false);
+
+  const oidcLoading = ref(false);
+  if (route.query && route.query.code && route.query.state) {
+    oidcLogin(route.query.code as string, route.query.state as string);
+  }
+
+  async function oidcLogin(code: string, state: string) {
+    oidcLoading.value = true;
+
+    await store.dispatch('loginWithOIDC', {
+      code,
+      state,
+    });
+    if (store.state.Root.logined) {
+      const redirect = route.query.redirect;
+      let to = '/';
+      if (typeof redirect === 'string') {
+        to = redirect;
+      } else if (redirect && redirect.length > 0) {
+        to = redirect[0] || to;
+      }
+      await router.push(to);
+    }
+    oidcLoading.value = false;
+  }
+
+  async function getAuthURL() {
+    const url = await getOIDCAuthURL();
+    console.log(url);
+    window.location.href = url;
+  }
 
   async function onSubmit() {
     loading.value = true;
