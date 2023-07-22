@@ -268,7 +268,7 @@ const actions: ActionTree<State, RootState> = {
   async login({ commit }, { username, password }) {
     const api = this.getters.apiv1;
     try {
-      const [user, token] = await login(api, username, password);
+      const [user, token] = await login(api, username,  password);
       commit('authed', { user, token });
     } catch (e) {
       commit('error', { error: e });

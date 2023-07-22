@@ -118,9 +118,14 @@
   }
 
   async function getAuthURL() {
-    const url = await getOIDCAuthURL();
-    console.log(url);
-    window.location.href = url;
+    oidcLoading.value = true;
+    try {
+      const url = await getOIDCAuthURL();
+      window.location.href = url;
+    } catch (e: any) {
+      console.error(e);
+      oidcLoading.value = false;
+    }
   }
 
   async function onSubmit() {

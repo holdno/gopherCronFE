@@ -174,7 +174,7 @@
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { startTask } from '@/api/request';
+  import { Task, startTask } from '@/api/request';
   import { killTask } from '@/api/task';
   import Confirm from '@/components/Confirm.vue';
   import DialogTemporaryTaskForm from '@/components/DialogTemporaryTaskForm.vue';
@@ -208,6 +208,28 @@
     tmpId: '',
   }));
 
+  function compareTaskEquals(
+    a: Task | undefined,
+    b: Task | undefined,
+  ): boolean {
+    if (!a) {
+      return false;
+    }
+    if (!b) {
+      return false;
+    }
+
+    return (
+      a.name === b.name &&
+      a.cronExpr === b.cronExpr &&
+      a.remark === b.remark &&
+      a.timeout === b.timeout &&
+      a.status === b.status &&
+      a.noseize === b.noseize &&
+      a.command === b.command
+    );
+  }
+
   const store = useStore();
   const task = computed(() =>
     store.state.Task.tasks.get(props.projectId)?.find((t) => t.id === props.id),
@@ -229,7 +251,7 @@
     if (task.value?.isRunning === 1) {
       return false;
     }
-    return JSON.stringify(task.value) !== JSON.stringify(editable.value);
+    return !compareTaskEquals(task.value, editable.value);
   });
   const canSave = computed(() => {
     const { name, command, timeout, cronExpr } = editable.value;
