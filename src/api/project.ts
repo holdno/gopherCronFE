@@ -25,3 +25,14 @@ export async function fetchProjectClients(
   const r = data.response;
   return r.list;
 }
+
+export async function getProjectToken(projectId: number): Promise<string> {
+  const resp = await apiv1.get('/project/token', {
+    params: {
+      project_id: projectId,
+    },
+  });
+  const data = resp.data;
+  const r = data.response;
+  return r;
+}
