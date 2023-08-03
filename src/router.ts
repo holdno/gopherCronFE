@@ -1,6 +1,7 @@
 import {
   RouteLocationNormalizedLoaded,
   createRouter,
+  createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
 
@@ -260,7 +261,8 @@ const routes = [
 ];
 
 const Router = createRouter({
-  history: createWebHistory(),
+  // history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: routes,
 });
 

@@ -131,6 +131,9 @@
 
   onMounted(() => {
     watchEffect(async () => {
+      store.dispatch('subscribeTopic', [
+        '/task/status/project/' + props.projectId,
+      ]);
       await fetchTasks();
     });
     store.watch(
@@ -154,16 +157,17 @@
   }
 
   const filter = ref('');
-  const tasks = computed(
-    () =>
+  const tasks = computed(() => {
+    return (
       store.state.Task.tasks
         .get(props.projectId)
         ?.filter(
           (t: Task) =>
             t.name.indexOf(filter.value) >= 0 ||
             t.id.toString().indexOf(filter.value) >= 0,
-        ) || [],
-  );
+        ) || []
+    );
+  });
 
   function activated(task: Task): boolean {
     const route = useRoute();

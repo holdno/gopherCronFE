@@ -323,6 +323,10 @@
     watch(
       () => props.id,
       async (current) => {
+        store.dispatch('subscribeTopic', [
+          '/workflow/status/' + props.id,
+          '/workflow/task/status/' + props.id,
+        ]);
         await refreshInfo();
         await refresh();
       },

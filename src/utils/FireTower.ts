@@ -1,5 +1,7 @@
 import { Store } from 'vuex';
 
+import { User } from '@/api/request';
+
 function errorMessage(message: string) {
   return {
     type: 'error',
@@ -118,51 +120,57 @@ export class FireTower {
   }
 }
 
-export function FireTowerPlugin(store: Store<any>) {
+export function FireTowerPlugin(user: User, store: Store<any>) {
   try {
     const buildTower = () => {
-      const endpoint = import.meta.env.VITE_API_V1_WS_URL;
+      let endpoint = import.meta.env.VITE_API_V1_WS_URL;
       if (!endpoint) {
         console.warn('firetower not allowed');
         return;
       }
+      if (endpoint.indexOf('?') !== -1) {
+        endpoint += '&user=' + user.id;
+      } else {
+        endpoint += '?user=' + user.id;
+      }
       const tower = new FireTower(
-        import.meta.env.VITE_API_V1_WS_URL,
+        endpoint,
         () => {
+          store.commit('setTower', tower);
           console.log('firetower connected');
-          tower.subscribe([
-            '/task/status',
-            '/workflow/status',
-            '/workflow/task/status',
-          ]);
+          // tower.subscribe([
+          //   '/task/status',
+          //   '/workflow/status',
+          //   '/workflow/task/status',
+          // ]);
           tower.onmessage = (event) => {
             const msg = JSON.parse(event.data);
-            const data = msg.data;
-            if (data.topic === '/task/status') {
-              const v = data.data;
+            const cloudeventData = msg.data.data;
+            if (msg.type !== 'publish') {
+              return;
+            }
+            if (msg.topic.startsWith('/task/status')) {
               store.commit('emitEventTask', {
                 event: {
-                  status: v.status,
-                  taskId: v.task_id,
-                  projectId: v.project_id,
+                  status: cloudeventData.status,
+                  taskId: cloudeventData.task_id,
+                  projectId: cloudeventData.project_id,
                 },
               });
-            } else if (data.topic === '/workflow/status') {
-              const v = data.data;
+            } else if (msg.topic.startsWith('/workflow/status')) {
               store.commit('emitEventWorkFlow', {
                 event: {
-                  status: v.status,
-                  workFlowId: v.workflow_id,
+                  status: cloudeventData.status,
+                  workFlowId: cloudeventData.workflow_id,
                 },
               });
-            } else if (data.topic === '/workflow/task/status') {
-              const v = data.data;
+            } else if (msg.topic.startsWith('/workflow/task/status')) {
               store.commit('emitEventWorkFlowTask', {
                 event: {
-                  status: v.status,
-                  taskId: v.task_id,
-                  projectId: v.project_id,
-                  workFlowId: v.workflow_id,
+                  status: cloudeventData.status,
+                  taskId: cloudeventData.task_id,
+                  projectId: cloudeventData.project_id,
+                  workFlowId: cloudeventData.workflow_id,
                 },
               });
             } else {

@@ -28,7 +28,7 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
       // Do something with response data
       const data = response.data;
       if (data.meta.code !== 0) {
-        const e = new Error(data.meta.msg);
+        const e = new Error(data.meta.log || data.meta.msg);
         store.commit('error', { error: e });
         throw ErrHandled;
       }
@@ -49,7 +49,7 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
           default:
         }
         try {
-          e = new Error(error.response.data.meta.msg || '请求失败，请稍后再试');
+          e = new Error(error.response.data.meta.log || '请求失败，请稍后再试');
         } catch (_) {
           e = new Error(error.message);
         }
@@ -74,6 +74,17 @@ export interface User {
   account: string;
   permissions: string[];
   createTime: number;
+}
+
+export interface LoginMethod {
+  oidc: boolean;
+}
+
+export async function loginMethods(): Promise<LoginMethod> {
+  const resp = await apiv1.get('/login_methods');
+  const data = resp.data;
+  const r = data.response;
+  return r;
 }
 
 export async function login(
@@ -148,6 +159,7 @@ export interface Project {
   taskCount: number;
   title: string;
   uid: number;
+  permission: string;
 }
 
 export interface Task {
@@ -334,10 +346,12 @@ export async function addProjectUser(
   api: AxiosInstance,
   projectId: number,
   userAccount: string,
+  userRole: string,
 ) {
   const payload = JSON.stringify({
     project_id: projectId,
     user_account: userAccount,
+    user_role: userRole,
   });
   return await api.post('/project/add_user', payload, {
     headers: {

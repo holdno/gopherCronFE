@@ -5,11 +5,12 @@
     <div
       class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-h-full tw-w-full"
     >
-      <LogoTpl class="tw-w-24 md:tw-w-32" src="/logo_white.png"></LogoTpl>
+      <LogoTpl class="tw-w-24 md:tw-w-32" src="./logo_white.png"></LogoTpl>
       <div
         class="tw-bg-[#1D1D1D] tw-shadow tw-rounded tw-max-w-md lg:tw-w-1/3 sm:tw-w-2/3 tw-w-full tw-p-10 md:tw-mt-6 tw-mt-2"
       >
         <q-btn
+          v-if="allowLoginMethods?.oidc"
           outline
           text-color="white"
           :loading="oidcLoading"
@@ -81,9 +82,10 @@
   import { onBeforeMount, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { getOIDCAuthURL } from '@/api/request';
+  import { LoginMethod, getOIDCAuthURL, loginMethods } from '@/api/request';
   import LogoTpl from '@/components/LogoTpl.vue';
   import { useStore } from '@/store/index';
+  import { getQueryVariable } from '@/utils/utils';
 
   const username = ref('');
   const password = ref('');
@@ -93,13 +95,34 @@
   const loading = ref(false);
 
   const oidcLoading = ref(false);
-  if (route.query && route.query.code && route.query.state) {
-    oidcLogin(route.query.code as string, route.query.state as string);
+
+  let code = getQueryVariable('code');
+  let state = getQueryVariable('state');
+  if (!code) {
+    code = route.query.code as string;
   }
+  if (!state) {
+    state = route.query.state as string;
+  }
+  if (code && state) {
+    oidcLogin(code, state);
+  }
+
+  const allowLoginMethods = ref<LoginMethod>();
+
+  async function getLoginMethods() {
+    try {
+      allowLoginMethods.value = await loginMethods();
+    } catch (e: any) {
+      console.error(e);
+    }
+  }
+
+  getLoginMethods();
 
   async function oidcLogin(code: string, state: string) {
     oidcLoading.value = true;
-
+    console.log('code', code, state);
     await store.dispatch('loginWithOIDC', {
       code,
       state,

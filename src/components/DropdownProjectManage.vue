@@ -8,6 +8,7 @@
     v-model="showUsersManageDialog"
     :project-id="props.projectId"
   />
+  <DialogProjectUsersManage></DialogProjectUsersManage>
   <q-btn-dropdown
     v-model="show"
     flat

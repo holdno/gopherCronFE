@@ -161,7 +161,7 @@
   getVersion();
 
   const notificationSetting = computed(() => store.getters.notificationSetting);
-  console.log(notificationSetting.value);
+
   function switchNotificationSetting() {
     store.dispatch('changeNotificationStatus');
   }

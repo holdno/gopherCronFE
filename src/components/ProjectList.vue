@@ -57,7 +57,10 @@
             :to="{ name: 'project', params: { projectId: project.id } }"
             >{{ project.title }}</router-link
           >
-          <DropdownProjectManage v-if="isAdmin" :project-id="project.id" />
+          <DropdownProjectManage
+            v-if="isAdmin || isManagerPermission(project.permission)"
+            :project-id="project.id"
+          />
         </div>
       </q-list>
       <div
@@ -81,6 +84,7 @@
 
   import { Project } from '@/api/request';
   import { useStore } from '@/store/index';
+  import { isManagerPermission } from '@/utils/permission';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
   const store = useStore();

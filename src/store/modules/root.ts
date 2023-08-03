@@ -40,7 +40,7 @@ import {
   userList,
 } from '@/api/user';
 import { State as RootState } from '@/store/index';
-import { FireTowerPlugin } from '@/utils/FireTower';
+import { FireTower, FireTowerPlugin } from '@/utils/FireTower';
 
 export interface EventTask {
   status: string;
@@ -69,6 +69,8 @@ export interface State {
   token?: string;
   apiv1?: AxiosInstance;
   $q?: QVueGlobals;
+  firetower?: FireTower;
+  subscribedTopic: string[];
 
   recentLogCountRecords: RecentLogCount[];
 
@@ -106,6 +108,12 @@ const mutations: MutationTree<State> = {
   },
   setQuasar(state, { $q }) {
     state.$q = $q;
+  },
+  setTower(state, tower) {
+    state.firetower = tower;
+  },
+  subscribedTopic(state, topics) {
+    state.subscribedTopic = topics;
   },
   setNotificationSwitch(state, { status }) {
     state.notificationSwitch = status;
@@ -259,7 +267,7 @@ const actions: ActionTree<State, RootState> = {
       api.defaults.headers.common[COOKIE_TOKEN] = token;
       const user = await userInfo(api);
       commit('authed', { user, token });
-      FireTowerPlugin(this);
+      FireTowerPlugin(user, this);
     } catch (e) {
       commit('unauthed');
       commit('error', { error: e });
@@ -293,6 +301,14 @@ const actions: ActionTree<State, RootState> = {
     } catch (e) {
       commit('error', { error: e });
     }
+  },
+  subscribeTopic({ commit }, topics) {
+    const subed = this.getters.subscribedTopic;
+    if (subed && subed.length > 0) {
+      this.getters.firetower.unsubscribe(subed);
+    }
+    this.getters.firetower.subscribe(topics);
+    commit('subscribedTopic', topics);
   },
   async saveWorkFlowTask({ commit }, { task }) {
     const api = this.getters.apiv1;
@@ -473,6 +489,12 @@ const actions: ActionTree<State, RootState> = {
 };
 
 const getters: GetterTree<State, RootState> = {
+  firetower(state): FireTower | undefined {
+    return state.firetower;
+  },
+  subscribedTopic(state): string[] {
+    return state.subscribedTopic;
+  },
   notificationSetting(state): { status: boolean } {
     return { status: state.notificationSwitch };
   },
@@ -518,6 +540,8 @@ export const defaultState = {
     return true;
   })(),
   logined: false,
+  FireTower: undefined,
+  subscribedTopic: [],
 
   workFlowTasks: [],
   loadingWorkFlowTasks: false,
