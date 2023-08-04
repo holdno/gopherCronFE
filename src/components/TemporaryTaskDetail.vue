@@ -156,6 +156,7 @@
     },
   });
 
+  const log = ref<TaskLog | null>();
   const store = useStore();
   const task = computed(() =>
     store.state.Task.temporaryTasks
@@ -222,7 +223,6 @@
     waitingRemove.value = false;
   };
 
-  const log = ref<TaskLog | null>();
   async function getCurrentTaskLog() {
     if (!task.value) {
       return;
