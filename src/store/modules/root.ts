@@ -130,6 +130,7 @@ const mutations: MutationTree<State> = {
     state.user = undefined;
     state.token = undefined;
     state.logined = false;
+
     Cookies.remove(COOKIE_TOKEN);
     const api = state.apiv1;
     if (api) {
@@ -254,12 +255,18 @@ const actions: ActionTree<State, RootState> = {
       JSON.stringify({ status: state.notificationSwitch }),
     );
   },
-  async checkLogin({ commit, state }) {
+  async logout({ commit, state }) {
+    commit('unauthed');
+    if (this.getters.firetower) {
+      this.getters.firetower.close();
+    }
+  },
+  async checkLogin({ dispatch, commit, state }) {
     if (state.logined) return;
 
     const token = Cookies.get(COOKIE_TOKEN);
     if (token === undefined) {
-      commit('unauthed');
+      await dispatch('logout');
       return;
     }
     try {
@@ -269,7 +276,7 @@ const actions: ActionTree<State, RootState> = {
       commit('authed', { user, token });
       FireTowerPlugin(user, this);
     } catch (e) {
-      commit('unauthed');
+      await dispatch('logout');
       commit('error', { error: e });
     }
   },
@@ -278,6 +285,7 @@ const actions: ActionTree<State, RootState> = {
     try {
       const [user, token] = await login(api, username, password);
       commit('authed', { user, token });
+      FireTowerPlugin(user, this);
     } catch (e) {
       commit('error', { error: e });
     }
@@ -303,12 +311,14 @@ const actions: ActionTree<State, RootState> = {
     }
   },
   subscribeTopic({ commit }, topics) {
-    const subed = this.getters.subscribedTopic;
-    if (subed && subed.length > 0) {
-      this.getters.firetower.unsubscribe(subed);
-    }
-    this.getters.firetower.subscribe(topics);
-    commit('subscribedTopic', topics);
+    try {
+      const subed = this.getters.subscribedTopic;
+      if (subed && subed.length > 0) {
+        this.getters.firetower.unsubscribe(subed);
+      }
+      this.getters.firetower.subscribe(topics);
+      commit('subscribedTopic', topics);
+    } catch (e: any) {}
   },
   async saveWorkFlowTask({ commit }, { task }) {
     const api = this.getters.apiv1;

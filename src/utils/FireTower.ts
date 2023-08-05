@@ -118,6 +118,10 @@ export class FireTower {
       }),
     );
   }
+
+  close() {
+    this.ws.close();
+  }
 }
 
 export function FireTowerPlugin(user: User, store: Store<any>) {
@@ -180,7 +184,9 @@ export function FireTowerPlugin(user: User, store: Store<any>) {
         },
         () => {
           setTimeout(() => {
-            buildTower();
+            if (store.getters.user) {
+              buildTower();
+            }
           }, 1000);
         },
       );
