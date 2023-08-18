@@ -159,7 +159,7 @@ export interface Project {
   taskCount: number;
   title: string;
   uid: number;
-  permission: string;
+  role: string;
 }
 
 export interface Task {

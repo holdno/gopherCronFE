@@ -318,11 +318,17 @@
   }
 
   onMounted(() => {
+    console.log('subscribe');
+    store.dispatch('subscribeTopic', [
+      '/workflow/status/' + props.id,
+      '/workflow/task/status/' + props.id,
+    ]);
     refreshInfo();
     refresh();
     watch(
       () => props.id,
       async (current) => {
+        console.log('subscribe');
         store.dispatch('subscribeTopic', [
           '/workflow/status/' + props.id,
           '/workflow/task/status/' + props.id,

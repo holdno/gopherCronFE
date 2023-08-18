@@ -58,7 +58,7 @@
             >{{ project.title }}</router-link
           >
           <DropdownProjectManage
-            v-if="isAdmin || isManagerPermission(project.permission)"
+            v-if="isAdmin || isManagerPermission(project.role)"
             :project-id="project.id"
           />
         </div>

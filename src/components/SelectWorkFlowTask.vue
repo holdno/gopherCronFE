@@ -5,6 +5,7 @@
     map-options
     emit-value
     behavior="menu"
+    multiple
     :disable="props.disabled"
     :options="
       tasks.map((t) => ({
@@ -25,7 +26,7 @@
 
   const props = defineProps({
     modelValue: {
-      type: Object as PropType<WorkFlowTask>,
+      type: Array as PropType<WorkFlowTask[]>,
       default: null,
     },
     projectId: {
@@ -42,7 +43,7 @@
     },
   });
   const emits = defineEmits(['update:modelValue']);
-  const task = computed<WorkFlowTask>({
+  const task = computed<WorkFlowTask[]>({
     get() {
       return props.modelValue;
     },

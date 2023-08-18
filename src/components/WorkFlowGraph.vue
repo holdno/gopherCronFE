@@ -463,7 +463,7 @@
 
   const addNodeDialogVisibility = ref(false);
   const project = ref<Project>();
-  const task = ref<WorkFlowTask>();
+  const task = ref<WorkFlowTask[]>([]);
 
   function ShowAddNodeDialog() {
     addNodeDialogVisibility.value = true;
@@ -471,18 +471,22 @@
 
   function HideAddNodeDialog() {
     project.value = undefined;
-    task.value = undefined;
+    task.value = [];
     addNodeDialogVisibility.value = false;
   }
 
   function addTaskNode() {
+    const added: KahnTask[] = [];
+    task.value.forEach((v, k, a) => {
+      added.push({
+        name: v.name,
+        id: `${project.value?.id}_${v.id}`,
+        origin: v,
+      });
+    });
     emits('update:modelValue', [
       ...props.modelValue,
-      {
-        name: task.value?.name,
-        id: `${project.value?.id}_${task.value?.id}`,
-        origin: task.value,
-      },
+      ...added,
     ]);
     HideAddNodeDialog();
   }

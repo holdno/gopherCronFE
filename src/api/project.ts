@@ -10,7 +10,7 @@ export async function projectList(): Promise<Project[]> {
     taskCount: p.task_count,
     title: p.title,
     uid: p.uid,
-    permission: p.permission,
+    role: p.role,
   }));
 }
 
