@@ -175,5 +175,5 @@
     password.value = '';
   }
 
-  onBeforeMount(() => store.commit('unauthed'));
+  onBeforeMount(() => store.dispatch('logout'));
 </script>
