@@ -255,8 +255,13 @@ export interface RecentLogCount {
   date: String;
 }
 
-export async function recentLog(api: AxiosInstance): Promise<RecentLogCount[]> {
-  const resp = await api.get('/log/recent');
+export async function recentLog(
+  api: AxiosInstance,
+  orgid: string,
+): Promise<RecentLogCount[]> {
+  const resp = await api.get('/log/recent', {
+    params: { oid: orgid },
+  });
   const data = resp.data;
   const r = data.response;
   return r.map((v: any) => ({
@@ -440,32 +445,34 @@ export interface WorkFlowTask {
   noseize: number;
 }
 
-export async function fetchWorkflows(
-  api: AxiosInstance,
-  page: number,
-  pageSize: number,
-): Promise<[WorkFlow[], number]> {
-  const resp = await api.get('/workflow/list', {
-    params: {
-      page: page,
-      pagesize: pageSize,
-    },
-  });
-  const data = resp.data;
-  const r = data.response;
-  return [
-    r.list?.map((v: any) => ({
-      id: v.id,
-      title: v.title,
-      remark: v.remark,
-      status: v.status,
-      state: v.state,
-      createTime: v.create_time,
-      cronExpr: v.cron,
-    })) || [],
-    r.total,
-  ];
-}
+// export async function fetchWorkflows(
+//   api: AxiosInstance,
+//   oid: string,
+//   page: number,
+//   pageSize: number,
+// ): Promise<[WorkFlow[], number]> {
+//   const resp = await api.get('/workflow/list', {
+//     params: {
+//       oid: oid,
+//       page: page,
+//       pagesize: pageSize,
+//     },
+//   });
+//   const data = resp.data;
+//   const r = data.response;
+//   return [
+//     r.list?.map((v: any) => ({
+//       id: v.id,
+//       title: v.title,
+//       remark: v.remark,
+//       status: v.status,
+//       state: v.state,
+//       createTime: v.create_time,
+//       cronExpr: v.cron,
+//     })) || [],
+//     r.total,
+//   ];
+// }
 
 export async function createWorkflow(
   api: AxiosInstance,

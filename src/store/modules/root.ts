@@ -3,44 +3,15 @@ import Cookies from 'js-cookie';
 import { QVueGlobals } from 'quasar';
 import { ActionTree, GetterTree, Module, MutationTree } from 'vuex';
 
-import {
-  RecentLogCount,
-  TaskLog,
-  User,
-  WorkFlow,
-  WorkFlowEdge,
-  WorkFlowLog,
-  WorkFlowTask,
-  WorkflowTaskState,
-  createProject,
-  createWorkFlowTask,
-  createWorkflow,
-  deleteProject,
-  deleteTask,
-  deleteWorkFlowTask,
-  deleteWorkflow,
-  fetchLogs,
-  fetchWorkFlowLogs,
-  fetchWorkflowEdges,
-  fetchWorkflows,
-  login,
-  loginWithOIDC,
-  recentLog,
-  saveTask,
-  saveWorkFlowTask,
-  updateProject,
-  updateWorkflow,
-  updateWorkflowEdges,
-  userInfo,
-} from '@/api/request';
-import {
-  CreateUserRequest,
-  GetUserListRequest,
-  createUser,
-  userList,
-} from '@/api/user';
+
+
+import { Org, fetchUserOrgs } from '@/api/org';
+import { RecentLogCount, TaskLog, User, WorkFlow, WorkFlowEdge, WorkFlowLog, WorkFlowTask, WorkflowTaskState, createProject, createWorkFlowTask, createWorkflow, deleteProject, deleteTask, deleteWorkFlowTask, deleteWorkflow, fetchLogs, fetchWorkFlowLogs, fetchWorkflowEdges, login, loginWithOIDC, recentLog, saveTask, saveWorkFlowTask, updateProject, updateWorkflow, updateWorkflowEdges, userInfo } from '@/api/request';
+import { CreateUserRequest, GetUserListRequest, createUser, userList } from '@/api/user';
+import router from '@/router';
 import { State as RootState } from '@/store/index';
 import { FireTower, FireTowerPlugin } from '@/utils/FireTower';
+
 
 export interface EventTask {
   status: string;
@@ -66,6 +37,8 @@ export interface State {
   users?: User[];
   userTotal?: number;
   user?: User;
+  userOrgs?: Org[];
+  currentOrg?: string;
   token?: string;
   apiv1?: AxiosInstance;
   $q?: QVueGlobals;
@@ -137,6 +110,13 @@ const mutations: MutationTree<State> = {
       delete api.defaults.headers.common[COOKIE_TOKEN];
     }
   },
+  userOrgs(state, orgs: Org[]) {
+    state.userOrgs = orgs;
+    console.log(state.currentOrg, orgs);
+    if (!state.currentOrg && orgs && orgs.length > 0) {
+      state.currentOrg = orgs[0].id;
+    }
+  },
   error(state, { error }) {
     if (error === ErrHandled) return;
     state.currentError = error;
@@ -202,12 +182,12 @@ const mutations: MutationTree<State> = {
     state.taskLogs = logs;
     state.taskLogsTotal = total;
   },
-  loadingWorkflows(state) {
-    state.loadingWorkflows = true;
-  },
-  unloadingWorkflows(state) {
-    state.loadingWorkflows = false;
-  },
+  // loadingWorkflows(state) {
+  //   state.loadingWorkflows = true;
+  // },
+  // unloadingWorkflows(state) {
+  //   state.loadingWorkflows = false;
+  // },
   setWorkflows(state, { workflows, total }) {
     state.workflows = workflows;
     state.workflowsTotal = total;
@@ -233,6 +213,9 @@ const mutations: MutationTree<State> = {
     state.workflowLogs = logs;
     state.workflowLogsTotal = total;
   },
+  setCurrentOrg(state, orgId) {
+    state.currentOrg = orgId;
+  },
   emitEventTask(state, { event }) {
     state.eventTask = event;
   },
@@ -255,11 +238,16 @@ const actions: ActionTree<State, RootState> = {
       JSON.stringify({ status: state.notificationSwitch }),
     );
   },
+  async refreshUserOrgs({ commit, state }) {},
   async logout({ commit, state }) {
     commit('unauthed');
     if (this.getters.firetower) {
       this.getters.firetower.close();
     }
+  },
+  switchOrg({ commit }, orgId: string) {
+    commit('setCurrentOrg', orgId);
+    router.push({ name: 'summary', params: { orgId: orgId } });
   },
   async checkLogin({ dispatch, commit, state }) {
     if (state.logined) return;
@@ -275,6 +263,8 @@ const actions: ActionTree<State, RootState> = {
       const user = await userInfo(api);
       commit('authed', { user, token });
       FireTowerPlugin(user, this);
+      const orgs = await fetchUserOrgs();
+      commit('userOrgs', orgs);
     } catch (e) {
       await dispatch('logout');
       commit('error', { error: e });
@@ -286,6 +276,8 @@ const actions: ActionTree<State, RootState> = {
       const [user, token] = await login(api, username, password);
       commit('authed', { user, token });
       FireTowerPlugin(user, this);
+      const orgs = await fetchUserOrgs();
+      commit('userOrgs', orgs);
     } catch (e) {
       commit('error', { error: e });
     }
@@ -295,6 +287,9 @@ const actions: ActionTree<State, RootState> = {
     try {
       const [user, token] = await loginWithOIDC(api, code, state);
       commit('authed', { user, token });
+      FireTowerPlugin(user, this);
+      const orgs = await fetchUserOrgs();
+      commit('userOrgs', orgs);
     } catch (e) {
       commit('error', { error: e });
     }
@@ -356,38 +351,41 @@ const actions: ActionTree<State, RootState> = {
       commit('error', { error: e });
     }
   },
-  async recentLog({ commit }) {
+  async recentLog({ commit }, orgId) {
     const api = this.getters.apiv1;
     try {
-      const recentLogCount = await recentLog(api);
+      const recentLogCount = await recentLog(api, orgId);
       commit('setRecentLogCount', { records: recentLogCount });
     } catch (e) {
       commit('error', { error: e });
     }
   },
-  async createProject({ dispatch, commit }, { title, remark }) {
+  async createProject({ dispatch, commit }, { title, remark, orgId }) {
     const api = this.getters.apiv1;
     try {
       await createProject(api, title, remark);
-      await dispatch('Project/fetchProjects');
+      await dispatch('Project/fetchProjects', { orgId: orgId });
     } catch (e) {
       commit('error', { error: e });
     }
   },
-  async updateProject({ dispatch, commit }, { projectId, title, remark }) {
+  async updateProject(
+    { dispatch, commit },
+    { projectId, title, remark, orgId },
+  ) {
     const api = this.getters.apiv1;
     try {
       await updateProject(api, projectId, title, remark);
-      await dispatch('Project/fetchProjects');
+      await dispatch('Project/fetchProjects', { orgId: orgId });
     } catch (e) {
       commit('error', { error: e });
     }
   },
-  async deleteProject({ dispatch, commit }, { projectId }) {
+  async deleteProject({ dispatch, commit }, { projectId, orgId }) {
     const api = this.getters.apiv1;
     try {
       await deleteProject(api, projectId);
-      await dispatch('Project/fetchProjects');
+      await dispatch('Project/fetchProjects', { orgId: orgId });
     } catch (e) {
       commit('error', { error: e });
     }
@@ -425,17 +423,17 @@ const actions: ActionTree<State, RootState> = {
     }
     commit('unloadingLogs');
   },
-  async fetchWorkflows({ commit }, { page, pageSize }) {
-    commit('loadingWorkflows');
-    const api = this.getters.apiv1;
-    try {
-      const [workflows, total] = await fetchWorkflows(api, page, pageSize);
-      commit('setWorkflows', { workflows, total });
-    } catch (e) {
-      commit('error', { error: e });
-    }
-    commit('unloadingWorkflows');
-  },
+  // async fetchWorkflows({ commit }, { orgId, page, pageSize }) {
+  //   commit('loadingWorkflows');
+  //   const api = this.getters.apiv1;
+  //   try {
+  //     const [workflows, total] = await fetchWorkflows(api,orgId, page, pageSize);
+  //     commit('setWorkflows', { workflows, total });
+  //   } catch (e) {
+  //     commit('error', { error: e });
+  //   }
+  //   commit('unloadingWorkflows');
+  // },
   async fetchWorkflowEdges({ commit }, { workflowId }) {
     commit('loadingWorkflowEdges');
     const api = this.getters.apiv1;
@@ -532,6 +530,9 @@ const getters: GetterTree<State, RootState> = {
     }
     return state.user;
   },
+  currentOrg(state): string {
+    return state.currentOrg || '';
+  },
 };
 
 export const defaultState = {
@@ -549,6 +550,7 @@ export const defaultState = {
     }
     return true;
   })(),
+  currentOrg: '',
   logined: false,
   FireTower: undefined,
   subscribedTopic: [],

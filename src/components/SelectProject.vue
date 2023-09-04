@@ -33,6 +33,10 @@
       type: Object as PropType<Project>,
       default: null,
     },
+    orgId: {
+      type: String,
+      required: true,
+    },
   });
   const emits = defineEmits(['update:modelValue']);
   const project = computed<Project>({
@@ -59,7 +63,9 @@
   ): void => {
     const update = () => (filter.value = inputValue);
     if (projects.value.length === 0) {
-      store.dispatch('Project/fetchProjects').then(() => doneFn(update));
+      store
+        .dispatch('Project/fetchProjects', { orgId: props.orgId })
+        .then(() => doneFn(update));
     } else {
       doneFn(update);
     }

@@ -1,7 +1,12 @@
 import { Project, apiv1 } from './request';
 
-export async function projectList(): Promise<Project[]> {
-  const resp = await apiv1.get('/project/list');
+
+export async function projectList(orgId: string): Promise<Project[]> {
+  const resp = await apiv1.get('/project/list', {
+    params: {
+      oid: orgId,
+    },
+  });
   const data = resp.data;
   const r = data.response;
   return r.list.map((p: any) => ({

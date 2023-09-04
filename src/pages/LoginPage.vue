@@ -122,22 +122,35 @@
 
   async function oidcLogin(code: string, state: string) {
     oidcLoading.value = true;
-    console.log('code', code, state);
     await store.dispatch('loginWithOIDC', {
       code,
       state,
     });
     if (store.state.Root.logined) {
-      const redirect = route.query.redirect;
-      let to = '/';
-      if (typeof redirect === 'string') {
-        to = redirect;
-      } else if (redirect && redirect.length > 0) {
-        to = redirect[0] || to;
-      }
-      await router.push(to);
+      await LoginRedirect(route.query.redirect as string);
     }
     oidcLoading.value = false;
+  }
+
+  async function LoginRedirect(redirect: string | undefined) {
+    const to = {
+      name: '',
+      path: '',
+      params: {},
+    };
+    if (
+      redirect &&
+      redirect.length > 0 &&
+      redirect.indexOf('/summary') === -1
+    ) {
+      to.path = redirect[0] || to.path;
+    } else {
+      to.name = 'summary';
+      to.params = {
+        orgid: store.state.Root.currentOrg,
+      };
+    }
+    await router.push(to);
   }
 
   async function getAuthURL() {
@@ -158,14 +171,7 @@
       password: password.value,
     });
     if (store.state.Root.logined) {
-      const redirect = route.query.redirect;
-      let to = '/';
-      if (typeof redirect === 'string') {
-        to = redirect;
-      } else if (redirect && redirect.length > 0) {
-        to = redirect[0] || to;
-      }
-      await router.push(to);
+      await LoginRedirect(route.query.redirect as string);
     }
     loading.value = false;
   }

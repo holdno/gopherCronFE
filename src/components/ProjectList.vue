@@ -87,10 +87,17 @@
   import { isManagerPermission } from '@/utils/permission';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
+  const props = defineProps({
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
+
   const store = useStore();
   const loading = computed(() => store.state.Project.loadingProjects);
   async function fetchProjects() {
-    await store.dispatch('Project/fetchProjects');
+    await store.dispatch('Project/fetchProjects', { orgId: props.orgId });
   }
   onMounted(fetchProjects);
 

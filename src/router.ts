@@ -1,13 +1,14 @@
-import {
-  RouteLocationNormalizedLoaded,
-  createRouter,
-  createWebHashHistory,
-  createWebHistory,
+import { RouteLocationNormalizedLoaded, createRouter, createWebHashHistory // createWebHistory,
 } from 'vue-router';
+
+
 
 import { fetchWorkFlowDetail } from './api/workflow';
 
+
+
 import { store } from '@/store/index';
+
 
 function createBeforeEnter(type: 'crontab' | 'workflow' | 'temporary') {
   return async (to: RouteLocationNormalizedLoaded) => {
@@ -96,12 +97,18 @@ const routes = [
     children: [
       {
         name: 'summary',
-        path: 'summary',
+        path: ':orgId/summary',
+        props: (route: RouteLocationNormalizedLoaded) => ({
+          orgId: route.params.orgId,
+        }),
         component: () => import('@/pages/Summary/SummaryPage.vue'),
       },
       {
         name: 'projects',
-        path: 'project',
+        path: ':orgId/project',
+        props: (route: RouteLocationNormalizedLoaded) => ({
+          orgId: route.params.orgId,
+        }),
         component: () => import('@/pages/ProjectList.vue'),
         children: [
           {
@@ -110,7 +117,9 @@ const routes = [
             component: () => import('@/layouts/DummyContainer.vue'),
             async beforeEnter(to: RouteLocationNormalizedLoaded) {
               if (store.state.Project.projects.length === 0) {
-                await store.dispatch('Project/fetchProjects');
+                await store.dispatch('Project/fetchProjects', {
+                  orgId: to.params.orgId,
+                });
               }
               const project = store.state.Project.projects.find(
                 (v) => v.id === Number(to.params.projectId),
@@ -157,7 +166,10 @@ const routes = [
       },
       {
         name: 'workflows',
-        path: 'workflows',
+        path: ':orgId/workflows',
+        props: (route: RouteLocationNormalizedLoaded) => ({
+          orgId: route.params.orgId,
+        }),
         component: () => import('@/pages/WorkflowList.vue'),
         children: [
           {
