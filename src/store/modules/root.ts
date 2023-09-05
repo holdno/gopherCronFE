@@ -363,7 +363,7 @@ const actions: ActionTree<State, RootState> = {
   async createProject({ dispatch, commit }, { title, remark, orgId }) {
     const api = this.getters.apiv1;
     try {
-      await createProject(api, title, remark);
+      await createProject(api, title, remark, orgId);
       await dispatch('Project/fetchProjects', { orgId: orgId });
     } catch (e) {
       commit('error', { error: e });

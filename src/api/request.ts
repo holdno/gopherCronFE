@@ -275,8 +275,10 @@ export async function createProject(
   api: AxiosInstance,
   title: string,
   remark: string,
+  orgId: string,
 ) {
   const payload = JSON.stringify({
+    oid: orgId,
     title: title,
     remark: remark,
   });

@@ -5,7 +5,7 @@
       v-model="showDeleteConfirm"
       :project-id="projectSelected.id"
     />
-    <DialogProjectForm v-model="showAddDialog" />
+    <DialogProjectForm v-model="showAddDialog" :org-id="orgId" />
     <div class="q-pa-md tw-flex tw-justify-around">
       <q-input
         v-model="filter"

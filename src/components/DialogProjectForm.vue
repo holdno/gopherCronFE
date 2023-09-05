@@ -56,6 +56,10 @@
       type: Boolean,
       default: false,
     },
+    orgId: {
+      type: String,
+      required: true,
+    },
   });
 
   const emits = defineEmits(['update:modelValue']);
@@ -113,6 +117,7 @@
       });
     } else {
       await store.dispatch('createProject', {
+        orgId: props.orgId,
         title: p.title.trim(),
         remark: p.remark.trim(),
       });
