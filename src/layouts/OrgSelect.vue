@@ -1,4 +1,5 @@
 <template>
+  <dialog-org-form v-model="showCreateDialog"></dialog-org-form>
   <q-select
     ref="search"
     v-model="currentOrg"
@@ -8,7 +9,6 @@
     standout="bg-white text-black"
     emit-value
     map-options
-    class="tw-ml-4"
     label="选择组织"
     :options="userOrgOptions"
     style="width: 300px"
@@ -24,12 +24,19 @@
       </q-item>
     </template>
 
+    <template #append>
+      <q-icon name="add" @click.stop.prevent="showCreateDialog = true" />
+    </template>
+
     <template #option="scope">
       <q-item v-bind="scope.itemProps" class="tw-text-white">
         <q-item-section>
-          <q-item-label class="" v-html="scope.opt.label" />
+          <q-item-label v-html="scope.opt.label" />
         </q-item-section>
-        <q-item-section side :class="{ 'default-type': !scope.opt.type }">
+        <q-item-section
+          side
+          :class="{ 'default-type': !scope.opt.type }"
+        >
           <q-btn
             outline
             dense
@@ -52,6 +59,7 @@
   import { computed, onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router';
 
+  import DialogOrgForm from '@/components/DialogOrgForm.vue';
   import { useStore } from '@/store/index';
 
   const store = useStore();
@@ -94,8 +102,10 @@
   onMounted(() => {
     if (store.getters.currentUser && !currentOrg.value) {
       const route = useRoute();
-      console.log('set current org');
       currentOrg.value = route.params.orgid as string;
     }
   });
+
+  // create logic
+  const showCreateDialog = ref(false);
 </script>

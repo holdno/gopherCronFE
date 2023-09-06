@@ -60,6 +60,7 @@
           <DropdownProjectManage
             v-if="isAdmin || isManagerPermission(project.role)"
             :project-id="project.id"
+            :org-id="orgId"
           />
         </div>
       </q-list>

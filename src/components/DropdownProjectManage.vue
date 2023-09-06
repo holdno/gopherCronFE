@@ -3,7 +3,11 @@
     v-model="showDeleteConfirm"
     :project-id="props.projectId"
   />
-  <DialogProjectForm v-model="showEditDialog" :project-id="props.projectId" />
+  <DialogProjectForm
+    v-model="showEditDialog"
+    :project-id="props.projectId"
+    :org-id="orgId"
+  />
   <DialogProjectUsersManage
     v-model="showUsersManageDialog"
     :project-id="props.projectId"
@@ -79,6 +83,22 @@
       </q-card-section>
 
       <q-card-actions align="right">
+        <q-btn
+          v-if="!showReGenButton"
+          v-close-popup
+          flat
+          label="重置"
+          color="warning"
+          @click="showReGenButton = true"
+        />
+        <q-btn
+          v-if="showReGenButton"
+          flat
+          label="我确定重置"
+          color="red"
+          :loading="reGenLoading"
+          @click="requestReGenProjectToken"
+        />
         <q-btn v-close-popup flat label="关闭" color="primary" />
       </q-card-actions>
     </q-card>
@@ -93,13 +113,17 @@
   import DialogProjectForm from './DialogProjectForm.vue';
   import DialogProjectUsersManage from './DialogProjectUsersManage.vue';
 
-  import { getProjectToken } from '@/api/project';
+  import { getProjectToken, reGenProjectToken } from '@/api/project';
   import { useStore } from '@/store/index';
 
   const show = ref(false);
   const props = defineProps({
     projectId: {
       type: Number,
+      required: true,
+    },
+    orgId: {
+      type: String,
       required: true,
     },
   });
@@ -113,7 +137,9 @@
   const showProjectTokenDialog = ref(false);
   const showProjectTokenLoading = ref(false);
   const projectToken = ref('');
+  const showReGenButton = ref(false);
   async function showProjectToken() {
+    showReGenButton.value = false;
     projectToken.value = '';
     showProjectTokenDialog.value = true;
     showProjectTokenLoading.value = true;
@@ -132,5 +158,18 @@
         message: 'token已复制',
       });
     });
+  }
+
+  // 重新生成项目token的逻辑
+  const reGenLoading = ref(false);
+  async function requestReGenProjectToken() {
+    reGenLoading.value = true;
+    try {
+      projectToken.value = await reGenProjectToken(props.projectId);
+    } catch (e: any) {
+      console.error(e);
+    }
+    reGenLoading.value = false;
+    showReGenButton.value = false;
   }
 </script>

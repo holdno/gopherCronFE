@@ -1,6 +1,5 @@
 import { Project, apiv1 } from './request';
 
-
 export async function projectList(orgId: string): Promise<Project[]> {
   const resp = await apiv1.get('/project/list', {
     params: {
@@ -17,6 +16,13 @@ export async function projectList(orgId: string): Promise<Project[]> {
     uid: p.uid,
     role: p.role,
   }));
+}
+
+export async function reGenProjectToken(projectId: number): Promise<string> {
+  const resp = await apiv1.post('/project/re_gen_token', {
+    project_id: projectId,
+  });
+  return resp.data.response;
 }
 
 export async function fetchProjectClients(

@@ -49,7 +49,7 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
           default:
         }
         try {
-          e = new Error(error.response.data.meta.log || '请求失败，请稍后再试');
+          e = new Error(error.response.data.meta.msg || '请求失败，请稍后再试');
         } catch (_) {
           e = new Error(error.message);
         }

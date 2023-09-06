@@ -3,15 +3,45 @@ import Cookies from 'js-cookie';
 import { QVueGlobals } from 'quasar';
 import { ActionTree, GetterTree, Module, MutationTree } from 'vuex';
 
-
-
-import { Org, fetchUserOrgs } from '@/api/org';
-import { RecentLogCount, TaskLog, User, WorkFlow, WorkFlowEdge, WorkFlowLog, WorkFlowTask, WorkflowTaskState, createProject, createWorkFlowTask, createWorkflow, deleteProject, deleteTask, deleteWorkFlowTask, deleteWorkflow, fetchLogs, fetchWorkFlowLogs, fetchWorkflowEdges, login, loginWithOIDC, recentLog, saveTask, saveWorkFlowTask, updateProject, updateWorkflow, updateWorkflowEdges, userInfo } from '@/api/request';
-import { CreateUserRequest, GetUserListRequest, createUser, userList } from '@/api/user';
+import { Org, createOrg, fetchUserOrgs, updateOrg } from '@/api/org';
+import {
+  RecentLogCount,
+  TaskLog,
+  User,
+  WorkFlow,
+  WorkFlowEdge,
+  WorkFlowLog,
+  WorkFlowTask,
+  WorkflowTaskState,
+  createProject,
+  createWorkFlowTask,
+  createWorkflow,
+  deleteProject,
+  deleteTask,
+  deleteWorkFlowTask,
+  deleteWorkflow,
+  fetchLogs,
+  fetchWorkFlowLogs,
+  fetchWorkflowEdges,
+  login,
+  loginWithOIDC,
+  recentLog,
+  saveTask,
+  saveWorkFlowTask,
+  updateProject,
+  updateWorkflow,
+  updateWorkflowEdges,
+  userInfo,
+} from '@/api/request';
+import {
+  CreateUserRequest,
+  GetUserListRequest,
+  createUser,
+  userList,
+} from '@/api/user';
 import router from '@/router';
 import { State as RootState } from '@/store/index';
 import { FireTower, FireTowerPlugin } from '@/utils/FireTower';
-
 
 export interface EventTask {
   status: string;
@@ -112,7 +142,6 @@ const mutations: MutationTree<State> = {
   },
   userOrgs(state, orgs: Org[]) {
     state.userOrgs = orgs;
-    console.log(state.currentOrg, orgs);
     if (!state.currentOrg && orgs && orgs.length > 0) {
       state.currentOrg = orgs[0].id;
     }
@@ -356,6 +385,24 @@ const actions: ActionTree<State, RootState> = {
     try {
       const recentLogCount = await recentLog(api, orgId);
       commit('setRecentLogCount', { records: recentLogCount });
+    } catch (e) {
+      commit('error', { error: e });
+    }
+  },
+  async createOrg({ commit }, org: Org) {
+    try {
+      await createOrg(org);
+      const orgs = await fetchUserOrgs();
+      commit('userOrgs', orgs);
+    } catch (e) {
+      commit('error', { error: e });
+    }
+  },
+  async updateOrg({ commit }, org: Org) {
+    try {
+      await updateOrg(org);
+      const orgs = await fetchUserOrgs();
+      commit('userOrgs', orgs);
     } catch (e) {
       commit('error', { error: e });
     }

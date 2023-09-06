@@ -12,7 +12,7 @@
           >GopherCron</span
         >
         <span v-if="version" class="tw-text-sm">({{ version }})</span>
-        <org-select></org-select>
+        <div class="tw-hidden md:tw-flex"><org-select></org-select></div>
 
         <q-space />
 
@@ -65,6 +65,9 @@
     >
       <q-scroll-area style="margin-bottom: 80px; height: calc(100% - 80px)">
         <q-list padding>
+          <q-item class="tw-flex md:tw-hidden">
+            <org-select></org-select>
+          </q-item>
           <q-item
             clickable
             :to="{

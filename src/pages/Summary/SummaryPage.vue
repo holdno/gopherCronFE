@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
   import { computed, onMounted, ref, watch } from 'vue';
+  import { useRoute } from 'vue-router';
 
   import ErrTaskLog from './ErrTaskLogs.vue';
 
@@ -48,7 +49,11 @@
     loading.value = false;
   }
 
+  const route = useRoute();
   onMounted(async () => {
+    if (route.params.orgId !== store.getters.currentOrg) {
+      store.commit('setCurrentOrg', route.params.orgId);
+    }
     init(store.getters.currentOrg);
     watch(
       () => store.getters.currentOrg,

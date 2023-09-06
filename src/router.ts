@@ -1,14 +1,12 @@
-import { RouteLocationNormalizedLoaded, createRouter, createWebHashHistory // createWebHistory,
+import {
+  RouteLocationNormalizedLoaded,
+  createRouter,
+  createWebHashHistory, // createWebHistory,
 } from 'vue-router';
-
-
 
 import { fetchWorkFlowDetail } from './api/workflow';
 
-
-
 import { store } from '@/store/index';
-
 
 function createBeforeEnter(type: 'crontab' | 'workflow' | 'temporary') {
   return async (to: RouteLocationNormalizedLoaded) => {
@@ -47,7 +45,7 @@ function createBeforeEnter(type: 'crontab' | 'workflow' | 'temporary') {
       const task = store.state.Task.temporaryTasks.get(projectId)?.find((v) => {
         return v.id === Number(to.params.taskId);
       });
-      console.log(to.params.taskId, task);
+
       if (task === undefined) {
         return { name: 'notfound' };
       }
@@ -91,7 +89,7 @@ const TaskRoutes = (type: 'crontab' | 'workflow' | 'temporary') => [
 const routes = [
   {
     path: '/',
-    redirect: { name: 'summary' },
+    redirect: { name: 'summary', params: { orgId: 'baseorg' } },
     component: () => import('@/layouts/LandingLayout.vue'),
     meta: { requiresAuth: true },
     children: [
