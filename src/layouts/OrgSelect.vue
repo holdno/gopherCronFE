@@ -33,10 +33,7 @@
         <q-item-section>
           <q-item-label v-html="scope.opt.label" />
         </q-item-section>
-        <q-item-section
-          side
-          :class="{ 'default-type': !scope.opt.type }"
-        >
+        <q-item-section side :class="{ 'default-type': !scope.opt.type }">
           <q-btn
             outline
             dense
@@ -100,9 +97,9 @@
   });
 
   onMounted(() => {
-    if (store.getters.currentUser && !currentOrg.value) {
+    if (!currentOrg.value) {
       const route = useRoute();
-      currentOrg.value = route.params.orgid as string;
+      currentOrg.value = route.params.orgId as string;
     }
   });
 
