@@ -176,6 +176,7 @@ const routes = [
             component: () => import('@/pages/WorkflowTabs.vue'),
             props: (route: RouteLocationNormalizedLoaded) => ({
               id: Number(route.params.workflowId),
+              orgId: route.params.orgId,
             }),
             async beforeEnter(to: RouteLocationNormalizedLoaded) {
               try {
@@ -195,6 +196,7 @@ const routes = [
                 component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
+                  orgId: route.params.orgId,
                 }),
               },
               {
@@ -203,6 +205,7 @@ const routes = [
                 component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
+                  orgId: route.params.orgId,
                 }),
               },
               {
@@ -211,6 +214,7 @@ const routes = [
                 component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
+                  orgId: route.params.orgId,
                 }),
               },
             ],
@@ -219,6 +223,9 @@ const routes = [
             name: 'create_workflow',
             path: 'create',
             component: () => import('@/pages/WorkflowTabs.vue'),
+            props: (route: RouteLocationNormalizedLoaded) => ({
+              orgId: route.params.orgId,
+            }),
           },
         ],
       },

@@ -36,7 +36,7 @@
         class="tw-w-full tw-h-full tw-bg-[#121212] tw-p-0 lg:tw-pr-4 tw-box-border"
       >
         <q-tab-panel name="graph">
-          <WorkflowGraph :id="props.id" />
+          <WorkflowGraph :id="props.id" :org-id="orgId"  />
         </q-tab-panel>
         <q-tab-panel name="logs">
           <WorkFlowLogs :id="props.id" />
@@ -92,6 +92,10 @@
     id: {
       type: Number,
       default: 0,
+    },
+    orgId: {
+      type: String,
+      required: true,
     },
   });
   const { width } = useWindowSize();

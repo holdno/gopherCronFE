@@ -1,6 +1,9 @@
 import { Store } from 'vuex';
 
+
+
 import { User } from '@/api/request';
+
 
 function errorMessage(message: string) {
   return {
@@ -149,11 +152,11 @@ export function FireTowerPlugin(user: User, store: Store<any>) {
           // ]);
           tower.onmessage = (event) => {
             const msg = JSON.parse(event.data);
-            const cloudeventData = msg.data.data;
+            const cloudeventData = msg.data;
             if (msg.type !== 'publish') {
               return;
             }
-            if (msg.topic.startsWith('/task/status')) {
+            if (msg.subject.startsWith('/task/status')) {
               store.commit('emitEventTask', {
                 event: {
                   status: cloudeventData.status,
@@ -161,14 +164,14 @@ export function FireTowerPlugin(user: User, store: Store<any>) {
                   projectId: cloudeventData.project_id,
                 },
               });
-            } else if (msg.topic.startsWith('/workflow/status')) {
+            } else if (msg.subject.startsWith('/workflow/status')) {
               store.commit('emitEventWorkFlow', {
                 event: {
                   status: cloudeventData.status,
                   workFlowId: cloudeventData.workflow_id,
                 },
               });
-            } else if (msg.topic.startsWith('/workflow/task/status')) {
+            } else if (msg.subject.startsWith('/workflow/task/status')) {
               store.commit('emitEventWorkFlowTask', {
                 event: {
                   status: cloudeventData.status,
