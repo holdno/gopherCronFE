@@ -142,9 +142,6 @@ const mutations: MutationTree<State> = {
   },
   userOrgs(state, orgs: Org[]) {
     state.userOrgs = orgs;
-    if (!state.currentOrg && orgs && orgs.length > 0) {
-      state.currentOrg = orgs[0].id;
-    }
   },
   error(state, { error }) {
     if (error === ErrHandled) return;
