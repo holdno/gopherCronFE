@@ -92,7 +92,11 @@
         return;
       }
 
-      store.dispatch('switchOrg', val);
+      if (currentOrg.value) {
+        store.dispatch('switchOrg', val);
+      } else {
+        store.commit('setCurrentOrg', val);
+      }
     },
   });
 
