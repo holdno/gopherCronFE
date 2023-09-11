@@ -5,7 +5,7 @@
       v-model="showDeleteConfirm"
       :project-id="projectSelected.id"
     />
-    <DialogProjectForm v-model="showAddDialog" />
+    <DialogProjectForm v-model="showAddDialog" :org-id="orgId" />
     <div class="q-pa-md tw-flex tw-justify-around">
       <q-input
         v-model="filter"
@@ -60,6 +60,7 @@
           <DropdownProjectManage
             v-if="isAdmin || isManagerPermission(project.role)"
             :project-id="project.id"
+            :org-id="orgId"
           />
         </div>
       </q-list>
@@ -87,10 +88,17 @@
   import { isManagerPermission } from '@/utils/permission';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
+  const props = defineProps({
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
+
   const store = useStore();
   const loading = computed(() => store.state.Project.loadingProjects);
   async function fetchProjects() {
-    await store.dispatch('Project/fetchProjects');
+    await store.dispatch('Project/fetchProjects', { orgId: props.orgId });
   }
   onMounted(fetchProjects);
 

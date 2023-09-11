@@ -6,10 +6,16 @@
     <q-header class="bg-black">
       <q-toolbar class="tw-gap-4">
         <q-btn flat round dense icon="menu" @click="drawer = !drawer" />
-        <q-toolbar-title>
-          GopherCron
-          <span v-if="version" class="tw-text-sm">({{ version }})</span>
-        </q-toolbar-title>
+
+        <span
+          class="tw-text-lg tw-pl-2 tw-tracking-wide tw-font-bold tw-cursor-pointer"
+          >GopherCron</span
+        >
+        <span v-if="version" class="tw-text-sm">({{ version }})</span>
+        <div class="tw-hidden md:tw-flex"><org-select></org-select></div>
+
+        <q-space />
+
         <q-btn
           flat
           round
@@ -59,7 +65,16 @@
     >
       <q-scroll-area style="margin-bottom: 80px; height: calc(100% - 80px)">
         <q-list padding>
-          <q-item clickable :to="{ name: 'summary' }">
+          <q-item class="tw-flex md:tw-hidden">
+            <org-select></org-select>
+          </q-item>
+          <q-item
+            clickable
+            :to="{
+              name: 'summary',
+              params: { orgid: store.getters.currentOrg },
+            }"
+          >
             <q-item-section avatar>
               <q-icon name="timeline" />
             </q-item-section>
@@ -67,7 +82,13 @@
             <q-item-section class="tw-font-medium">看板</q-item-section>
           </q-item>
 
-          <q-item clickable :to="{ name: 'projects' }">
+          <q-item
+            clickable
+            :to="{
+              name: 'projects',
+              params: { orgid: store.getters.currentOrg },
+            }"
+          >
             <q-item-section avatar>
               <q-icon name="view_list" />
             </q-item-section>
@@ -75,7 +96,13 @@
             <q-item-section class="tw-font-medium">项目管理</q-item-section>
           </q-item>
 
-          <q-item clickable :to="{ name: 'workflows' }">
+          <q-item
+            clickable
+            :to="{
+              name: 'workflows',
+              params: { orgid: store.getters.currentOrg },
+            }"
+          >
             <q-item-section avatar>
               <q-icon name="mediation" />
             </q-item-section>
@@ -135,6 +162,7 @@
   import { computed, ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
 
+  import OrgSelect from './OrgSelect.vue';
   import UserBaseInfo from './UserBaseInfo.vue';
 
   import { getServiceVersion } from '@/api/version';
@@ -165,4 +193,15 @@
   function switchNotificationSetting() {
     store.dispatch('changeNotificationStatus');
   }
+
+  // const userOrgOptions = computed(() => {
+  //   const tmp: { label: string; value: string }[] = [];
+  //   store.state.Root.userOrgs?.forEach((v, k, a) => {
+  //     tmp.push({
+  //       label: v.title,
+  //       value: v.id,
+  //     });
+  //   });
+  //   return tmp;
+  // });
 </script>

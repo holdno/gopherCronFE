@@ -1,7 +1,11 @@
 import { Project, apiv1 } from './request';
 
-export async function projectList(): Promise<Project[]> {
-  const resp = await apiv1.get('/project/list');
+export async function projectList(orgId: string): Promise<Project[]> {
+  const resp = await apiv1.get('/project/list', {
+    params: {
+      oid: orgId,
+    },
+  });
   const data = resp.data;
   const r = data.response;
   return r.list.map((p: any) => ({
@@ -12,6 +16,13 @@ export async function projectList(): Promise<Project[]> {
     uid: p.uid,
     role: p.role,
   }));
+}
+
+export async function reGenProjectToken(projectId: number): Promise<string> {
+  const resp = await apiv1.post('/project/re_gen_token', {
+    project_id: projectId,
+  });
+  return resp.data.response;
 }
 
 export async function fetchProjectClients(

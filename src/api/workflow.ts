@@ -1,11 +1,13 @@
 import { User, WorkFlow, apiv1 } from './request';
 
 export async function fetchWorkFlows(
+  oid: string,
   page: number,
   pageSize: number,
 ): Promise<[WorkFlow[], number]> {
   const resp = await apiv1.get('/workflow/list', {
     params: {
+      oid: oid,
       page: page,
       pagesize: pageSize,
     },

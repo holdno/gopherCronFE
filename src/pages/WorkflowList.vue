@@ -8,7 +8,7 @@
         visibilyClass
       "
     >
-      <WorkflowList />
+      <WorkflowList v-if="orgId" :org-id="orgId" />
     </div>
     <div class="tw-w-full tw-h-full tw-grow tw-overflow-hidden">
       <router-view />
@@ -21,6 +21,13 @@
   import { useRoute } from 'vue-router';
 
   import WorkflowList from '@/components/WorkFlowList.vue';
+
+  defineProps({
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
 
   const route = useRoute();
   const visibilyClass = computed(() =>

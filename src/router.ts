@@ -1,8 +1,7 @@
 import {
   RouteLocationNormalizedLoaded,
   createRouter,
-  createWebHashHistory,
-  createWebHistory,
+  createWebHashHistory, // createWebHistory,
 } from 'vue-router';
 
 import { fetchWorkFlowDetail } from './api/workflow';
@@ -46,7 +45,7 @@ function createBeforeEnter(type: 'crontab' | 'workflow' | 'temporary') {
       const task = store.state.Task.temporaryTasks.get(projectId)?.find((v) => {
         return v.id === Number(to.params.taskId);
       });
-      console.log(to.params.taskId, task);
+
       if (task === undefined) {
         return { name: 'notfound' };
       }
@@ -90,18 +89,24 @@ const TaskRoutes = (type: 'crontab' | 'workflow' | 'temporary') => [
 const routes = [
   {
     path: '/',
-    redirect: { name: 'summary' },
+    redirect: { name: 'summary', params: { orgId: 'baseorg' } },
     component: () => import('@/layouts/LandingLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       {
         name: 'summary',
-        path: 'summary',
+        path: ':orgId/summary',
+        props: (route: RouteLocationNormalizedLoaded) => ({
+          orgId: route.params.orgId,
+        }),
         component: () => import('@/pages/Summary/SummaryPage.vue'),
       },
       {
         name: 'projects',
-        path: 'project',
+        path: ':orgId/project',
+        props: (route: RouteLocationNormalizedLoaded) => ({
+          orgId: route.params.orgId,
+        }),
         component: () => import('@/pages/ProjectList.vue'),
         children: [
           {
@@ -110,7 +115,9 @@ const routes = [
             component: () => import('@/layouts/DummyContainer.vue'),
             async beforeEnter(to: RouteLocationNormalizedLoaded) {
               if (store.state.Project.projects.length === 0) {
-                await store.dispatch('Project/fetchProjects');
+                await store.dispatch('Project/fetchProjects', {
+                  orgId: to.params.orgId,
+                });
               }
               const project = store.state.Project.projects.find(
                 (v) => v.id === Number(to.params.projectId),
@@ -157,7 +164,10 @@ const routes = [
       },
       {
         name: 'workflows',
-        path: 'workflows',
+        path: ':orgId/workflows',
+        props: (route: RouteLocationNormalizedLoaded) => ({
+          orgId: route.params.orgId,
+        }),
         component: () => import('@/pages/WorkflowList.vue'),
         children: [
           {
@@ -166,6 +176,7 @@ const routes = [
             component: () => import('@/pages/WorkflowTabs.vue'),
             props: (route: RouteLocationNormalizedLoaded) => ({
               id: Number(route.params.workflowId),
+              orgId: route.params.orgId,
             }),
             async beforeEnter(to: RouteLocationNormalizedLoaded) {
               try {
@@ -185,6 +196,7 @@ const routes = [
                 component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
+                  orgId: route.params.orgId,
                 }),
               },
               {
@@ -193,6 +205,7 @@ const routes = [
                 component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
+                  orgId: route.params.orgId,
                 }),
               },
               {
@@ -201,6 +214,7 @@ const routes = [
                 component: () => import('@/pages/WorkflowTabs.vue'),
                 props: (route: RouteLocationNormalizedLoaded) => ({
                   id: Number(route.params.workflowId),
+                  orgId: route.params.orgId,
                 }),
               },
             ],
@@ -209,6 +223,9 @@ const routes = [
             name: 'create_workflow',
             path: 'create',
             component: () => import('@/pages/WorkflowTabs.vue'),
+            props: (route: RouteLocationNormalizedLoaded) => ({
+              orgId: route.params.orgId,
+            }),
           },
         ],
       },

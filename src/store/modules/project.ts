@@ -15,10 +15,10 @@ export interface State {
 }
 
 const actions: ActionTree<State, RootState> = {
-  async fetchProjects({ commit }) {
+  async fetchProjects({ commit }, {orgId}) {
     commit('loadingProjects');
     try {
-      const projects = await projectList();
+      const projects = await projectList(orgId);
       commit('setProjects', { projects });
     } catch (e) {
       commit('error', { error: e }, { root: true });

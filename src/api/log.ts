@@ -1,6 +1,7 @@
 import { apiv1 } from './request';
 
 export interface GetSummaryErrorLogsRequest {
+  oid: string;
   page: number;
   pagesize: number;
 }
@@ -65,6 +66,7 @@ export async function getSummaryErrorLogs(
 ): Promise<GetSummaryErrorLogsResponse> {
   const resp = await apiv1.get('/log/errors', {
     params: {
+      oid: args.oid,
       page: args.page,
       pagesize: args.pagesize,
     },

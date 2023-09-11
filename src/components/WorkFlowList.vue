@@ -17,7 +17,10 @@
           :offset="100"
           @load="onLoad"
         >
-          <q-list class="tw-flex tw-flex-col tw-gap-2 tw-pb-4">
+          <q-list
+            v-if="workflows && workflows.size > 0"
+            class="tw-flex tw-flex-col tw-gap-2 tw-pb-4"
+          >
             <router-link
               v-for="[, workflow] in workflows"
               :key="workflow.id"
@@ -78,15 +81,15 @@
               </div>
             </router-link>
           </q-list>
+          <div
+            v-if="!loading && (!workflows || workflows.size === 0)"
+            class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
+          >
+            <q-icon name="outlet" style="font-size: 3rem" />
+            暂无数据
+          </div>
         </q-infinite-scroll>
       </q-scroll-area>
-      <div
-        v-if="!loading && (!workflows || workflows.size === 0)"
-        class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
-      >
-        <q-icon name="outlet" style="font-size: 3rem" />
-        暂无数据
-      </div>
     </div>
   </div>
 </template>
@@ -103,10 +106,17 @@
   import { formatTimestamp } from '@/utils/datetime';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
+  const props = defineProps({
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
+
   const store = useStore();
   const route = useRoute();
   const scrollArea = ref<QScrollArea>();
-  const loading = computed(() => store.state.Root.loadingWorkflows);
+  const loading = computed(() => store.state.WorkFlow.loadingWorkflows);
 
   watch(
     () => route.name,
@@ -168,6 +178,7 @@
     } else {
       done(false);
     }
+    console.log(workflows);
   }
 
   const pagination = reactive({
@@ -177,6 +188,7 @@
 
   async function refresh() {
     const [workflows] = await store.dispatch('WorkFlow/fetchWorkFlows', {
+      orgId: props.orgId,
       ...pagination,
     });
     return workflows;

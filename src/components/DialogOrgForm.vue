@@ -3,14 +3,14 @@
     <q-card class="tw-w-96 q-pa-sm">
       <q-form @submit="onSubmit">
         <q-card-section>
-          <div v-if="project === undefined" class="text-h6">创建项目</div>
-          <div v-else class="text-h6">编辑项目</div>
+          <div v-if="editable.id === ''" class="text-h6">创建组织</div>
+          <div v-else class="text-h6">编辑组织</div>
         </q-card-section>
         <q-card-section>
           <q-input
             v-model="editable.title"
             type="text"
-            label="项目名"
+            label="组织名称"
             square
             filled
             class="tw-mb-4"
@@ -32,9 +32,10 @@
             color="primary"
             text-color="black"
             type="submit"
-            :label="project === undefined ? '创建' : '保存'"
+            :label="editable.id === '' ? '创建' : '保存'"
             :disable="!canSubmit"
             class="lg:tw-w-24 tw-w-full"
+            :loading="loading"
           />
         </q-card-section>
       </q-form>
@@ -45,23 +46,17 @@
 <script setup lang="ts">
   import { computed, onMounted, ref, watchEffect } from 'vue';
 
+  import { Org } from '@/api/org';
   import { useStore } from '@/store/index';
 
   const props = defineProps({
-    projectId: {
-      type: Number,
-      default: 0,
-    },
     modelValue: {
       type: Boolean,
       default: false,
     },
-    orgId: {
-      type: String,
-      required: true,
-    },
   });
 
+  const loading = ref(false);
   const emits = defineEmits(['update:modelValue']);
 
   const show = computed({
@@ -71,31 +66,21 @@
 
   const store = useStore();
 
-  const project = computed(() =>
-    store.state.Project.projects.find((p) => p.id === props.projectId),
-  );
-
-  const origin = computed(() => {
-    const p = project.value;
-    return {
-      title: p?.title || '',
-      remark: p?.remark || '',
-    };
-  });
-
-  const editable = ref(origin.value);
+  const editable = ref<Org>({ title: '', remark: '', id: '' });
+  const origin = ref<Org>({ title: '', remark: '', id: '' });
 
   const canDismiss = computed(() => {
     const p = editable.value;
     const o = origin.value;
     return (
-      p.title.trim() === o.title.trim() && p.remark.trim() === o.remark.trim()
+      p?.title.trim() === o?.title.trim() &&
+      p?.remark.trim() === o?.remark.trim()
     );
   });
 
   const canSubmit = computed(() => {
     const p = editable.value;
-    return p.title.trim() !== '' && !canDismiss.value;
+    return p?.title.trim() !== '' && !canDismiss.value;
   });
 
   onMounted(() => {
@@ -108,20 +93,25 @@
 
   async function onSubmit() {
     const p = editable.value;
+    if (!p) {
+      store.commit('error', { error: '请输入组织信息' });
+      return;
+    }
     store.commit('cleanError');
-    if (props.projectId > 0) {
-      await store.dispatch('updateProject', {
-        projectId: props.projectId,
+    loading.value = true;
+    if (p.id !== '') {
+      await store.dispatch('updateOrg', {
+        id: p.id,
         title: p.title.trim(),
         remark: p.remark.trim(),
       });
     } else {
-      await store.dispatch('createProject', {
-        orgId: props.orgId,
+      await store.dispatch('createOrg', {
         title: p.title.trim(),
         remark: p.remark.trim(),
       });
     }
     if (store.state.Root.currentError === undefined) show.value = false;
+    loading.value = false;
   }
 </script>

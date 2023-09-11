@@ -155,6 +155,7 @@
       <WorkFlowGraph
         ref="workflow"
         v-model="current"
+        :org-id="orgId"
         :workflow-id="props.id"
         :tasks="tasks"
       />
@@ -178,6 +179,17 @@
   import { useStore } from '@/store/index';
   import { KahnTask } from '@/types';
 
+  const props = defineProps({
+    id: {
+      type: Number,
+      required: true,
+    },
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
+
   const { width } = useWindowSize();
   const isSmallScreen = computed(() => width.value < 1024);
 
@@ -198,12 +210,6 @@
     return task;
   });
 
-  const props = defineProps({
-    id: {
-      type: Number,
-      required: true,
-    },
-  });
   const tasks = ref<KahnTask[]>([]);
   const current = ref<KahnTask[]>([]);
   const store = useStore();

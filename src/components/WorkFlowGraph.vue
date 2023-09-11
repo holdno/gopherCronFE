@@ -22,7 +22,7 @@
         <div class="text-h6">添加新的任务节点</div>
       </q-card-section>
       <q-card-section>
-        <SelectProject v-model="project" />
+        <SelectProject v-model="project" :org-id="orgId" />
         <SelectWorkFlowTask
           v-model="task"
           :disabled="project === undefined"
@@ -225,6 +225,10 @@
     modelValue: {
       type: Object as PropType<KahnTask[]>,
       default: new Array<KahnTask[]>(0),
+    },
+    orgId: {
+      type: String,
+      required: true,
     },
   });
   const emits = defineEmits(['update:modelValue']);
@@ -484,10 +488,7 @@
         origin: v,
       });
     });
-    emits('update:modelValue', [
-      ...props.modelValue,
-      ...added,
-    ]);
+    emits('update:modelValue', [...props.modelValue, ...added]);
     HideAddNodeDialog();
   }
 

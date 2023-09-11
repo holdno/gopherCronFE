@@ -6,7 +6,7 @@
         visibilyClass
       "
     >
-      <ProjectList />
+      <ProjectList v-if="orgId" :org-id="orgId" />
     </div>
     <router-view />
   </div>
@@ -17,6 +17,13 @@
   import { useRoute } from 'vue-router';
 
   import ProjectList from '@/components/ProjectList.vue';
+
+  defineProps({
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
 
   const route = useRoute();
   const visibilyClass = computed(() =>

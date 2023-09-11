@@ -82,6 +82,13 @@
   import { formatTimestamp } from '@/utils/datetime';
   import { Pagination, TableRequestProp } from '@/utils/quasar';
 
+  const props = defineProps({
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
+
   const logs: Ref<TaskLog[]> = ref([]);
   const total = ref(0);
   const loading = ref(false);
@@ -97,6 +104,7 @@
     loading.value = true;
     try {
       const resp = await getSummaryErrorLogs({
+        oid: props.orgId,
         page: pagination.value.page,
         pagesize: pagination.value.rowsPerPage,
       });
