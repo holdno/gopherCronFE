@@ -118,6 +118,7 @@
   const scrollArea = ref<QScrollArea>();
   const loading = computed(() => store.state.WorkFlow.loadingWorkflows);
 
+  store.commit('WorkFlow/clearWorkFlows');
   watch(
     () => route.name,
     (current) => {
@@ -167,10 +168,16 @@
       },
       { deep: true },
     );
+
+    refresh();
   });
 
   const workflows = computed(() => store.state.WorkFlow.workflows);
   async function onLoad(index: number, done: (stop: boolean) => void) {
+    if (index === 1) {
+      // index 为 1 时，由onmounted负责加载
+      return;
+    }
     pagination.page = index;
     const workflows = await refresh();
     if (workflows.length < pagination.pageSize) {
@@ -178,12 +185,11 @@
     } else {
       done(false);
     }
-    console.log(workflows);
   }
 
   const pagination = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 15,
   });
 
   async function refresh() {

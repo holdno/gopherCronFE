@@ -1,12 +1,11 @@
 import { ActionTree, Module, MutationTree } from 'vuex';
 
+
+
 import { WorkFlow } from '@/api/request';
-import {
-  deleteWorkFlow,
-  fetchWorkFlowDetail,
-  fetchWorkFlows,
-} from '@/api/workflow';
+import { deleteWorkFlow, fetchWorkFlowDetail, fetchWorkFlows } from '@/api/workflow';
 import { State as RootState } from '@/store/index';
+
 
 export const NameSpace = 'WorkFlow';
 
@@ -57,8 +56,10 @@ const mutations: MutationTree<State> = {
     state,
     { workflows, total }: { workflows: WorkFlow[]; total: number },
   ) {
-    for (const w of workflows) {
-      state.workflows.set(w.id, w);
+    if (workflows) {
+      for (const w of workflows) {
+        state.workflows.set(w.id, w);
+      }
     }
     state.totalCount = total;
   },
