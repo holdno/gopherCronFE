@@ -66,7 +66,7 @@
       <q-scroll-area style="margin-bottom: 80px; height: calc(100% - 80px)">
         <q-list padding>
           <q-item class="tw-flex md:tw-hidden">
-            <org-select></org-select>
+            <org-select v-if="!miniState"></org-select>
           </q-item>
           <q-item
             clickable
