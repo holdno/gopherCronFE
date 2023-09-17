@@ -12,6 +12,10 @@
     v-model="showUsersManageDialog"
     :project-id="props.projectId"
   />
+  <DialogProjectWebhookManage
+    v-model="showWebhookManageDialog"
+    :project-id="props.projectId"
+  />
   <DialogProjectUsersManage></DialogProjectUsersManage>
   <q-btn-dropdown
     v-model="show"
@@ -38,6 +42,16 @@
       >
         <q-item-section>
           <q-item-label>人员管理</q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-item
+        v-close-popup
+        clickable
+        class="hover:tw-bg-primary hover:tw-text-black"
+        @click.stop="showWebhookManageDialog = true"
+      >
+        <q-item-section>
+          <q-item-label>Webhook</q-item-label>
         </q-item-section>
       </q-item>
       <q-item
@@ -112,6 +126,7 @@
   import DialogProjectDeleteConfirm from './DialogProjectDeleteConfirm.vue';
   import DialogProjectForm from './DialogProjectForm.vue';
   import DialogProjectUsersManage from './DialogProjectUsersManage.vue';
+  import DialogProjectWebhookManage from './DialogProjectWebhookManage.vue';
 
   import { getProjectToken, reGenProjectToken } from '@/api/project';
   import { useStore } from '@/store/index';
@@ -133,6 +148,7 @@
   const showDeleteConfirm = ref(false);
   const showEditDialog = ref(false);
   const showUsersManageDialog = ref(false);
+  const showWebhookManageDialog = ref(false);
 
   const showProjectTokenDialog = ref(false);
   const showProjectTokenLoading = ref(false);
