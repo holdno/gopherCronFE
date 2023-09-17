@@ -138,11 +138,7 @@
       path: '',
       params: {},
     };
-    if (
-      redirect &&
-      redirect.length > 0 &&
-      redirect.indexOf('/summary') === -1
-    ) {
+    if (redirect && redirect.length > 0 && redirect.indexOf('/summary') !== 0) {
       to.path = redirect[0] || to.path;
     } else {
       to.name = 'summary';

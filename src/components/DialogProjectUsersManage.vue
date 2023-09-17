@@ -44,62 +44,68 @@
 
       <q-separator />
 
-      <q-card-section style="max-height: 60vh; height: 60vh" class="scroll">
-        <ul role="list" class="tw-divide-y tw-divide-white/5">
-          <li
-            v-for="user of users"
-            :key="user.id"
-            class="tw-relative tw-flex tw-items-center tw-space-x-4 tw-py-2"
-          >
-            <div class="tw-min-w-0 tw-flex-auto">
-              <div class="tw-flex tw-items-center tw-gap-x-3">
-                <div class="flex-none rounded-full p-1">
-                  <div
-                    class="tw-h-2 tw-w-2 tw-rounded-full tw-bg-current"
-                  ></div>
+      <q-card-section style="max-height: 40vh; height: 40vh" class="scroll">
+        <q-infinite-scroll class="tw-w-full tw-h-full" :offset="100">
+          <ul role="list" class="tw-divide-y tw-divide-white/5">
+            <li
+              v-for="user of users"
+              :key="user.id"
+              class="tw-relative tw-flex tw-items-center tw-space-x-4 tw-py-2"
+            >
+              <div class="tw-min-w-0 tw-flex-auto">
+                <div class="tw-flex tw-items-center tw-gap-x-3">
+                  <div class="flex-none rounded-full p-1">
+                    <div
+                      class="tw-h-2 tw-w-2 tw-rounded-full tw-bg-current"
+                    ></div>
+                  </div>
+                  <h2
+                    class="tw-min-w-0 tw-text-sm tw-font-semibold tw-leading-6 tw-text-white"
+                  >
+                    <a class="tw-flex tw-gap-x-2">
+                      <span class="tw-whitespace-nowrap">{{ user.name }}</span>
+                      <span class="tw-text-gray-400"> - </span>
+                      <span class="tw-whitespace-nowrap tw-opacity-75">{{
+                        user.permissions &&
+                        getUserPermission(user.permissions[0])
+                      }}</span>
+                    </a>
+                  </h2>
                 </div>
-                <h2
-                  class="tw-min-w-0 tw-text-sm tw-font-semibold tw-leading-6 tw-text-white"
+                <div
+                  class="tw-mt-1 tw-flex tw-items-center tw-gap-x-2.5 tw-text-xs tw-leading-5 tw-text-gray-400"
                 >
-                  <a class="tw-flex tw-gap-x-2">
-                    <span class="tw-whitespace-nowrap">{{ user.name }}</span>
-                    <span class="tw-text-gray-400"> - </span>
-                    <span class="tw-whitespace-nowrap tw-opacity-75">{{
-                      user.permissions && getUserPermission(user.permissions[0])
-                    }}</span>
-                  </a>
-                </h2>
+                  <p class="tw-truncate tw-text-primary">{{ user.account }}</p>
+                  <svg
+                    viewbox="0 0 2 2"
+                    class="tw-h-0.5 tw-w-0.5 tw-flex-none tw-fill-gray-300"
+                  >
+                    <circle cx="1" cy="1" r="1"></circle>
+                  </svg>
+                  <p class="tw-whitespace-nowrap">
+                    {{
+                      formatTimestamp(
+                        user.createTime * 1000,
+                        'YYYY-MM-DD HH:mm',
+                      )
+                    }}
+                  </p>
+                </div>
               </div>
               <div
-                class="tw-mt-1 tw-flex tw-items-center tw-gap-x-2.5 tw-text-xs tw-leading-5 tw-text-gray-400"
+                class="rounded-full flex-none py-1 px-2 text-xs font-medium ring-1 ring-inset"
               >
-                <p class="tw-truncate">{{ user.account }}</p>
-                <svg
-                  viewbox="0 0 2 2"
-                  class="tw-h-0.5 tw-w-0.5 tw-flex-none tw-fill-gray-300"
+                <q-btn
+                  type="primary"
+                  unelevated
+                  class="tw-text-red-500"
+                  @click="openRemoveUserConfirm(user)"
+                  >移除</q-btn
                 >
-                  <circle cx="1" cy="1" r="1"></circle>
-                </svg>
-                <p class="tw-whitespace-nowrap">
-                  {{
-                    formatTimestamp(user.createTime * 1000, 'YYYY-MM-DD HH:mm')
-                  }}
-                </p>
               </div>
-            </div>
-            <div
-              class="rounded-full flex-none py-1 px-2 text-xs font-medium ring-1 ring-inset"
-            >
-              <q-btn
-                type="primary"
-                unelevated
-                class="tw-text-red-500"
-                @click="openRemoveUserConfirm(user)"
-                >移除</q-btn
-              >
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </q-infinite-scroll>
       </q-card-section>
 
       <q-separator />

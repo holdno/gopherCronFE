@@ -1,5 +1,5 @@
 export interface WebHook {
-  types: string;
+  type: string;
   callBackUrl: string;
   projectId: number;
   createTime?: number;
