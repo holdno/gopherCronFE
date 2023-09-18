@@ -119,14 +119,28 @@
             header-class="tw-font-medium"
             icon="admin_panel_settings"
           >
-            <q-item clickable :inset-level="0.2" :to="{ name: 'user-admin' }">
+            <q-item
+              clickable
+              :inset-level="0.2"
+              :to="{
+                name: 'user-admin',
+                params: { orgid: store.getters.currentOrg },
+              }"
+            >
               <q-item-section avatar>
                 <q-icon name="supervisor_account" />
               </q-item-section>
 
               <q-item-section class="tw-font-medium">用户管理</q-item-section>
             </q-item>
-            <q-item clickable :inset-level="0.2" :to="{ name: 'node-admin' }">
+            <q-item
+              clickable
+              :inset-level="0.2"
+              :to="{
+                name: 'node-admin',
+                params: { orgid: store.getters.currentOrg },
+              }"
+            >
               <q-item-section avatar>
                 <q-icon name="dynamic_form" />
               </q-item-section>

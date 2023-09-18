@@ -56,6 +56,13 @@
 
   import { useStore } from '@/store/index';
 
+  const props = defineProps({
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
+
   const page = ref(1);
   const pagesize = ref(10);
   const showCreate = ref(false);
@@ -74,6 +81,7 @@
     loading.value = true;
     try {
       await store.dispatch('fetchUsers', {
+        oid: props.orgId,
         page: page.value,
         pagesize: pagesize.value,
       });

@@ -55,6 +55,7 @@
         </q-item-section>
       </q-item>
       <q-item
+        v-if="isAdminPermission(role)"
         v-close-popup
         clickable
         class="hover:tw-bg-primary hover:tw-text-black"
@@ -130,12 +131,17 @@
 
   import { getProjectToken, reGenProjectToken } from '@/api/project';
   import { useStore } from '@/store/index';
+  import { isAdminPermission } from '@/utils/permission';
 
   const show = ref(false);
   const props = defineProps({
     projectId: {
       type: Number,
       required: true,
+    },
+    role: {
+      type: String,
+      default: '',
     },
     orgId: {
       type: String,

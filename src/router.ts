@@ -231,14 +231,20 @@ const routes = [
       },
       {
         name: 'user-admin',
-        path: 'admin/user',
+        path: ':orgId/admin/user',
         component: () => import('@/pages/UserListAdmin/UserListAdmin.vue'),
+        props: (route: RouteLocationNormalizedLoaded) => ({
+          orgId: route.params.orgId,
+        }),
         meta: { requiresAdmin: true },
       },
       {
         name: 'node-admin',
-        path: 'admin/node',
+        path: ':orgId/admin/node',
         component: () => import('@/pages/NodeListAdmin/NodeListAdmin.vue'),
+        props: (route: RouteLocationNormalizedLoaded) => ({
+          orgId: route.params.orgId,
+        }),
         meta: { requiresAdmin: true },
       },
       {

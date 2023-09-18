@@ -33,6 +33,7 @@ export async function changePassword(args: ChangePasswordRequest) {
 }
 
 export interface GetUserListRequest {
+  oid: string;
   name?: String;
   account?: String;
   projectID?: Number;
@@ -50,6 +51,7 @@ export async function userList(
 ): Promise<GetUserListResponse> {
   const resp = await apiv1.get('/user/list', {
     params: {
+      oid: args.oid,
       name: args.name,
       account: args.account,
       project_id: args.projectID,

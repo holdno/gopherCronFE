@@ -38,6 +38,13 @@
   import { Node, getClientList } from '@/api/node';
   import { useStore } from '@/store/index';
 
+  const props = defineProps({
+    orgId: {
+      type: String,
+      required: true,
+    },
+  });
+
   const store = useStore();
 
   const nodeList: Ref<Node[]> = ref([]);
@@ -45,7 +52,7 @@
   const getList = async () => {
     loading.value = true;
     try {
-      const res = await getClientList({ projectIDs: [] });
+      const res = await getClientList({ oid: props.orgId, projectIDs: [] });
       if (res.meta.code === 0) {
         nodeList.value = res.nodeList;
       } else {

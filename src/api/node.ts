@@ -1,6 +1,7 @@
 import { Meta, apiv1 } from './request';
 
 export interface GetClientListRequest {
+  oid: string;
   projectIDs?: number[];
 }
 
@@ -19,6 +20,7 @@ export async function getClientList(
 ): Promise<GetClientListResponse> {
   const resp = await apiv1.get('/client/list', {
     params: {
+      oid: args.oid,
       project_ids: args.projectIDs,
     },
   });
