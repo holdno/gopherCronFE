@@ -65,8 +65,11 @@
     >
       <q-scroll-area style="margin-bottom: 80px; height: calc(100% - 80px)">
         <q-list padding>
-          <q-item class="tw-flex md:tw-hidden">
-            <org-select v-if="!miniState"></org-select>
+          <q-item v-show="!miniState" class="tw-flex md:tw-hidden">
+            <q-item-section v-show="miniState" avatar>
+              <q-icon name="timeline" />
+            </q-item-section>
+            <org-select behavior="dialog"></org-select>
           </q-item>
           <q-item
             clickable

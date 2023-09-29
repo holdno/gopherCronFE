@@ -143,7 +143,7 @@
     } else {
       to.name = 'summary';
       to.params = {
-        orgId: store.state.Root.currentOrg,
+        orgId: 'baseorg',
       };
     }
     await router.push(to);

@@ -11,6 +11,7 @@
     map-options
     label="选择组织"
     :options="userOrgOptions"
+    :behavior="behavior"
     style="width: 300px"
     @filter="reloadOrgOptions"
   >
@@ -53,11 +54,18 @@
 
 <script lang="ts" setup>
   import { QSelect } from 'quasar';
-  import { computed, onMounted, ref } from 'vue';
+  import { computed, onMounted, ref,PropType } from 'vue';
   import { useRoute } from 'vue-router';
 
   import DialogOrgForm from '@/components/DialogOrgForm.vue';
   import { useStore } from '@/store/index';
+
+  defineProps({
+    behavior: {
+      type: String as PropType<'default' | 'dialog'>,
+      default: 'default',
+    },
+  });
 
   const store = useStore();
 
