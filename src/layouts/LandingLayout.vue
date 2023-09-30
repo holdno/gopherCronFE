@@ -57,15 +57,16 @@
 
     <q-drawer
       v-model="drawer"
-      :mini="miniState && !adminMenuExpanded"
+      show-if-above
+      :mini="miniState"
       :width="200"
-      :breakpoint="500"
+      :breakpoint="$q.screen.sizes.md"
       @mouseover="miniState = false"
       @mouseout="miniState = true"
     >
       <q-scroll-area style="margin-bottom: 80px; height: calc(100% - 80px)">
         <q-list padding>
-          <q-item v-show="!miniState" class="tw-flex md:tw-hidden">
+          <q-item v-show="showMenuOrgSelector" class="tw-flex md:tw-hidden">
             <org-select behavior="dialog"></org-select>
           </q-item>
           <q-item
@@ -173,6 +174,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useQuasar } from 'quasar';
   import { computed, ref, watchEffect } from 'vue';
   import { useRoute } from 'vue-router';
 
@@ -182,7 +184,11 @@
   import { getServiceVersion } from '@/api/version';
   import { useStore } from '@/store/index';
 
+  const $q = useQuasar();
   const drawer = ref(true);
+  if ($q.screen.lt.md) {
+    drawer.value = false;
+  }
   const miniState = ref(true);
   const adminMenuExpanded = ref(false);
   const store = useStore();
@@ -193,6 +199,13 @@
     adminMenuExpanded.value = adminMenuItemRouteNames.includes(
       route.name.toString(),
     );
+  });
+
+  const showMenuOrgSelector = computed(() => {
+    if ($q.screen.lt.md) {
+      return drawer.value;
+    }
+    return !miniState.value;
   });
 
   const version = ref('');
