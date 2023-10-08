@@ -289,7 +289,12 @@ const Router = createRouter({
   routes: routes,
 });
 
+Router.onError((err, to, from) => {
+  console.error('router error', err);
+});
+
 Router.beforeEach(async (to, from) => {
+  console.log(to);
   await store.dispatch('checkLogin');
 
   if (to.params.orgId !== from.params.orgId && to.params.orgId) {

@@ -57,7 +57,6 @@
 
     <q-drawer
       v-model="drawer"
-      show-if-above
       :mini="miniState"
       :width="200"
       :breakpoint="$q.screen.sizes.md"
@@ -73,7 +72,7 @@
             clickable
             :to="{
               name: 'summary',
-              params: { orgid: store.getters.currentOrg },
+              params: { orgId: store.getters.currentOrg },
             }"
           >
             <q-item-section avatar>
@@ -87,7 +86,7 @@
             clickable
             :to="{
               name: 'projects',
-              params: { orgid: store.getters.currentOrg },
+              params: { orgId: store.getters.currentOrg },
             }"
           >
             <q-item-section avatar>
@@ -101,7 +100,7 @@
             clickable
             :to="{
               name: 'workflows',
-              params: { orgid: store.getters.currentOrg },
+              params: { orgId: store.getters.currentOrg },
             }"
           >
             <q-item-section avatar>
@@ -125,7 +124,7 @@
               :inset-level="0.2"
               :to="{
                 name: 'user-admin',
-                params: { orgid: store.getters.currentOrg },
+                params: { orgId: store.getters.currentOrg },
               }"
             >
               <q-item-section avatar>
@@ -139,7 +138,7 @@
               :inset-level="0.2"
               :to="{
                 name: 'node-admin',
-                params: { orgid: store.getters.currentOrg },
+                params: { orgId: store.getters.currentOrg },
               }"
             >
               <q-item-section avatar>

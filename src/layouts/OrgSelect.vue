@@ -54,7 +54,7 @@
 
 <script lang="ts" setup>
   import { QSelect } from 'quasar';
-  import { computed, onMounted, ref,PropType } from 'vue';
+  import { PropType, computed, onMounted, ref } from 'vue';
   import { useRoute } from 'vue-router';
 
   import DialogOrgForm from '@/components/DialogOrgForm.vue';
@@ -111,7 +111,8 @@
   onMounted(() => {
     if (!currentOrg.value) {
       const route = useRoute();
-      currentOrg.value = route.params.orgId as string;
+      currentOrg.value = (route.params.orgId as string) || 'baseorg';
+      store.commit('setCurrentOrg', currentOrg.value);
     }
   });
 
