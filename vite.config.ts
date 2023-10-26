@@ -14,7 +14,7 @@ export default defineConfig({
       sassVariables: 'src/quasar-variables.sass',
     }),
   ],
-  // base: './',
+  base: './',
   resolve: {
     alias: {
       // 键必须以斜线开始和结束

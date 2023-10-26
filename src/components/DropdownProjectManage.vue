@@ -2,6 +2,7 @@
   <DialogProjectDeleteConfirm
     v-model="showDeleteConfirm"
     :project-id="props.projectId"
+    :org-id="orgId"
   />
   <DialogProjectForm
     v-model="showEditDialog"
