@@ -41,7 +41,10 @@
     store.commit('cleanError');
     await store.dispatch('deleteProject', { projectId });
     if (store.state.Root.currentError === undefined) {
-      router.push({ name: 'projects' });
+      router.push({
+        name: 'projects',
+        params: { orgId: store.getters.currentOrg },
+      });
       show.value = false;
     }
   }
