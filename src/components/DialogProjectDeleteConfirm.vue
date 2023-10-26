@@ -19,13 +19,17 @@
       type: Number,
       required: true,
     },
+    orgId: {
+      type: String,
+      required: true,
+    },
     modelValue: {
       type: Boolean,
       default: false,
     },
   });
 
-  const emits = defineEmits(['update:modelValue', 'deleted']);
+  const emits = defineEmits(['update:modelValue']);
 
   const show = computed({
     get: () => props.modelValue,
@@ -38,10 +42,12 @@
   );
   async function deleteProject(projectId: number) {
     store.commit('cleanError');
-    await store.dispatch('deleteProject', { projectId });
+    await store.dispatch('deleteProject', {
+      projectId: projectId,
+      orgId: props.orgId,
+    });
     if (store.state.Root.currentError === undefined) {
       show.value = false;
-      emits('deleted');
     }
   }
 </script>

@@ -114,6 +114,7 @@
         projectId: props.projectId,
         title: p.title.trim(),
         remark: p.remark.trim(),
+        orgId: props.orgId,
       });
     } else {
       await store.dispatch('createProject', {
