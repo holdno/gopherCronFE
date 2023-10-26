@@ -4,6 +4,7 @@
       v-if="projectSelected"
       v-model="showDeleteConfirm"
       :project-id="projectSelected.id"
+      @deleted="fetchProjects"
     />
     <DialogProjectForm v-model="showAddDialog" :org-id="orgId" />
     <div class="q-pa-md tw-flex tw-justify-around">

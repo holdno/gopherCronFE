@@ -9,7 +9,6 @@
 
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { useRouter } from 'vue-router';
 
   import Confirm from './Confirm.vue';
 
@@ -26,13 +25,13 @@
     },
   });
 
-  const emits = defineEmits(['update:modelValue']);
+  const emits = defineEmits(['update:modelValue', 'deleted']);
 
   const show = computed({
     get: () => props.modelValue,
     set: (value) => emits('update:modelValue', value),
   });
-  const router = useRouter();
+
   const store = useStore();
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
@@ -41,11 +40,8 @@
     store.commit('cleanError');
     await store.dispatch('deleteProject', { projectId });
     if (store.state.Root.currentError === undefined) {
-      router.push({
-        name: 'projects',
-        params: { orgId: store.getters.currentOrg },
-      });
       show.value = false;
+      emits('deleted');
     }
   }
 </script>
