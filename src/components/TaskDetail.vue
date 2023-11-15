@@ -154,6 +154,7 @@
           type="submit"
           label="保存"
           :disable="!modified"
+          :loading="loading"
           class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
         >
         </q-btn>
@@ -272,12 +273,14 @@
   });
 
   const router = useRouter();
+  const loading = ref(false);
   async function onSubmit() {
     store.commit('cleanError');
     if (!canSave.value) {
       store.commit('error', { error: { message: cantSaveReason.value } });
       return;
     }
+    loading.value = true;
     const newTask = await store.dispatch('saveTask', {
       task: editable.value,
     });
@@ -292,6 +295,7 @@
         },
       });
     }
+    loading.value = false;
   }
   function onReset() {
     editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
