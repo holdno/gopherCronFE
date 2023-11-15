@@ -4,6 +4,7 @@
       v-model="showDeleteConfirm"
       :content="'是否要删除任务' + selectedTask?.name + '?'"
       type="warning"
+      :loading="deleteLoading"
       @confirm="
         selectedTask && deleteTask(selectedTask.projectId, selectedTask.id)
       "
@@ -151,19 +152,26 @@
   const selectedTask = computed(() => tasks.value.filter(activated).pop());
   const router = useRouter();
   const showDeleteConfirm = ref(false);
+  const deleteLoading = ref(false);
   async function deleteTask(projectId: number, taskId: string) {
-    store.commit('cleanError');
-    await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
-    if (store.state.Root.currentError === undefined) {
-      router.push({
-        name: 'workflow_tasks',
-        params: {
-          projectId: projectId,
-        },
-      });
-      showDeleteConfirm.value = false;
-      await fetchTasks();
+    deleteLoading.value = true;
+    try {
+      store.commit('cleanError');
+      await store.dispatch('deleteWorkFlowTask', { projectId, taskId });
+      if (store.state.Root.currentError === undefined) {
+        router.push({
+          name: 'workflow_tasks',
+          params: {
+            projectId: projectId,
+          },
+        });
+        showDeleteConfirm.value = false;
+        await fetchTasks();
+      }
+    } catch (e: any) {
+      console.error(e);
     }
+    deleteLoading.value = false;
   }
 </script>
 

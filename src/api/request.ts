@@ -428,6 +428,7 @@ export const STATUS_WORK_FLOW_DISABLE = 2;
 export interface WorkFlow {
   id: number;
   title: string;
+  oid: string;
   remark: string;
   status: STATUS_WORK_FLOW;
   state: WorkFlowState | null;
@@ -478,12 +479,14 @@ export interface WorkFlowTask {
 
 export async function createWorkflow(
   api: AxiosInstance,
+  oid: string,
   title: string,
   remark: string,
   cronExpr: string,
   status: STATUS_WORK_FLOW = STATUS_WORK_FLOW_DISABLE,
 ) {
   const payload = JSON.stringify({
+    oid: oid,
     title: title,
     remark: remark,
     cron: cronExpr,

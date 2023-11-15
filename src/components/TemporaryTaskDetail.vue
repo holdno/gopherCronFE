@@ -176,7 +176,7 @@
     store.watch(
       (state) => [state.Root.eventTask],
       ([eventTask]) => {
-        if (!eventTask || eventTask.projectId !== props.projectId) return;
+        if (!eventTask || eventTask.projectId !== props.projectId || eventTask.taskId !== task.value?.taskId) return;
 
         store.dispatch('Task/fetchTemporaryTasks', {
           projectId: props.projectId,

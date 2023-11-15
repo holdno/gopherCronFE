@@ -34,6 +34,7 @@
             type="submit"
             :label="project === undefined ? '创建' : '保存'"
             :disable="!canSubmit"
+            :loading="loading"
             class="lg:tw-w-24 tw-w-full"
           />
         </q-card-section>
@@ -106,23 +107,30 @@
     });
   });
 
+  const loading = ref(false);
   async function onSubmit() {
-    const p = editable.value;
-    store.commit('cleanError');
-    if (props.projectId > 0) {
-      await store.dispatch('updateProject', {
-        projectId: props.projectId,
-        title: p.title.trim(),
-        remark: p.remark.trim(),
-        orgId: props.orgId,
-      });
-    } else {
-      await store.dispatch('createProject', {
-        orgId: props.orgId,
-        title: p.title.trim(),
-        remark: p.remark.trim(),
-      });
+    loading.value = true;
+    try {
+      const p = editable.value;
+      store.commit('cleanError');
+      if (props.projectId > 0) {
+        await store.dispatch('updateProject', {
+          projectId: props.projectId,
+          title: p.title.trim(),
+          remark: p.remark.trim(),
+          orgId: props.orgId,
+        });
+      } else {
+        await store.dispatch('createProject', {
+          orgId: props.orgId,
+          title: p.title.trim(),
+          remark: p.remark.trim(),
+        });
+      }
+      if (store.state.Root.currentError === undefined) show.value = false;
+    } catch (e: any) {
+      console.error(e);
     }
-    if (store.state.Root.currentError === undefined) show.value = false;
+    loading.value = false;
   }
 </script>

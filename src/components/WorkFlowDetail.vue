@@ -54,6 +54,7 @@
         type="submit"
         :label="isCreateMode ? '创建' : '保存'"
         :disable="!modified || !canSave"
+        :loading="loading"
         class="lg:tw-w-24 tw-w-full"
       />
     </q-card-section>
@@ -82,6 +83,7 @@
   const DefaultTaskValues = computed<WorkFlow>(() => ({
     id: 0,
     title: '',
+    oid: '',
     cronExpr: '0 0 0 * * * *',
     remark: '',
     createTime: 0,
@@ -110,23 +112,35 @@
       workflowInfo.value || DefaultTaskValues.value,
     );
   });
+
+  const loading = ref(false);
   async function onSubmit() {
-    const v = editable.value;
-    if (isCreateMode.value) {
-      await createWorkflow(
-        store.getters.apiv1,
-        v.title.trim(),
-        v.remark.trim(),
-        v.cronExpr.trim(),
-        v.status,
-      );
-      router.push({
-        name: 'workflows',
-      });
-    } else {
-      await updateWorkflow(store.getters.apiv1, editable.value);
-      await refreshInfo();
+    loading.value = true;
+    try {
+      const v = editable.value;
+      if (isCreateMode.value) {
+        await createWorkflow(
+          store.getters.apiv1,
+          store.getters.currentOrg,
+          v.title.trim(),
+          v.remark.trim(),
+          v.cronExpr.trim(),
+          v.status,
+        );
+        router.push({
+          name: 'workflows',
+        });
+      } else {
+        await updateWorkflow(store.getters.apiv1, editable.value);
+        store.commit('success', {
+          message: '更新成功',
+        });
+        await refreshInfo();
+      }
+    } catch (e: any) {
+      console.error(e);
     }
+    loading.value = false;
   }
   const route = useRoute();
   const isCreateMode = computed(

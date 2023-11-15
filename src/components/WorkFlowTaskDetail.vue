@@ -30,7 +30,7 @@
     <q-btn
       color="primary"
       text-color="black"
-      :disable="true || modified"
+      :disable="modified"
       class="tw-w-24"
       :loading="executing"
       @click="() => task && execute(projectId, task.id)"
@@ -110,6 +110,7 @@
         text-color="black"
         type="submit"
         label="保存"
+        :loading="loading"
         :disable="!modified"
         class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
       />
@@ -188,36 +189,43 @@
     return '';
   });
   const router = useRouter();
+  const loading = ref(false);
   async function onSubmit() {
-    store.commit('cleanError');
-    if (!canSave.value) {
-      store.commit('error', { error: { message: cantSaveReason.value } });
-      return;
-    }
+    loading.value = true;
+    try {
+      store.commit('cleanError');
+      if (!canSave.value) {
+        store.commit('error', { error: { message: cantSaveReason.value } });
+        return;
+      }
 
-    await store.dispatch('saveWorkFlowTask', {
-      task: editable.value,
-    });
-    await store.dispatch('WorkFlowTask/fetchTasks', {
-      projectId: props.projectId,
-    });
-    if (isCreateMode.value) {
-      const tasks: WorkFlowTask[] = Object.assign(
-        [],
-        store.state.WorkFlowTask.tasks.get(props.projectId) || [],
-      );
-      tasks.sort((a: WorkFlowTask, b: WorkFlowTask) => {
-        return a.createTime - b.createTime;
+      await store.dispatch('saveWorkFlowTask', {
+        task: editable.value,
       });
-      const newTask: WorkFlowTask = tasks[tasks.length - 1];
-      router.push({
-        name: 'workflow_task',
-        params: {
-          projectId: props.projectId,
-          taskId: newTask.id,
-        },
+      await store.dispatch('WorkFlowTask/fetchTasks', {
+        projectId: props.projectId,
       });
+      if (isCreateMode.value) {
+        const tasks: WorkFlowTask[] = Object.assign(
+          [],
+          store.state.WorkFlowTask.tasks.get(props.projectId) || [],
+        );
+        tasks.sort((a: WorkFlowTask, b: WorkFlowTask) => {
+          return a.createTime - b.createTime;
+        });
+        const newTask: WorkFlowTask = tasks[tasks.length - 1];
+        router.push({
+          name: 'workflow_task',
+          params: {
+            projectId: props.projectId,
+            taskId: newTask.id,
+          },
+        });
+      }
+    } catch (e: any) {
+      console.error(e);
     }
+    loading.value = false;
   }
   function onReset() {
     editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
@@ -255,7 +263,8 @@
       ([eventWorkFlowTask]) => {
         if (
           !eventWorkFlowTask ||
-          eventWorkFlowTask.projectId !== props.projectId
+          eventWorkFlowTask.projectId !== props.projectId ||
+          eventWorkFlowTask.taskId !== props.id
         )
           return;
 

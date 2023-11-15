@@ -56,7 +56,7 @@
                         ? '执行中'
                         : workflow.status == 1
                         ? '调度中'
-                        : '已终止'
+                        : '已暂停'
                     }}
                   </q-badge>
                   <!-- <div :class="'tw-w-[50px] task__status' + task.status"></div> -->

@@ -4,6 +4,7 @@
       v-model="showDeleteConfirm"
       :content="'是否要删除任务' + selectedTask?.name + '?'"
       type="warning"
+      :loading="deleteLoading"
       @confirm="
         selectedTask && deleteTask(selectedTask.projectId, selectedTask.id)
       "
@@ -73,7 +74,7 @@
                       ? '执行中'
                       : task.status == 1
                       ? '调度中'
-                      : '已终止'
+                      : '已暂停'
                   }}
                 </q-badge>
                 <!-- <div :class="'tw-w-[50px] task__status' + task.status"></div> -->
@@ -177,19 +178,26 @@
   const selectedTask = computed(() => tasks.value.filter(activated).pop());
   const router = useRouter();
   const showDeleteConfirm = ref(false);
+  const deleteLoading = ref(false);
   async function deleteTask(projectId: number, taskId: string) {
-    store.commit('cleanError');
-    await store.dispatch('deleteTask', { projectId, taskId });
-    if (store.state.Root.currentError === undefined) {
-      router.push({
-        name: 'crontab_tasks',
-        params: {
-          projectId: projectId,
-        },
-      });
-      showDeleteConfirm.value = false;
-      await fetchTasks();
+    try {
+      deleteLoading.value = true;
+      store.commit('cleanError');
+      await store.dispatch('deleteTask', { projectId, taskId });
+      if (store.state.Root.currentError === undefined) {
+        router.push({
+          name: 'crontab_tasks',
+          params: {
+            projectId: projectId,
+          },
+        });
+        showDeleteConfirm.value = false;
+        await fetchTasks();
+      }
+    } catch (e: any) {
+      console.error(e);
     }
+    deleteLoading.value = false;
   }
 </script>
 

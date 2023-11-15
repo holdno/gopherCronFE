@@ -22,6 +22,7 @@
           flat
           :label="confirmLabel"
           :color="config.confirmColor"
+          :loading="loading"
           @click="callback"
         />
       </q-card-actions>
@@ -52,6 +53,10 @@
     type: {
       type: String,
       default: 'confirm',
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   });
   const emits = defineEmits(['update:modelValue', 'confirm', 'cancel']);

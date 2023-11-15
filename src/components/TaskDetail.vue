@@ -8,6 +8,7 @@
       v-model="showDeleteConfirm"
       :content="'是否要删除任务' + task?.name + '?'"
       type="warning"
+      :loading="deleteLoading"
       @confirm="project && task && deleteTask(project.id, task.id)"
     ></Confirm>
     <Confirm
@@ -302,20 +303,29 @@
   }
 
   const showDeleteConfirm = ref(false);
+  const deleteLoading = ref(false);
   async function deleteTask(projectId: number, taskId: string) {
     store.commit('cleanError');
-    await store.dispatch('deleteTask', { projectId, taskId });
-    if (store.state.Root.currentError === undefined) {
-      const projectId = props.projectId;
-      await store.dispatch('Task/fetchTasks', { projectId });
-      router.push({
-        name: 'crontab_tasks',
-        params: {
-          projectId: route.params.projectId,
-        },
-      });
-      showDeleteConfirm.value = false;
+    deleteLoading.value = true;
+    console.log('delete loading', deleteLoading.value);
+    try {
+      await store.dispatch('deleteTask', { projectId, taskId });
+      if (store.state.Root.currentError === undefined) {
+        const projectId = props.projectId;
+        await store.dispatch('Task/fetchTasks', { projectId });
+        router.push({
+          name: 'crontab_tasks',
+          params: {
+            projectId: route.params.projectId,
+          },
+        });
+        showDeleteConfirm.value = false;
+      }
+    } catch (e: any) {
+      console.error(e);
     }
+
+    deleteLoading.value = false;
   }
 
   const route = useRoute();

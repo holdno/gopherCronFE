@@ -3,12 +3,13 @@
     v-model="show"
     :content="'是否要删除项目' + project?.title + '?'"
     type="warning"
+    :loading="loading"
     @confirm="project && deleteProject(project.id)"
   ></Confirm>
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, ref } from 'vue';
 
   import Confirm from './Confirm.vue';
 
@@ -40,14 +41,21 @@
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
   );
+  const loading = ref(false);
   async function deleteProject(projectId: number) {
-    store.commit('cleanError');
-    await store.dispatch('deleteProject', {
-      projectId: projectId,
-      orgId: props.orgId,
-    });
-    if (store.state.Root.currentError === undefined) {
-      show.value = false;
+    loading.value = true;
+    try {
+      store.commit('cleanError');
+      await store.dispatch('deleteProject', {
+        projectId: projectId,
+        orgId: props.orgId,
+      });
+      if (store.state.Root.currentError === undefined) {
+        show.value = false;
+      }
+    } catch (e: any) {
+      console.error(e);
     }
+    loading.value = false;
   }
 </script>
