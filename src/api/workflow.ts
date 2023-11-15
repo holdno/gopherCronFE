@@ -39,6 +39,7 @@ export async function fetchWorkFlowDetail(
   const v = resp.data.response;
   return {
     id: v.id,
+    oid: v.oid,
     title: v.title,
     remark: v.remark,
     status: v.status,
