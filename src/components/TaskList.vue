@@ -196,6 +196,7 @@
       }
     } catch (e: any) {
       console.error(e);
+      store.commit('error', { error: e });
     }
     deleteLoading.value = false;
   }

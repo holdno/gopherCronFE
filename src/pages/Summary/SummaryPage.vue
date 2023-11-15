@@ -45,6 +45,7 @@
       });
     } catch (e: any) {
       console.error(e);
+      store.commit('error', { error: e });
     }
     loading.value = false;
   }

@@ -15,7 +15,6 @@ import {
   WorkflowTaskState,
   createProject,
   createWorkFlowTask,
-  createWorkflow,
   deleteProject,
   deleteTask,
   deleteWorkFlowTask,
@@ -510,14 +509,6 @@ const actions: ActionTree<State, RootState> = {
     try {
       await updateWorkflowEdges(api, workflowId, edges);
       await dispatch('fetchWorkflowEdges', { workflowId });
-    } catch (e) {
-      commit('error', { error: e });
-    }
-  },
-  async createWorkflow({ dispatch, commit }, { title, remark, cronExpr }) {
-    const api = this.getters.apiv1;
-    try {
-      await createWorkflow(api, title, remark, cronExpr);
     } catch (e) {
       commit('error', { error: e });
     }

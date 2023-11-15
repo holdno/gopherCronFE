@@ -171,6 +171,7 @@
       projectToken.value = token;
     } catch (e: any) {
       console.error(e);
+      store.commit('error', { error: e });
     }
     showProjectTokenLoading.value = false;
   }
@@ -191,6 +192,7 @@
       projectToken.value = await reGenProjectToken(props.projectId);
     } catch (e: any) {
       console.error(e);
+      store.commit('error', { error: e });
     }
     reGenLoading.value = false;
     showReGenButton.value = false;

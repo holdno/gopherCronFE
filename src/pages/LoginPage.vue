@@ -115,6 +115,7 @@
       allowLoginMethods.value = await loginMethods();
     } catch (e: any) {
       console.error(e);
+      store.commit('error', { error: e });
     }
   }
 
@@ -157,6 +158,7 @@
     } catch (e: any) {
       console.error(e);
       oidcLoading.value = false;
+      store.commit('error', { error: e });
     }
   }
 

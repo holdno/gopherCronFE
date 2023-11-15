@@ -323,6 +323,7 @@
       }
     } catch (e: any) {
       console.error(e);
+      store.commit('error', { error: e });
     }
 
     deleteLoading.value = false;
@@ -371,6 +372,7 @@
       await killTask({ projectId: props.projectId, taskId: props.id });
     } catch (e) {
       console.error(e);
+      store.commit('error', { error: e });
     }
     waitingKill.value = false;
   };
