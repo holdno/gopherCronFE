@@ -148,7 +148,9 @@
       ([eventWorkFlow]) => {
         if (!eventWorkFlow) return;
 
-        const flow = workflows.value.get(eventWorkFlow.workFlowId);
+        const flow = store.state.WorkFlow.workflows.get(
+          eventWorkFlow.workFlowId,
+        );
         if (flow !== undefined) {
           store.commit('notifySuccess', {
             message: `任务编排 ${flow.title} 当前状态: ${eventWorkFlow.status}`,
@@ -174,7 +176,6 @@
 
   const workflows = computed(() => {
     const wlist = store.state.WorkFlow.workflows;
-    console.log(wlist);
     const list = Array.from(wlist.values());
     list.sort((i, j) => {
       return j.id - i.id;
