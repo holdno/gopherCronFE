@@ -18,11 +18,11 @@
           @load="onLoad"
         >
           <q-list
-            v-if="workflows && workflows.size > 0"
+            v-if="workflows && workflows.length > 0"
             class="tw-flex tw-flex-col tw-gap-2 tw-pb-4"
           >
             <router-link
-              v-for="[, workflow] in workflows"
+              v-for="workflow in workflows"
               :key="workflow.id"
               :to="{
                 name: 'workflow',
@@ -82,7 +82,7 @@
             </router-link>
           </q-list>
           <div
-            v-if="!loading && (!workflows || workflows.size === 0)"
+            v-if="!loading && (!workflows || workflows.length === 0)"
             class="tw-w-full tw-text-center tw-m-auto tw-text-gray-500"
           >
             <q-icon name="outlet" style="font-size: 3rem" />
@@ -172,7 +172,15 @@
     refresh();
   });
 
-  const workflows = computed(() => store.state.WorkFlow.workflows);
+  const workflows = computed(() => {
+    const wlist = store.state.WorkFlow.workflows;
+    console.log(wlist);
+    const list = Array.from(wlist.values());
+    list.sort((i, j) => {
+      return j.id - i.id;
+    });
+    return list;
+  });
   async function onLoad(index: number, done: (stop: boolean) => void) {
     if (index === 1) {
       // index 为 1 时，由onmounted负责加载
