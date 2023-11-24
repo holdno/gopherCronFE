@@ -294,7 +294,6 @@ Router.onError((err, to, from) => {
 });
 
 Router.beforeEach(async (to, from) => {
-  console.log(to);
   await store.dispatch('checkLogin');
 
   if (to.params.orgId !== from.params.orgId && to.params.orgId) {

@@ -7,6 +7,7 @@ export interface GetClientListRequest {
 
 export interface Node {
   clientIP: string;
+  projectID: number;
   version: string;
 }
 
@@ -30,6 +31,7 @@ export async function getClientList(
     resp.data.response.forEach((element: any, i: number) => {
       data.push({
         clientIP: element.client_ip,
+        projectID: element.project_id,
         version: element.version,
       });
     });
@@ -42,6 +44,7 @@ export async function getClientList(
 
 export interface ReloadNodeConfigRequest {
   clientIP: string;
+  projectID: number;
 }
 
 export async function reloadNodeConfig(
@@ -49,6 +52,7 @@ export async function reloadNodeConfig(
 ): Promise<Meta> {
   const resp = await apiv1.post('/client/reload/config', {
     client_ip: args.clientIP,
+    project_id: args.projectID,
   });
   return { code: resp.data.meta.code, message: resp.data.meta.msg };
 }

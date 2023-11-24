@@ -132,7 +132,6 @@ const mutations: MutationTree<State> = {
     state.user = undefined;
     state.token = undefined;
     state.logined = false;
-
     Cookies.remove(COOKIE_TOKEN);
     const api = state.apiv1;
     if (api) {
@@ -254,7 +253,6 @@ const mutations: MutationTree<State> = {
 
 const actions: ActionTree<State, RootState> = {
   changeNotificationStatus({ commit, state }) {
-    console.log('set setting', state.notificationSwitch);
     commit('setNotificationSwitch', {
       status: !state.notificationSwitch,
     });
@@ -287,7 +285,7 @@ const actions: ActionTree<State, RootState> = {
       api.defaults.headers.common[COOKIE_TOKEN] = token;
       const user = await userInfo(api);
       commit('authed', { user, token });
-      FireTowerPlugin(user, this);
+      FireTowerPlugin(user, this, token);
       const orgs = await fetchUserOrgs();
       commit('userOrgs', orgs);
     } catch (e) {
@@ -300,7 +298,7 @@ const actions: ActionTree<State, RootState> = {
     try {
       const [user, token] = await login(api, username, password);
       commit('authed', { user, token });
-      FireTowerPlugin(user, this);
+      FireTowerPlugin(user, this, token);
       const orgs = await fetchUserOrgs();
       commit('userOrgs', orgs);
     } catch (e) {
@@ -312,7 +310,7 @@ const actions: ActionTree<State, RootState> = {
     try {
       const [user, token] = await loginWithOIDC(api, code, state);
       commit('authed', { user, token });
-      FireTowerPlugin(user, this);
+      FireTowerPlugin(user, this, token);
       const orgs = await fetchUserOrgs();
       commit('userOrgs', orgs);
     } catch (e) {

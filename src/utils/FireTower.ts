@@ -20,11 +20,11 @@ function successMessage(message: string) {
 }
 
 export class FireTower {
-  ws: WebSocket;
+  ws: WebSocket | undefined;
 
-  subscribeKey = 'subscribe';
-  unSubscribeKey = 'unSubscribe';
-  publishKey = 'publish';
+  subscribeKey = 2;
+  unSubscribeKey = 3;
+  publishKey = 1;
   logging = true; // 开启log
 
   onmessage?: (event: MessageEvent) => void;
@@ -36,10 +36,17 @@ export class FireTower {
     onopen: () => void,
     onclose: (event: CloseEvent) => void,
   ) {
-    this.ws = new WebSocket(addr);
-    this.ws.onopen = onopen;
     this.onclose = onclose;
+    try {
+      this.ws = new WebSocket(addr);
+    } catch (e: any) {
+      if (this.onclose) {
+        this.onclose(e);
+      }
+      return;
+    }
 
+    this.ws.onopen = onopen;
     this.ws.onmessage = (event) => {
       if (this.logging) {
         this.logInfo('new message:' + JSON.stringify(event.data));
@@ -76,7 +83,7 @@ export class FireTower {
       );
     }
 
-    this.ws.send(
+    this.ws?.send(
       JSON.stringify({
         type: this.publishKey,
         topic: topic,
@@ -95,11 +102,10 @@ export class FireTower {
       this.logInfo('subscribe:"' + topics.join(',') + '"');
     }
 
-    this.ws.send(
+    this.ws?.send(
       JSON.stringify({
         type: this.subscribeKey,
         topic: topics.join(','),
-        data: '',
       }),
     );
   }
@@ -113,21 +119,20 @@ export class FireTower {
       this.logInfo('unSubscribe:"' + topics.join(',') + '"');
     }
 
-    this.ws.send(
+    this.ws?.send(
       JSON.stringify({
         type: this.unSubscribeKey,
         topic: topics.join(','),
-        data: '',
       }),
     );
   }
 
   close() {
-    this.ws.close();
+    this.ws?.close();
   }
 }
 
-export function FireTowerPlugin(user: User, store: Store<any>) {
+export function FireTowerPlugin(user: User, store: Store<any>, token: string) {
   try {
     const buildTower = () => {
       let endpoint = import.meta.env.VITE_API_V1_WS_URL;
@@ -136,14 +141,15 @@ export function FireTowerPlugin(user: User, store: Store<any>) {
         return;
       }
       if (endpoint.indexOf('?') !== -1) {
-        endpoint += '&user=' + user.id;
+        endpoint += '&user=' + user.id + '&token=' + token;
       } else {
-        endpoint += '?user=' + user.id;
+        endpoint += '?user=' + user.id + '&token=' + token;
       }
       const tower = new FireTower(
         endpoint,
         () => {
           store.commit('setTower', tower);
+
           console.log('firetower connected');
           // tower.subscribe([
           //   '/task/status',
@@ -151,8 +157,13 @@ export function FireTowerPlugin(user: User, store: Store<any>) {
           //   '/workflow/task/status',
           // ]);
           tower.onmessage = (event) => {
-            const msg = JSON.parse(event.data);
-            const cloudeventData = msg.data;
+            let msg = JSON.parse(event.data);
+
+            let cloudeventData = msg.data;
+            if (msg.topic) {
+              msg = msg.data;
+              cloudeventData = cloudeventData.data;
+            }
             if (msg.type !== 'publish') {
               return;
             }
@@ -187,7 +198,7 @@ export function FireTowerPlugin(user: User, store: Store<any>) {
         },
         () => {
           setTimeout(() => {
-            if (store.getters.user) {
+            if (store.getters.currentUser) {
               buildTower();
             }
           }, 1000);

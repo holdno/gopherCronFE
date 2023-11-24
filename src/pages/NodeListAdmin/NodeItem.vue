@@ -80,7 +80,10 @@
   const reload = async () => {
     loading.value = true;
     try {
-      const resp = await reloadNodeConfig({ clientIP: props.node.clientIP });
+      const resp = await reloadNodeConfig({
+        clientIP: props.node.clientIP,
+        projectID: props.node.projectID,
+      });
       if (resp.code !== 0) {
         store.commit('error', { error: { message: resp.message } });
       } else {
