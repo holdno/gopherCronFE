@@ -1,9 +1,6 @@
 import { Store } from 'vuex';
 
-
-
 import { User } from '@/api/request';
-
 
 function errorMessage(message: string) {
   return {
@@ -137,8 +134,11 @@ export function FireTowerPlugin(user: User, store: Store<any>, token: string) {
     const buildTower = () => {
       let endpoint = import.meta.env.VITE_API_V1_WS_URL;
       if (!endpoint) {
-        console.warn('firetower not allowed');
-        return;
+        let protocol = 'ws://';
+        if (window.location.protocol === 'https') {
+          protocol = 'wss://';
+        }
+        endpoint = protocol + window.location.host + '/api/v1/connect';
       }
       if (endpoint.indexOf('?') !== -1) {
         endpoint += '&user=' + user.id + '&token=' + token;
@@ -207,6 +207,6 @@ export function FireTowerPlugin(user: User, store: Store<any>, token: string) {
     };
     buildTower();
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 }
