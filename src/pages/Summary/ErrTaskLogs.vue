@@ -46,7 +46,7 @@
           <q-item-section>
             <q-item-label overline>节点 IP</q-item-label>
             <q-item-label>
-              {{ scope.row.clientIP }}
+              {{ scope.row.clientIp }}
             </q-item-label>
           </q-item-section>
           <q-item-section>

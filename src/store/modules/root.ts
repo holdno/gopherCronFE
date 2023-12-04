@@ -139,6 +139,18 @@ const mutations: MutationTree<State> = {
     }
   },
   userOrgs(state, orgs: Org[]) {
+    if (orgs && orgs.length > 0) {
+      const choosedOrg = localStorage.getItem('gc_choosed_org');
+      let choosedExistOrg = false;
+      orgs.forEach((v, k, a) => {
+        if (v.id === choosedOrg) {
+          choosedExistOrg = true;
+        }
+      });
+      if (!choosedExistOrg) {
+        localStorage.removeItem('gc_choosed_org');
+      }
+    }
     state.userOrgs = orgs;
   },
   error(state, { error }) {

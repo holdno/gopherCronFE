@@ -129,14 +129,16 @@
   function scrollTo(id: number) {
     const s = scrollArea.value;
     if (s === undefined) throw new Error('scroll-area instance is missing');
-    const ids = Array.from(workflows.value.keys());
-    const idx = ids.findIndex((x) => x === id);
+    if (!workflows.value) return;
+    const idx = workflows.value.findIndex((x) => x.id === id);
     setTimeout(() => {
       if (idx < 0) {
-        // scroll to end
-        s.setScrollPercentage('vertical', 1.0);
+        // scroll to start
+        s.setScrollPercentage('vertical', 0);
       } else {
-        const p = ((1.0 * idx) / ids.length) * s.getScroll().verticalSize - 50;
+        const p =
+          ((1.0 * idx) / workflows.value.length) * s.getScroll().verticalSize -
+          50;
         s.setScrollPosition('vertical', p);
       }
     }, 100);

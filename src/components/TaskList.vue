@@ -135,6 +135,7 @@
       store.dispatch('subscribeTopic', [
         '/task/status/project/' + props.projectId,
       ]);
+      filter.value = '';
       await fetchTasks();
     });
     store.watch(

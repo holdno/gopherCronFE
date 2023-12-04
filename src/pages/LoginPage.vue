@@ -142,9 +142,10 @@
     if (redirect && redirect.length > 0 && redirect.indexOf('/summary') !== 0) {
       to.path = redirect[0] || to.path;
     } else {
+      const choosedOrg = localStorage.getItem('gc_choosed_org') || 'baseorg';
       to.name = 'summary';
       to.params = {
-        orgId: 'baseorg',
+        orgId: choosedOrg,
       };
     }
     await router.push(to);

@@ -233,9 +233,11 @@
   }
 
   const store = useStore();
-  const task = computed(() =>
-    store.state.Task.tasks.get(props.projectId)?.find((t) => t.id === props.id),
-  );
+  const task = computed(() => {
+    return store.state.Task.tasks
+      .get(props.projectId)
+      ?.find((t) => t.id === props.id);
+  });
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
   );
@@ -283,7 +285,7 @@
     }
     loading.value = true;
     const newTask = await store.dispatch('saveTask', {
-      task: editable.value,
+      task: JSON.parse(JSON.stringify(editable.value)),
     });
     if (isCreateMode.value) {
       const projectId = props.projectId;

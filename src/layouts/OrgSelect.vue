@@ -75,8 +75,16 @@
     input: string,
     done: (callbackFn: () => void, afterFn?: (ref: QSelect) => void) => void,
   ) {
-    const tmp: { label: string; value: string }[] = [];
+    const tmp: { label: string; value: string }[] = [
+      {
+        label: '通用',
+        value: 'baseorg',
+      },
+    ];
     store.state.Root.userOrgs?.forEach((v, k, a) => {
+      if (v.id === 'baseorg') {
+        return;
+      }
       tmp.push({
         label: v.title,
         value: v.id,
@@ -105,6 +113,8 @@
       } else {
         store.commit('setCurrentOrg', val);
       }
+
+      localStorage.setItem('gc_choosed_org', val);
     },
   });
 
