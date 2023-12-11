@@ -34,6 +34,7 @@
     </div>
     <div class="tw-w-full tw-grow">
       <q-scroll-area
+        ref="scrollArea"
         class="tw-w-full tw-h-full tw-px-[15px]"
         visible
         :thumb-style="thumbStyle"
@@ -111,6 +112,7 @@
 </template>
 
 <script setup lang="ts">
+  import { QScrollArea } from 'quasar';
   import { computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
@@ -129,7 +131,7 @@
 
   const store = useStore();
   const loading = computed(() => store.state.Task.loadingTasks);
-
+  const route = useRoute();
   onMounted(() => {
     watchEffect(async () => {
       store.dispatch('subscribeTopic', [
@@ -137,6 +139,9 @@
       ]);
       filter.value = '';
       await fetchTasks();
+      if (route.params.taskId) {
+        scrollTo(route.params.taskId as string);
+      }
     });
     store.watch(
       (state) => [state.Root.eventTask],
@@ -148,12 +153,17 @@
           store.commit('notifySuccess', {
             message: `任务 ${task.name} 当前状态: ${eventTask.status}`,
           });
-        }
 
-        fetchTasks();
+          store.commit('Task/updateTaskStatus', {
+            projectId: task.projectId,
+            taskId: task.id,
+            isRunning: eventTask.status === 'running',
+          });
+        }
       },
     );
   });
+
   async function fetchTasks() {
     await store.dispatch('Task/fetchTasks', { ...props });
   }
@@ -171,13 +181,38 @@
     );
   });
 
+  const scrollArea = ref<QScrollArea>();
+  function scrollTo(id: string) {
+    const s = scrollArea.value;
+    if (!s || !tasks.value) return;
+    const idx = tasks.value.findIndex((x) => x.id === id);
+    setTimeout(() => {
+      if (idx < 0) {
+        // scroll to start
+        s.setScrollPercentage('vertical', 0);
+      } else {
+        const p =
+          ((1.0 * idx) / tasks.value.length) * s.getScroll().verticalSize - 150;
+        s.setScrollPosition('vertical', p);
+      }
+    }, 100);
+  }
+
   function activated(task: Task): boolean {
-    const route = useRoute();
     return route.params.taskId === task.id;
   }
 
   const selectedTask = computed(() => tasks.value.filter(activated).pop());
+
   const router = useRouter();
+  router.beforeEach((to, from, next) => {
+    if (!from.params.taskId && to.params.taskId) {
+      // created task
+      scrollTo(to.params.taskId as string);
+    }
+    next();
+  });
+
   const showDeleteConfirm = ref(false);
   const deleteLoading = ref(false);
   async function deleteTask(projectId: number, taskId: string) {

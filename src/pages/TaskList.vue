@@ -15,7 +15,11 @@
             params: { projectId: props.projectId },
           }"
           replace
-        />
+        >
+          <q-tooltip class="bg-warning tw-text-black" :offset="[10, 10]">
+            日常周期性定时执行的任务
+          </q-tooltip>
+        </q-route-tab>
         <q-route-tab
           name="temporary"
           label="临时"
@@ -37,7 +41,11 @@
             params: { projectId: props.projectId },
           }"
           replace
-        />
+        >
+          <q-tooltip class="bg-warning tw-text-black" :offset="[10, 10]">
+            用于任务编排的子任务
+          </q-tooltip>
+        </q-route-tab>
       </q-tabs>
       <q-tab-panels :model-value="tab" animated class="tw-w-full tw-grow">
         <q-tab-panel name="normal" class="tw-p-0">

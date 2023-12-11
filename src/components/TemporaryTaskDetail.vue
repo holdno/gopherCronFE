@@ -1,4 +1,9 @@
 <template>
+  <DialogTemporaryTaskForm
+    v-model="showCopyConfirm"
+    :task="copiedTask"
+    @created="reloadTmpTasks"
+  ></DialogTemporaryTaskForm>
   <Confirm
     v-model="showKillConfirm"
     content="确定要结束进程吗？"
@@ -53,8 +58,15 @@
       @click="showKillConfirm = true"
       >结束进程</q-btn
     >
+    <q-btn
+      text-color="primary"
+      outline
+      class="tw-w-24 tw-ml-1"
+      @click="tiggerTaskCopy"
+      >复制任务</q-btn
+    >
   </div>
-  <q-form class="tw-w-full">
+  <q-form v-if="task" class="tw-w-full">
     <q-input
       v-if="task"
       key="id"
@@ -76,7 +88,7 @@
     />
     <q-input
       key="remark"
-      v-model="editable.remark"
+      v-model="task.remark"
       type="textarea"
       label="任务备注"
       autogrow
@@ -88,7 +100,7 @@
     <q-input
       key="cron"
       :model-value="
-        formatTimestamp(editable.scheduleTime * 1000, 'YYYY-MM-DD HH:mm')
+        formatTimestamp(task.scheduleTime * 1000, 'YYYY-MM-DD HH:mm')
       "
       label="调度时间"
       square
@@ -98,7 +110,7 @@
     />
     <q-input
       key="timeout"
-      v-model.number="editable.timeout"
+      v-model.number="task.timeout"
       type="number"
       label="超时时间 (单位:秒 s)"
       square
@@ -108,7 +120,7 @@
     />
     <q-input
       key="command"
-      v-model="editable.command"
+      v-model="task.command"
       placeholder='echo "hello word"'
       type="textarea"
       label="执行指令"
@@ -120,8 +132,8 @@
     />
 
     <q-input
-      key="remark"
-      :model-value="editable.noseize === 1 ? '是' : '否'"
+      key="noseize"
+      :model-value="task.noseize === 1 ? '是' : '否'"
       type="textarea"
       label="并行调度"
       autogrow
@@ -134,12 +146,14 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
 
   import { GetTemporaryTaskLogDetail, TaskLog } from '@/api/log';
+  import { Task, TemporaryTask } from '@/api/request';
   import { killTask, removeTemporaryTask } from '@/api/task';
   import Confirm from '@/components/Confirm.vue';
+  import DialogTemporaryTaskForm from '@/components/DialogTemporaryTaskForm.vue';
   import JSONViewer from '@/components/JSONViewer.vue';
   import { useStore } from '@/store/index';
   import { formatTimestamp } from '@/utils/datetime';
@@ -156,6 +170,27 @@
     },
   });
 
+  const showCopyConfirm = ref(false);
+  const copiedTask = ref<Task | undefined>();
+  function copyTask(t: TemporaryTask) {
+    copiedTask.value = {
+      id: t.taskId,
+      projectId: t.projectId,
+      remark: t.remark,
+      command: t.command,
+      timeout: t.timeout,
+      cronExpr: '',
+      createTime: 0,
+      name: '',
+      status: 0,
+      isRunning: 0,
+      noseize: 0,
+      exclusion: 0,
+      clientIp: '',
+      tmpId: '',
+    };
+  }
+
   const log = ref<TaskLog | null>();
   const store = useStore();
   const task = computed(() =>
@@ -164,26 +199,43 @@
       ?.find((t) => t.id === Number(props.id)),
   );
 
+  function tiggerTaskCopy() {
+    if (task.value) {
+      console.log(task.value);
+      copyTask(task.value);
+      showCopyConfirm.value = true;
+    } else {
+      console.error('failed to copy task, the task is not found');
+    }
+  }
+
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
   );
-  const editable = ref(Object.assign({}, task.value));
-  watchEffect(() => {
-    editable.value = Object.assign({}, task.value);
-    getCurrentTaskLog();
-  });
+  async function reloadTmpTasks() {
+    try {
+      await store.dispatch('Task/fetchTemporaryTasks', {
+        projectId: props.projectId,
+      });
+    } catch (e: any) {
+      console.error('failed to dispatch fetchTemporaryTasks', e);
+    }
+  }
   onMounted(() => {
     store.watch(
       (state) => [state.Root.eventTask],
-      ([eventTask]) => {
-        if (!eventTask || eventTask.projectId !== props.projectId || eventTask.taskId !== task.value?.taskId) return;
+      async ([eventTask]) => {
+        if (
+          !eventTask ||
+          eventTask.projectId !== props.projectId ||
+          eventTask.taskId !== task.value?.taskId
+        )
+          return;
 
-        store.dispatch('Task/fetchTemporaryTasks', {
-          projectId: props.projectId,
-        });
+        await reloadTmpTasks();
+        getCurrentTaskLog();
       },
     );
-    getCurrentTaskLog();
   });
 
   const waitingKill = ref(false);

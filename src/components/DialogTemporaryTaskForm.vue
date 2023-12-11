@@ -3,6 +3,9 @@
     <q-card class="tw-w-96 q-pa-sm">
       <q-card-section>
         <div class="text-h6">创建任务</div>
+        <div class="text-base">
+          临时任务同样会与正式的定时任务竞争相同的锁，请避免调度冲突(指运行时间有交集)
+        </div>
       </q-card-section>
       <q-card-section style="max-height: 50vh" class="scroll">
         <q-input
@@ -158,7 +161,6 @@
 
   import { Task } from '@/api/request';
   import { CreateTemporaryTask, CreateTemporaryTaskRequest } from '@/api/task';
-  import router from '@/router';
   import { useStore } from '@/store/index';
   import { afterTimeStr } from '@/utils/datetime';
 
@@ -175,7 +177,7 @@
     },
   });
 
-  const emits = defineEmits(['update:modelValue']);
+  const emits = defineEmits(['update:modelValue', 'created']);
 
   const show = computed({
     get: () => props.modelValue,
@@ -200,7 +202,7 @@
 
   onMounted(() => {
     watchEffect(() => {
-      if (!show.value) {
+      if (show.value) {
         editable.value = Object.assign(
           {},
           {
@@ -243,12 +245,7 @@
         store.commit('error', { error: { message: res.message } });
       } else {
         store.commit('success', { message: '创建成功' });
-        router.push({
-          name: 'temporary_tasks',
-          params: {
-            projectId: props.task.projectId,
-          },
-        });
+        emits('created');
       }
     } catch (e: any) {}
     loading.value = false;

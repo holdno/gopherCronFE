@@ -62,6 +62,19 @@ const mutations: MutationTree<State> = {
     if (projectId !== undefined) state.tasks.delete(projectId);
     else state.tasks.clear();
   },
+  updateTaskStatus(
+    state,
+    data: { projectId: number; taskId: string; isRunning: boolean },
+  ) {
+    const tasks = state.tasks.get(data.projectId);
+    if (tasks === undefined) {
+      return;
+    }
+    const idx = tasks.findIndex((t) => t.id === data.taskId);
+    if (idx !== -1) {
+      tasks[idx].status = data.isRunning === true ? 1 : 0;
+    }
+  },
   updateTask(state, { task }: { task: Task }) {
     const tasks = state.tasks.get(task.projectId);
     if (tasks === undefined) {

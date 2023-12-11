@@ -16,18 +16,23 @@
       <div v-if="project && project.remark.trim() !== ''" class="tw-pb-4">
         {{ project.remark }}
       </div>
-      <div>
-        <div class="tw-pb-4">
-          <q-icon name="hive" />
-          在线节点: {{ projectClients?.length || 0 }}
-        </div>
-        <div
-          class="tw-flex tw-flex-wrap tw-gap-3 tw-px-2 tw-py-1 tw-text-white tw-bg-black"
+      <div class="tw-flex tw-gap-2 tw-items-center">
+        <q-icon name="hive" />
+        在线节点:
+        <span
+          class="tw-font-extrabold"
+          :class="{
+            'tw-text-primary': projectClients && projectClients.length > 0,
+            'tw-text-red-500': !projectClients || projectClients.length === 0,
+          }"
+          >{{ projectClients?.length || 0 }}</span
         >
-          <div v-for="client of projectClients" :key="client">
-            {{ client }}
-          </div>
-        </div>
+        <span
+          v-show="projectClients && projectClients.length > 0"
+          class="tw-text-white tw-cursor-pointer"
+          @click="showOnlineNodes"
+          >查看节点</span
+        >
       </div>
     </div>
     <q-tabs
@@ -122,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-  import { QScrollArea } from 'quasar';
+  import { QScrollArea, useQuasar } from 'quasar';
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useRoute } from 'vue-router';
   import { useWindowSize } from 'vue-window-size';
@@ -148,6 +153,22 @@
       default: 'crontab',
     },
   });
+
+  const $q = useQuasar();
+
+  function showOnlineNodes() {
+    let nodes = 'empty';
+    if (projectClients.value && projectClients.value.length > 0) {
+      nodes = projectClients.value.join('</br>');
+    }
+
+    $q.dialog({
+      title: '在线节点',
+      message: nodes,
+      html: true,
+      color: 'primary',
+    });
+  }
 
   const store = useStore();
   const project = computed(() =>
@@ -179,10 +200,13 @@
 
   const { width } = useWindowSize();
 
-  onMounted(() => {
-    store.dispatch('Project/fetchProjectClients', {
+  async function loadOnlineNodes() {
+    await store.dispatch('Project/fetchProjectClients', {
       projectId: props.projectId,
     });
+  }
+  onMounted(() => {
+    loadOnlineNodes();
   });
   onUnmounted(() => {
     store.commit('Project/setProjectClients', { clients: [] });

@@ -3,6 +3,7 @@
     <DialogTemporaryTaskForm
       v-model="showCreateTemporaryTask"
       :task="task"
+      @created="createdTemporaryTask"
     ></DialogTemporaryTaskForm>
     <Confirm
       v-model="showDeleteConfirm"
@@ -13,7 +14,7 @@
     ></Confirm>
     <Confirm
       v-model="showKillConfirm"
-      content="确定要结束进程吗？"
+      content="确定要结束进程吗？强制结束后任务的启用状态会自动变更为停用状态。"
       type="warning"
       @confirm="kill"
     ></Confirm>
@@ -56,9 +57,7 @@
       <q-btn
         color="warning"
         text-color="black"
-        :disable="modified || task?.isRunning === 1"
         class="tw-w-24 tw-opacity-90"
-        :loading="executing || task?.isRunning === 1"
         @click="showCreateTemporaryTask = true"
         >临时调度
         <q-tooltip class="bg-warning tw-text-black" :offset="[10, 10]">
@@ -193,6 +192,15 @@
     },
   });
 
+  function createdTemporaryTask() {
+    router.push({
+      name: 'temporary_tasks',
+      params: {
+        projectId: props.projectId,
+      },
+    });
+  }
+
   const DefaultTaskValues = computed(() => ({
     id: '',
     name: '',
@@ -275,6 +283,10 @@
     return '';
   });
 
+  async function fetchTasks() {
+    await store.dispatch('Task/fetchTasks', { projectId: props.projectId });
+  }
+
   const router = useRouter();
   const loading = ref(false);
   async function onSubmit() {
@@ -289,7 +301,7 @@
     });
     if (isCreateMode.value) {
       const projectId = props.projectId;
-      await store.dispatch('Task/fetchTasks', { projectId });
+      await fetchTasks();
       router.push({
         name: 'crontab_task',
         params: {
@@ -313,8 +325,7 @@
     try {
       await store.dispatch('deleteTask', { projectId, taskId });
       if (store.state.Root.currentError === undefined) {
-        const projectId = props.projectId;
-        await store.dispatch('Task/fetchTasks', { projectId });
+        await fetchTasks();
         router.push({
           name: 'crontab_tasks',
           params: {
@@ -356,9 +367,7 @@
         if (eventTask.status === 'starting') {
           executing.value = true;
         } else {
-          store.dispatch('Task/fetchTasks', {
-            projectId: props.projectId,
-          });
+          fetchTasks();
           executing.value = false;
         }
       },
@@ -372,6 +381,8 @@
     waitingKill.value = true;
     try {
       await killTask({ projectId: props.projectId, taskId: props.id });
+      await fetchTasks();
+      editable.value.status = 0;
     } catch (e) {
       console.error(e);
       store.commit('error', { error: e });

@@ -1,4 +1,4 @@
-import { Notify, Quasar } from 'quasar';
+import { Dialog, Notify, Quasar } from 'quasar';
 import quasarLang from 'quasar/lang/zh-CN';
 // A few examples for animations from Animate.css:
 // import @quasar/extras/animate/fadeIn.css
@@ -29,6 +29,7 @@ const app = createApp(App);
 app.use(Quasar, {
   plugins: {
     Notify,
+    Dialog,
   },
   config: {
     dark: true /* true, false, "auto" */,

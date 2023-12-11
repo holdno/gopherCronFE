@@ -82,7 +82,9 @@
   <q-dialog v-model="showProjectTokenDialog">
     <q-card class="tw-w-[400px] tw-max-w-full">
       <q-card-section>
-        <div class="text-h6">项目 Token</div>
+        <div class="text-h6">
+          项目 Token <span class="!tw-text-base"> (ID: {{ projectId }}) </span>
+        </div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
