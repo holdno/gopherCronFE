@@ -9,14 +9,14 @@
     "pretty": "prettier --write ."
   },
   "dependencies": {
-    "@quasar/extras": "^1.12.3",
+    "@quasar/extras": "^1.16.9",
     "@types/js-cookie": "^3.0.1",
     "axios": "^0.24.0",
     "echarts": "^5.2.2",
     "js-cookie": "^3.0.1",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.35",
-    "quasar": "^2.12.2",
+    "quasar": "^2.14.1",
     "v-network-graph": "^0.3.11",
     "vue": "^3.2.25",
     "vue-router": "^4.0.12",
@@ -24,7 +24,7 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@quasar/vite-plugin": "^1.0.4",
+    "@quasar/vite-plugin": "^1.6.0",
     "@trivago/prettier-plugin-sort-imports": "^3.1.1",
     "@types/node": "^20.4.5",
     "@typescript-eslint/eslint-plugin": "^5.9.0",

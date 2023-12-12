@@ -17,7 +17,7 @@
   >
     <q-list dense>
       <q-item
-        v-close-popup
+        v-close-popup="true"
         clickable
         class="hover:tw-bg-primary hover:tw-text-black"
         @click.stop="showUsersManageDialog = true"
@@ -27,7 +27,7 @@
         </q-item-section>
       </q-item>
       <q-item
-        v-close-popup
+        v-close-popup="true"
         clickable
         class="hover:tw-bg-primary hover:tw-text-black"
         @click.stop="showDeleteConfirm = true"

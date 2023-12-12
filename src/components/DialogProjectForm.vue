@@ -27,7 +27,12 @@
           align="right"
           class="tw-flex tw-gap-4 tw-flex-col-reverse lg:tw-flex-row lg:tw-justify-end"
         >
-          <q-btn v-close-popup flat label="取消" class="lg:tw-w-24 tw-w-full" />
+          <q-btn
+            v-close-popup="true"
+            flat
+            label="取消"
+            class="lg:tw-w-24 tw-w-full"
+          />
           <q-btn
             color="primary"
             text-color="black"

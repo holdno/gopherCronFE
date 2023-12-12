@@ -26,7 +26,7 @@
   >
     <q-list dense>
       <q-item
-        v-close-popup
+        v-close-popup="true"
         clickable
         class="hover:tw-bg-primary hover:tw-text-black"
         @click.stop="showEditDialog = true"
@@ -36,7 +36,7 @@
         </q-item-section>
       </q-item>
       <q-item
-        v-close-popup
+        v-close-popup="true"
         clickable
         class="hover:tw-bg-primary hover:tw-text-black"
         @click.stop="showUsersManageDialog = true"
@@ -46,7 +46,7 @@
         </q-item-section>
       </q-item>
       <q-item
-        v-close-popup
+        v-close-popup="true"
         clickable
         class="hover:tw-bg-primary hover:tw-text-black"
         @click.stop="showWebhookManageDialog = true"
@@ -57,7 +57,7 @@
       </q-item>
       <q-item
         v-if="isAdminPermission(role)"
-        v-close-popup
+        v-close-popup="true"
         clickable
         class="hover:tw-bg-primary hover:tw-text-black"
         @click.stop="showProjectToken"
@@ -67,7 +67,7 @@
         </q-item-section>
       </q-item>
       <q-item
-        v-close-popup
+        v-close-popup="true"
         clickable
         class="hover:tw-bg-primary hover:tw-text-black"
         @click.stop="showDeleteConfirm = true"
@@ -103,7 +103,7 @@
       <q-card-actions align="right">
         <q-btn
           v-if="!showReGenButton"
-          v-close-popup
+          v-close-popup="true"
           flat
           label="重置"
           color="warning"
@@ -117,7 +117,7 @@
           :loading="reGenLoading"
           @click="requestReGenProjectToken"
         />
-        <q-btn v-close-popup flat label="关闭" color="primary" />
+        <q-btn v-close-popup="true" flat label="关闭" color="primary" />
       </q-card-actions>
     </q-card>
   </q-dialog>

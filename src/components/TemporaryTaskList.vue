@@ -12,7 +12,13 @@
           <q-icon name="search" />
         </template>
       </q-input>
-      <q-btn flat dense :loading="loading" icon="refresh" @click="fetchTasks" />
+      <q-btn
+        flat
+        dense
+        :loading="loading"
+        icon="refresh"
+        @click="reloadTmpTasks"
+      />
     </div>
     <div class="tw-w-full tw-grow">
       <q-scroll-area
@@ -22,7 +28,7 @@
         :bar-style="barStyle"
       >
         <q-list
-          v-if="tasks"
+          v-if="temporaryTasks"
           class="tw-w-full tw-flex tw-flex-col tw-gap-2 tw-pb-4"
         >
           <router-link
@@ -109,24 +115,56 @@
   });
 
   const filter = ref('');
-
   const store = useStore();
   const loading = computed(() => store.state.Task.loadingTasks);
 
-  async function fetchTasks() {
-    await store.dispatch('Task/fetchTasks', { ...props });
-    await store.dispatch('Task/fetchTemporaryTasks', { ...props });
-  }
   onMounted(async () => {
     watchEffect(async () => {
-      await fetchTasks();
+      await reloadTmpTasks();
+      store.dispatch('subscribeTopic', [
+        '/task/status/project/' + props.projectId,
+      ]);
     });
 
-    if (!store.state.Task.tasks) {
-      await store.dispatch('Task/fetchTasks', { projectId: props.projectId });
+    if (!store.state.Task.temporaryTasks) {
+      await reloadTmpTasks();
     }
+
+    store.watch(
+      (state) => [state.Root.eventTask],
+      async ([eventTask]) => {
+        if (!eventTask || eventTask.projectId !== props.projectId) return;
+
+        const task = temporaryTasks.value.find(
+          (t) => t.tmpId === eventTask.tmpId,
+        );
+        if (!task) return;
+        store.commit('notifySuccess', {
+          message: `任务 ${task.remark} 当前状态: ${eventTask.status}`,
+        });
+        store.commit('Task/updateTemporaryTaskStatus', {
+          projectId: props.projectId,
+          tmpId: eventTask.tmpId,
+          isRunning:
+            eventTask.status === 'running' || eventTask.status === 'starting',
+          finished:
+            eventTask.status !== 'running' && eventTask.status !== 'starting',
+        });
+        // await reloadTmpTasks();
+      },
+    );
   });
-  const tasks = computed(() => store.state.Task.tasks.get(props.projectId));
+
+  async function reloadTmpTasks() {
+    try {
+      await store.dispatch('Task/fetchTemporaryTasks', {
+        projectId: props.projectId,
+      });
+    } catch (e: any) {
+      console.error('failed to dispatch fetchTemporaryTasks', e);
+    }
+  }
+
   const temporaryTasks = computed(
     () =>
       store.state.Task.temporaryTasks

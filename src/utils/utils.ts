@@ -22,3 +22,11 @@ export function getQueryVariable(variable: string): string {
   }
   return '';
 }
+
+export function compareArrays(a: [], b: []): boolean {
+  if (typeof a !== typeof b) return false;
+  if ((!a && b) || (a && !b)) return false;
+  return (
+    a.length === b.length && a.every((element, index) => element === b[index])
+  );
+}

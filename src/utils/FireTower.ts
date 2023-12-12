@@ -172,6 +172,7 @@ export function FireTowerPlugin(user: User, store: Store<any>, token: string) {
                 event: {
                   status: cloudeventData.status,
                   taskId: cloudeventData.task_id,
+                  tmpId: cloudeventData.tmp_id,
                   projectId: cloudeventData.project_id,
                 },
               });

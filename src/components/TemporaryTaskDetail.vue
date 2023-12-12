@@ -16,7 +16,13 @@
     type="warning"
     @confirm="remove"
   ></Confirm>
-  <q-card v-if="log" class="tw-mb-4" flat bordered>
+  <q-skeleton
+    v-show="loading"
+    type="QInput"
+    class="tw-h-52 tw-mb-4"
+    animation="fade"
+  />
+  <q-card v-if="!loading && log" class="tw-mb-4" flat bordered>
     <q-item>
       <q-item-section>
         <q-item-label overline>开始时间</q-item-label>
@@ -38,7 +44,18 @@
       <JSONViewer :json="log.result" />
     </q-card-section>
   </q-card>
-  <div class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-1">
+  <div
+    v-if="loading"
+    class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-2"
+  >
+    <q-skeleton type="QBtn" animation="fade" />
+  </div>
+
+  <div
+    v-if="!loading"
+    class="tw-flex tw-flex-row-reverse tw-pb-3 tw-flex-wrap tw-gap-2"
+  >
+    <q-btn v-if="task?.isRunning" :loading="true"> </q-btn>
     <q-btn
       v-if="task?.isRunning !== 1 && !log?.result"
       text-color="red"
@@ -66,7 +83,16 @@
       >复制任务</q-btn
     >
   </div>
-  <q-form v-if="task" class="tw-w-full">
+  <div v-if="loading">
+    <q-skeleton type="QInput" class="tw-mb-4" square animation="fade" />
+    <q-skeleton type="QInput" class="tw-mb-4" square animation="fade" />
+    <q-skeleton type="QInput" class="tw-mb-4" square animation="fade" />
+    <q-skeleton type="QInput" class="tw-mb-4" square animation="fade" />
+    <q-skeleton type="QInput" class="tw-mb-4" square animation="fade" />
+    <q-skeleton type="QInput" class="tw-mb-4" square animation="fade" />
+    <q-skeleton type="QInput" class="tw-mb-4" square animation="fade" />
+  </div>
+  <q-form v-if="!loading && task" class="tw-w-full">
     <q-input
       v-if="task"
       key="id"
@@ -146,7 +172,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useRouter } from 'vue-router';
 
   import { GetTemporaryTaskLogDetail, TaskLog } from '@/api/log';
@@ -193,15 +219,36 @@
 
   const log = ref<TaskLog | null>();
   const store = useStore();
-  const task = computed(() =>
-    store.state.Task.temporaryTasks
+  // const task = computed(() =>
+  //   store.state.Task.temporaryTasks
+  //     .get(props.projectId)
+  //     ?.find((t) => t.id === Number(props.id)),
+  // );
+
+  const task = ref<TemporaryTask | undefined>();
+
+  function updateCurrentTask() {
+    task.value = store.state.Task.temporaryTasks
       .get(props.projectId)
-      ?.find((t) => t.id === Number(props.id)),
+      ?.find((t) => t.id === Number(props.id));
+  }
+  watch(
+    () => props.id,
+    (o, n) => {
+      console.log('watched', o, n);
+      updateCurrentTask();
+    },
   );
+
+  watch(task, (o, n) => {
+    console.log('watched task', o, n);
+    if (!log.value || o?.tmpId !== n?.tmpId) {
+      updateCurrentTaskLog();
+    }
+  });
 
   function tiggerTaskCopy() {
     if (task.value) {
-      console.log(task.value);
       copyTask(task.value);
       showCopyConfirm.value = true;
     } else {
@@ -228,14 +275,15 @@
         if (
           !eventTask ||
           eventTask.projectId !== props.projectId ||
-          eventTask.taskId !== task.value?.taskId
+          eventTask.tmpId !== task.value?.tmpId
         )
           return;
-
-        await reloadTmpTasks();
-        getCurrentTaskLog();
+        if (!log.value && eventTask.status === 'done') {
+          updateCurrentTaskLog();
+        }
       },
     );
+    updateCurrentTask();
   });
 
   const waitingKill = ref(false);
@@ -251,6 +299,7 @@
         projectId: props.projectId,
         taskId: task.value.taskId,
       });
+      await reloadTmpTasks();
     } catch (e) {
       console.log(e);
     }
@@ -265,9 +314,7 @@
     waitingRemove.value = true;
     try {
       await removeTemporaryTask(Number(props.id));
-      await store.dispatch('Task/fetchTemporaryTasks', {
-        projectId: props.projectId,
-      });
+      await reloadTmpTasks();
       router.back();
     } catch (e) {
       console.log(e);
@@ -275,10 +322,34 @@
     waitingRemove.value = false;
   };
 
-  async function getCurrentTaskLog() {
+  const loading = ref(true);
+
+  function showLoadingWithDelay(delay = 500): () => void {
+    let requestDone = false;
+    let timeouted = false;
+    loading.value = true;
+
+    setTimeout(() => {
+      timeouted = true;
+      if (requestDone) {
+        loading.value = false;
+      }
+    }, delay);
+
+    const close = () => {
+      requestDone = true;
+      if (timeouted) {
+        loading.value = false;
+      }
+    };
+    return close;
+  }
+
+  async function updateCurrentTaskLog() {
     if (!task.value) {
       return;
     }
+    const closeFunc = showLoadingWithDelay(500);
     log.value = null;
     try {
       log.value = await GetTemporaryTaskLogDetail({
@@ -286,6 +357,9 @@
         projectId: task.value.projectId,
         tmpId: task.value.tmpId,
       });
-    } catch (e: any) {}
+    } catch (e: any) {
+      console.error(e);
+    }
+    closeFunc();
   }
 </script>

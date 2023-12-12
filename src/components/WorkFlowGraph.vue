@@ -44,13 +44,18 @@
   </q-dialog>
   <q-menu ref="viewMenu" touch-position context-menu>
     <q-list dense>
-      <q-item key="add-task" v-close-popup clickable @click="ShowAddNodeDialog">
+      <q-item
+        key="add-task"
+        v-close-popup="true"
+        clickable
+        @click="ShowAddNodeDialog"
+      >
         <q-item-section>添加</q-item-section>
       </q-item>
       <q-item
         v-if="canAddEdge"
         key="add-edge"
-        v-close-popup
+        v-close-popup="true"
         clickable
         @click="() => AddEdge(selectedNodes[0], selectedNodes[1])"
       >
@@ -59,7 +64,7 @@
       <q-item
         v-if="selectedEdges.length > 0"
         key="remove-edge"
-        v-close-popup
+        v-close-popup="true"
         clickable
         @click="() => removeEdges(selectedEdges)"
       >
@@ -70,7 +75,7 @@
       <q-item
         v-if="selectedNodes.length > 0"
         key="remove-task"
-        v-close-popup
+        v-close-popup="true"
         clickable
         @click="() => removeNodes(selectedNodes)"
       >
@@ -79,10 +84,15 @@
         </q-item-section>
       </q-item>
       <q-separator />
-      <q-item key="reset-view" v-close-popup clickable @click="ResetView">
+      <q-item
+        key="reset-view"
+        v-close-popup="true"
+        clickable
+        @click="ResetView"
+      >
         <q-item-section>重置视图</q-item-section>
       </q-item>
-      <q-item key="reset" v-close-popup clickable @click="reset">
+      <q-item key="reset" v-close-popup="true" clickable @click="reset">
         <q-item-section>重置</q-item-section>
       </q-item>
     </q-list>

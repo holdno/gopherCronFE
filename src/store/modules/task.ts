@@ -1,8 +1,11 @@
 import { ActionTree, Module, MutationTree } from 'vuex';
 
+
+
 import { Task, TemporaryTask } from '@/api/request';
 import { fetchTasks, fetchTemporaryTasks } from '@/api/task';
 import { State as RootState } from '@/store/index';
+
 
 export const NameSpace = 'Task';
 
@@ -61,6 +64,20 @@ const mutations: MutationTree<State> = {
   clearTasks(state, { projectId }) {
     if (projectId !== undefined) state.tasks.delete(projectId);
     else state.tasks.clear();
+  },
+  updateTemporaryTaskStatus(
+    state,
+    data: { projectId: number; tmpId: string; isRunning: boolean, finished: boolean },
+  ) {
+    const tasks = state.temporaryTasks.get(data.projectId);
+    if (tasks === undefined) {
+      return;
+    }
+    const idx = tasks.findIndex((t) => t.tmpId === data.tmpId);
+    if (idx !== -1) {
+      tasks[idx].scheduleStatus = !data.finished ? 1 : 0;
+      tasks[idx].isRunning = data.isRunning ? 1 : 0
+    }
   },
   updateTaskStatus(
     state,

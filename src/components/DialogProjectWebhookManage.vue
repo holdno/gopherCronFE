@@ -112,7 +112,7 @@
       <q-separator />
 
       <q-card-actions align="right">
-        <q-btn v-close-popup flat label="关闭" color="primary" />
+        <q-btn v-close-popup="true" flat label="关闭" color="primary" />
       </q-card-actions>
     </q-card>
   </q-dialog>

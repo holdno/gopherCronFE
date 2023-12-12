@@ -41,10 +41,12 @@ import {
 import router from '@/router';
 import { State as RootState } from '@/store/index';
 import { FireTower, FireTowerPlugin } from '@/utils/FireTower';
+import { compareArrays } from '@/utils/utils';
 
 export interface EventTask {
   status: string;
   taskId: string;
+  tmpId: string;
   projectId: number;
 }
 
@@ -344,6 +346,7 @@ const actions: ActionTree<State, RootState> = {
     try {
       const subed = this.getters.subscribedTopic;
       if (subed && subed.length > 0) {
+        if (compareArrays(subed, topics)) return;
         this.getters.firetower.unsubscribe(subed);
       }
       this.getters.firetower.subscribe(topics);

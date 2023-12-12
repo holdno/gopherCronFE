@@ -12,7 +12,7 @@
 
       <q-card-actions align="right">
         <q-btn
-          v-close-popup
+          v-close-popup="true"
           flat
           :label="cancelLabel"
           :color="config.cancelColor"

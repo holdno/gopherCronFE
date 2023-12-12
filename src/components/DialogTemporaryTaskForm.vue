@@ -79,7 +79,12 @@
                   mask="YYYY-MM-DD HH:mm"
                 >
                   <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="关闭" color="primary" flat />
+                    <q-btn
+                      v-close-popup="true"
+                      label="关闭"
+                      color="primary"
+                      flat
+                    />
                   </div>
                 </q-date>
               </q-popup-proxy>
@@ -100,7 +105,12 @@
                   format24h
                 >
                   <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="关闭" color="primary" flat />
+                    <q-btn
+                      v-close-popup="true"
+                      label="关闭"
+                      color="primary"
+                      flat
+                    />
                   </div>
                 </q-time>
               </q-popup-proxy>
@@ -142,7 +152,12 @@
         align="right"
         class="tw-flex tw-gap-2 tw-flex-col-reverse lg:tw-flex-row lg:tw-justify-end"
       >
-        <q-btn v-close-popup flat label="取消" class="lg:tw-w-24 tw-w-full" />
+        <q-btn
+          v-close-popup="true"
+          flat
+          label="取消"
+          class="lg:tw-w-24 tw-w-full"
+        />
         <q-btn
           color="primary"
           text-color="black"
@@ -181,7 +196,10 @@
 
   const show = computed({
     get: () => props.modelValue,
-    set: (value) => emits('update:modelValue', value),
+    set: (value) => {
+      emits('update:modelValue', value);
+      scheduleTime.value = '';
+    },
   });
 
   const store = useStore();
@@ -245,6 +263,7 @@
         store.commit('error', { error: { message: res.message } });
       } else {
         store.commit('success', { message: '创建成功' });
+        show.value = false;
         emits('created');
       }
     } catch (e: any) {}
