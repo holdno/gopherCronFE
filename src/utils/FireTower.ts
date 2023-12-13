@@ -19,9 +19,15 @@ function successMessage(message: string) {
 export class FireTower {
   ws: WebSocket | undefined;
 
+  publishKey = 1;
   subscribeKey = 2;
   unSubscribeKey = 3;
-  publishKey = 1;
+
+  // old keys
+  // publishKey = 'publish';
+  // subscribeKey = 'subscribe';
+  // unSubscribeKey = 'unSubscribe';
+
   logging = true; // 开启log
 
   onmessage?: (event: MessageEvent) => void;
