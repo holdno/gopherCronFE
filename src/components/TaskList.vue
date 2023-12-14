@@ -119,6 +119,7 @@
   import { Task } from '@/api/request';
   import Confirm from '@/components/Confirm.vue';
   import { useStore } from '@/store/index';
+  import { TASK_STATUS } from '@/types/task';
   import { formatTimestamp } from '@/utils/datetime';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
@@ -157,7 +158,7 @@
           store.commit('Task/updateTaskStatus', {
             projectId: task.projectId,
             taskId: task.id,
-            isRunning: eventTask.status === 'running',
+            isRunning: TASK_STATUS.isRunning(eventTask.status),
           });
         }
       },

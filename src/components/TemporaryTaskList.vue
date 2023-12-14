@@ -104,6 +104,7 @@
 
   import { TemporaryTask } from '@/api/request';
   import { useStore } from '@/store/index';
+  import { TASK_STATUS } from '@/types/task';
   import { formatTimestamp } from '@/utils/datetime';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
@@ -145,10 +146,8 @@
         store.commit('Task/updateTemporaryTaskStatus', {
           projectId: props.projectId,
           tmpId: eventTask.tmpId,
-          isRunning:
-            eventTask.status === 'running' || eventTask.status === 'starting',
-          finished:
-            eventTask.status !== 'running' && eventTask.status !== 'starting',
+          isRunning: TASK_STATUS.isRunning(eventTask.status),
+          finished: TASK_STATUS.isFinished(eventTask.status),
         });
         // await reloadTmpTasks();
       },

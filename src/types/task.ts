@@ -16,3 +16,16 @@ export function DefaultTaskValue() {
     tmpId: '',
   };
 }
+
+export const TASK_STATUS = {
+  STARTING: 'starting',
+  RUNNING: 'running',
+  DONE: 'done',
+  FAILED: 'fail',
+  isFinished: (status: string): boolean => {
+    return status === TASK_STATUS.DONE || status === TASK_STATUS.FAILED;
+  },
+  isRunning: (status: string): boolean => {
+    return status === TASK_STATUS.STARTING || status === TASK_STATUS.RUNNING;
+  },
+};

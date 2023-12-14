@@ -180,6 +180,7 @@
   import Confirm from '@/components/Confirm.vue';
   import DialogTemporaryTaskForm from '@/components/DialogTemporaryTaskForm.vue';
   import { useStore } from '@/store/index';
+  import { TASK_STATUS } from '@/types/task';
 
   const props = defineProps({
     id: {
@@ -363,11 +364,13 @@
     store.watch(
       (state) => [state.Root.eventTask],
       ([eventTask]) => {
-        if (!eventTask || eventTask.projectId !== props.projectId) return;
-        if (eventTask.status === 'starting') {
-          executing.value = true;
-        } else {
-          fetchTasks();
+        if (
+          !eventTask ||
+          eventTask.projectId !== props.projectId ||
+          eventTask.taskId !== props.id
+        )
+          return;
+        if (TASK_STATUS.isFinished(eventTask.status)) {
           executing.value = false;
         }
       },

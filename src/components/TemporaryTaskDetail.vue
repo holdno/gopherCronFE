@@ -182,6 +182,7 @@
   import DialogTemporaryTaskForm from '@/components/DialogTemporaryTaskForm.vue';
   import JSONViewer from '@/components/JSONViewer.vue';
   import { useStore } from '@/store/index';
+  import { TASK_STATUS } from '@/types/task';
   import { formatTimestamp } from '@/utils/datetime';
 
   const props = defineProps({
@@ -278,7 +279,7 @@
           eventTask.tmpId !== task.value?.tmpId
         )
           return;
-        if (!log.value && eventTask.status === 'done') {
+        if (!log.value && TASK_STATUS.isFinished(eventTask.status)) {
           updateCurrentTaskLog();
         }
       },
