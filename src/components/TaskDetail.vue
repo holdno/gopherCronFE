@@ -29,6 +29,7 @@
     >
       <q-btn
         flat
+        dense
         class="tw-w-24 tw-text-red-300 lg:tw-hidden"
         icon="delete"
         @click="showDeleteConfirm = true"
@@ -64,10 +65,17 @@
           指定时间调度一次的任务
         </q-tooltip>
       </q-btn>
+
+      <q-btn outline class="tw-w-24 tw-opacity-90" @click="copyTask"
+        >复制任务
+        <q-tooltip class="bg-warning tw-text-black" :offset="[10, 10]">
+          以当前任务内容为基础进行新任务的创建
+        </q-tooltip>
+      </q-btn>
     </div>
     <q-form class="tw-w-full" @submit="onSubmit" @reset="onReset">
       <q-input
-        v-if="task"
+        v-if="task && !isCreateMode"
         key="id"
         :model-value="task.id"
         disable
@@ -152,7 +160,7 @@
           color="primary"
           text-color="black"
           type="submit"
-          label="保存"
+          :label="isCreateMode ? '创建' : '保存'"
           :disable="!modified"
           :loading="loading"
           class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
@@ -172,7 +180,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
+  import { Ref, computed, onMounted, ref, watchEffect } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
   import { Task, startTask } from '@/api/request';
@@ -242,20 +250,34 @@
   }
 
   const store = useStore();
+  const route = useRoute();
   const task = computed(() => {
     return store.state.Task.tasks
       .get(props.projectId)
-      ?.find((t) => t.id === props.id);
+      ?.find((t) => t.id === props.id || t.id === route.query.copyid);
   });
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
   );
-  const editable = ref(
+
+  const editable: Ref<Task> = ref(
     Object.assign({}, task.value || DefaultTaskValues.value),
   );
-  editable.value.isRunning = -1;
+
+  const isCreateMode = computed(
+    () => route.name && route.name.toString() === 'create_crontab_task',
+  );
+
+  if (isCreateMode.value) {
+    editable.value.id = '';
+    editable.value.isRunning = -1;
+  }
+
   watchEffect(() => {
-    if (props.id !== editable.value.id) {
+    if (
+      props.id !== task.value?.id ||
+      (!isCreateMode.value && editable.value.id === '')
+    ) {
       editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
       editable.value.isRunning = -1;
     }
@@ -343,11 +365,6 @@
     deleteLoading.value = false;
   }
 
-  const route = useRoute();
-  const isCreateMode = computed(
-    () => route.name && route.name.toString() === 'create_crontab_task',
-  );
-
   const executing = ref(false);
   const showExecuteConfirm = ref(false);
   async function execute(projectId: number, taskId: string) {
@@ -394,4 +411,11 @@
   };
 
   const showCreateTemporaryTask = ref(false);
+
+  function copyTask() {
+    router.push({
+      name: 'create_crontab_task',
+      query: { copyid: task.value?.id },
+    });
+  }
 </script>

@@ -139,8 +139,12 @@
       path: '',
       params: {},
     };
-    if (redirect && redirect.length > 0 && redirect.indexOf('/summary') !== 0) {
-      to.path = redirect[0] || to.path;
+    if (
+      redirect &&
+      redirect.length > 0 &&
+      redirect.indexOf('/summary') === -1
+    ) {
+      to.path = redirect || to.path;
     } else {
       const choosedOrg = localStorage.getItem('gc_choosed_org') || 'baseorg';
       to.name = 'summary';

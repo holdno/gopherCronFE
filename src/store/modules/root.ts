@@ -335,6 +335,9 @@ const actions: ActionTree<State, RootState> = {
     const api = this.getters.apiv1;
     try {
       const oldOrNew = await saveTask(api, task);
+      if (oldOrNew) {
+        task.isRunning = oldOrNew.isRunning;
+      }
       commit('Task/updateTask', { task });
       commit('success', { message: '更新成功' });
       return oldOrNew;

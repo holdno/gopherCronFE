@@ -84,6 +84,7 @@ export interface CreateTemporaryTaskRequest {
   remark: string;
   scheduleTime: number;
   timeout: number;
+  host: string;
 }
 
 export interface CreateTemporaryTaskResponse {
@@ -102,6 +103,7 @@ export async function CreateTemporaryTask(
     remark: args.remark,
     schedule_time: args.scheduleTime,
     timeout: args.timeout,
+    host: args.host,
   });
   return resp.data.meta;
 }

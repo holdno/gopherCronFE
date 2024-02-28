@@ -138,6 +138,18 @@
           class="tw-mb-4"
         />
 
+        <q-select
+          v-model="editable.host"
+          emit-value
+          map-options
+          autogrow
+          square
+          filled
+          label="执行节点"
+          :options="projectHosts"
+          class="tw-mb-4"
+        ></q-select>
+
         <q-toggle
           key="noseize"
           v-model="editable.noseize"
@@ -198,8 +210,32 @@
     get: () => props.modelValue,
     set: (value) => {
       emits('update:modelValue', value);
+
       scheduleTime.value = '';
     },
+  });
+
+  const projectHosts = computed(() => {
+    const hostList: {
+      value: string;
+      label: string;
+    }[] = [
+      {
+        value: '',
+        label: '随机',
+      },
+    ];
+    const hosts = store.state.Project.projectClients.get(props.task.projectId);
+    if (hosts) {
+      hosts.forEach((v, k, a) => {
+        const h = v.split(':')[0];
+        hostList.push({
+          value: h,
+          label: h,
+        });
+      });
+    }
+    return hostList;
   });
 
   const store = useStore();
@@ -212,6 +248,7 @@
     noseize: props.task.noseize,
     scheduleTime: 0,
     timeout: props.task.timeout,
+    host: '',
   });
   const scheduleTime = ref('');
   function afterTime(t: number) {
@@ -231,6 +268,7 @@
             noseize: props.task.noseize,
             scheduleTime: 0,
             timeout: props.task.timeout,
+            host: '',
           },
         );
       }
@@ -258,6 +296,7 @@
         scheduleTime: Date.parse(scheduleTime.value) / 1000,
         remark: p.remark,
         timeout: p.timeout,
+        host: p.host,
       });
       if (res.code !== 0) {
         store.commit('error', { error: { message: res.message } });
