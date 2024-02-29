@@ -180,7 +180,7 @@
 </template>
 
 <script setup lang="ts">
-  import { Ref, computed, onMounted, ref, watchEffect } from 'vue';
+  import { Ref, computed, onMounted, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
   import { Task, startTask } from '@/api/request';
@@ -273,15 +273,22 @@
     editable.value.isRunning = -1;
   }
 
-  watchEffect(() => {
-    if (
-      props.id !== task.value?.id ||
-      (!isCreateMode.value && editable.value.id === '')
-    ) {
-      editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
+  watch(
+    () => props.id,
+    (o, n) => {
+      if (
+        props.id !== task.value?.id ||
+        (!isCreateMode.value && editable.value.id === '') ||
+        editable.value.id !== task.value.id
+      ) {
+        editable.value = Object.assign(
+          {},
+          task.value || DefaultTaskValues.value,
+        );
+      }
       editable.value.isRunning = -1;
-    }
-  });
+    },
+  );
   const modified = computed(() => {
     if (task.value?.isRunning === 1) {
       return false;
@@ -319,6 +326,9 @@
       return;
     }
     loading.value = true;
+    if (isCreateMode.value) {
+      editable.value.id = '';
+    }
     const newTask = await store.dispatch('saveTask', {
       task: JSON.parse(JSON.stringify(editable.value)),
     });

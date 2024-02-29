@@ -25,6 +25,12 @@
   <q-card v-if="!loading && log" class="tw-mb-4" flat bordered>
     <q-item>
       <q-item-section>
+        <q-item-label overline>节点 IP</q-item-label>
+        <q-item-label>
+          {{ log.clientIp }}
+        </q-item-label>
+      </q-item-section>
+      <q-item-section>
         <q-item-label overline>开始时间</q-item-label>
         <q-item-label>
           {{ formatTimestamp(log.startTime * 1000) }}
@@ -75,11 +81,7 @@
       @click="showKillConfirm = true"
       >结束进程</q-btn
     >
-    <q-btn
-      text-color="primary"
-      outline
-      class="tw-w-24 tw-ml-1"
-      @click="tiggerTaskCopy"
+    <q-btn outline class="tw-w-24 tw-ml-1" @click="tiggerTaskCopy"
       >复制任务</q-btn
     >
   </div>
@@ -98,7 +100,7 @@
       key="id"
       :model-value="task.taskId + ' - ' + task.tmpId"
       disable
-      label="任务 ID"
+      label="任务 ID（task_id - tmp_id）"
       square
       filled
       class="tw-mb-4"

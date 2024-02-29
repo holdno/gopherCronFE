@@ -63,7 +63,7 @@
                       ? '执行中'
                       : task.scheduleStatus == 1
                       ? '等待中'
-                      : '已完成'
+                      : '已处理'
                   }}
                 </q-badge>
                 <!-- <div :class="'tw-w-[50px] task__status' + task.status"></div> -->
