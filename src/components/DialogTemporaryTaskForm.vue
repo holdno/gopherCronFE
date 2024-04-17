@@ -33,7 +33,7 @@
           <q-btn
             dense
             unelevated
-            class="tw-text-xs tw-h-6"
+            class="tw-text-xs tw-h-6 tw-px-3"
             color="warning"
             text-color="black"
             label="一分钟后"
@@ -42,7 +42,7 @@
           <q-btn
             dense
             unelevated
-            class="tw-text-xs tw-h-6"
+            class="tw-text-xs tw-h-6 tw-px-3"
             color="warning"
             text-color="black"
             label="五分钟后"
@@ -51,7 +51,7 @@
           <q-btn
             dense
             unelevated
-            class="tw-text-xs tw-h-6"
+            class="tw-text-xs tw-h-6 tw-px-3"
             color="warning"
             text-color="black"
             label="一小时后"
@@ -162,7 +162,7 @@
 
       <q-card-actions
         align="right"
-        class="tw-flex tw-gap-2 tw-flex-col-reverse lg:tw-flex-row lg:tw-justify-end"
+        class="tw-flex tw-gap-2 tw-flex-col-reverse lg:tw-flex-row tw-justify-center lg:tw-justify-end"
       >
         <q-btn
           v-close-popup="true"
@@ -174,7 +174,7 @@
           color="primary"
           text-color="black"
           label="创建"
-          class="lg:tw-w-24 tw-w-full"
+          class="lg:tw-w-24 tw-w-full !tw-ml-0"
           :loading="loading"
           @click="onSubmit"
         />
@@ -228,7 +228,7 @@
     const hosts = store.state.Project.projectClients.get(props.task.projectId);
     if (hosts) {
       hosts.forEach((v, k, a) => {
-        const h = v.split(':')[0];
+        const h = v.clientIP;
         hostList.push({
           value: h,
           label: h,

@@ -25,17 +25,34 @@ export async function reGenProjectToken(projectId: number): Promise<string> {
   return resp.data.response;
 }
 
+export interface ClientMeta {
+  clientIP: string;
+  weight: number;
+  version: string;
+  region: string;
+}
+
 export async function fetchProjectClients(
   projectId: number,
-): Promise<string[]> {
-  const resp = await apiv1.get('/crontab/client_list', {
+): Promise<ClientMeta[]> {
+  const resp = await apiv1.get('/crontab/client/list', {
     params: {
       project_id: projectId,
     },
   });
   const data = resp.data;
   const r = data.response;
-  return r.list;
+
+  if (!r.list) {
+    return [];
+  }
+
+  return r.list.map((p: any) => ({
+    clientIP: p.client_ip,
+    weight: p.weight,
+    version: p.version,
+    region: p.region,
+  }));
 }
 
 export async function getProjectToken(projectId: number): Promise<string> {

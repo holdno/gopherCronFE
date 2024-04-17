@@ -1,6 +1,6 @@
 import { ActionTree, Module, MutationTree } from 'vuex';
 
-import { fetchProjectClients, projectList } from '@/api/project';
+import { ClientMeta, fetchProjectClients, projectList } from '@/api/project';
 import { Project } from '@/api/request';
 import { State as RootState } from '@/store/index';
 
@@ -10,12 +10,12 @@ export interface State {
   projects: Project[];
   loadingProjects: boolean;
 
-  projectClients: Map<number, string[]>;
+  projectClients: Map<number, ClientMeta[]>;
   loadingProjectClients: boolean;
 }
 
 const actions: ActionTree<State, RootState> = {
-  async fetchProjects({ commit }, {orgId}) {
+  async fetchProjects({ commit }, { orgId }) {
     commit('loadingProjects');
     try {
       const projects = await projectList(orgId);

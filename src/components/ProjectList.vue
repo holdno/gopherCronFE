@@ -50,7 +50,7 @@
             (!activated(project)
               ? 'tw-bg-[#27272a] '
               : 'tw-bg-primary tw-text-black ') +
-            'tw-w-full tw-flex tw-flex-row tw-rounded-md'
+            'tw-w-full tw-flex tw-flex-row tw-rounded-lg'
           "
         >
           <router-link

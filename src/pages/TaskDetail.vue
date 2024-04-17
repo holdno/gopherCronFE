@@ -124,10 +124,43 @@
       </div>
     </div>
   </div>
+  <q-dialog v-model="displayNodes" style="max-width: 80vw">
+    <q-card class="tw-w-full">
+      <q-card-section>
+        <div class="tw-text-h3">节点列表</div>
+      </q-card-section>
+
+      <q-card-section
+        class="tw-q-pt-none scroll tw-flex tw-items-center tw-justify-center tw-align-middle tw-gap-2 tw-flex-wrap"
+        style="max-height: 60vh"
+      >
+        <template v-for="props in projectClients" :key="props.clientIP">
+          <div class="md:tw-w-[48%] tw-w-full">
+            <q-card flat bordered>
+              <q-card-section class="text-center">
+                <strong>{{ props.clientIP }}</strong>
+                <br />
+                {{ props.version }}
+              </q-card-section>
+              <q-separator />
+              <q-card-section class="flex flex-center">
+                权重：
+                <div>{{ props.weight }}</div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </template>
+      </q-card-section>
+
+      <q-card-actions align="right" class="text-teal">
+        <q-btn v-close-popup="true" flat label="OK" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
-  import { QScrollArea, useQuasar } from 'quasar';
+  import { QScrollArea } from 'quasar';
   import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
   import { useRoute } from 'vue-router';
   import { useWindowSize } from 'vue-window-size';
@@ -154,20 +187,10 @@
     },
   });
 
-  const $q = useQuasar();
-
+  // const $q = useQuasar();
+  const displayNodes = ref(false);
   function showOnlineNodes() {
-    let nodes = 'empty';
-    if (projectClients.value && projectClients.value.length > 0) {
-      nodes = projectClients.value.join('</br>');
-    }
-
-    $q.dialog({
-      title: '在线节点',
-      message: nodes,
-      html: true,
-      color: 'primary',
-    });
+    displayNodes.value = true;
   }
 
   const store = useStore();

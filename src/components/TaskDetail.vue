@@ -73,6 +73,12 @@
         </q-tooltip>
       </q-btn>
     </div>
+    <div
+      v-if="isCopyMode"
+      class="tw-flex tw-pb-3 tw-flex-wrap tw-gap-2 text-h6"
+    >
+      复制任务
+    </div>
     <q-form class="tw-w-full" @submit="onSubmit" @reset="onReset">
       <q-input
         v-if="task && !isCreateMode"
@@ -84,7 +90,20 @@
         filled
         class="tw-mb-4"
       />
+      <q-select
+        v-if="isCreateMode"
+        v-model="editable.projectId"
+        square
+        filled
+        class="tw-w-full tw-mb-4"
+        emit-value
+        map-options
+        label="所属项目"
+        placeholder="请选择项目"
+        :options="projectOptions"
+      ></q-select>
       <q-input
+        v-else
         key="project"
         :model-value="project ? project.title : ''"
         disable
@@ -160,7 +179,7 @@
           color="primary"
           text-color="black"
           type="submit"
-          :label="isCreateMode ? '创建' : '保存'"
+          :label="isCopyMode ? '确认复制' : '保存'"
           :disable="!modified"
           :loading="loading"
           class="lg:tw-w-24 tw-w-full lg:tw-mr-4 lg:tw-mb-0 tw-mb-4"
@@ -183,7 +202,7 @@
   import { Ref, computed, onMounted, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { Task, startTask } from '@/api/request';
+  import { Project, Task, startTask } from '@/api/request';
   import { killTask } from '@/api/task';
   import Confirm from '@/components/Confirm.vue';
   import DialogTemporaryTaskForm from '@/components/DialogTemporaryTaskForm.vue';
@@ -239,6 +258,7 @@
     }
 
     return (
+      a.projectId === b.projectId &&
       a.name === b.name &&
       a.cronExpr === b.cronExpr &&
       a.remark === b.remark &&
@@ -260,12 +280,37 @@
     store.state.Project.projects.find((p) => p.id === props.projectId),
   );
 
+  const projectOptions = ref<{ value: number; label: string }[]>([]);
+  function setProjectOptions(source: Project[]) {
+    const newList: { value: number; label: string }[] = [];
+    source?.forEach((v, k, a) => {
+      newList.push({
+        value: v.id,
+        label: v.title,
+      });
+    });
+    projectOptions.value = newList;
+  }
+  if (store.state.Project.projects && store.state.Project.projects.length > 0) {
+    setProjectOptions(store.state.Project.projects);
+  }
+  watch(
+    () => store.state.Project.projects,
+    (o, n) => {
+      setProjectOptions(n);
+    },
+  );
+
   const editable: Ref<Task> = ref(
     Object.assign({}, task.value || DefaultTaskValues.value),
   );
 
   const isCreateMode = computed(
     () => route.name && route.name.toString() === 'create_crontab_task',
+  );
+
+  const isCopyMode = computed(
+    () => route.query.copyid && route.query.copyid !== '',
   );
 
   if (isCreateMode.value) {
@@ -326,23 +371,26 @@
       return;
     }
     loading.value = true;
-    if (isCreateMode.value) {
+    if (isCreateMode.value || isCopyMode.value) {
       editable.value.id = '';
     }
-    const newTask = await store.dispatch('saveTask', {
-      task: JSON.parse(JSON.stringify(editable.value)),
-    });
-    if (isCreateMode.value) {
-      const projectId = props.projectId;
-      await fetchTasks();
-      router.push({
-        name: 'crontab_task',
-        params: {
-          projectId: projectId,
-          taskId: newTask.id,
-        },
+
+    try {
+      const newTask = await store.dispatch('saveTask', {
+        task: JSON.parse(JSON.stringify(editable.value)),
       });
-    }
+      if (isCreateMode.value) {
+        await fetchTasks();
+        router.push({
+          name: 'crontab_task',
+          params: {
+            projectId: editable.value.projectId,
+            taskId: newTask.id,
+          },
+        });
+      }
+    } catch (e: any) {}
+
     loading.value = false;
   }
   function onReset() {
