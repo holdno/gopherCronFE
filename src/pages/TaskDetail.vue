@@ -130,22 +130,28 @@
         <div class="text-h6">节点列表</div>
         <div class="text-base">仅 v2.4.6 及以上版本支持权重变更</div>
       </q-card-section>
+      <template v-for="[key, items] in regionClients" :key="key">
+        <q-card-section>
+          <div class="tw-text-lg">Region: {{ key }}</div>
+        </q-card-section>
 
-      <q-card-section
-        class="tw-q-pt-none scroll tw-flex tw-items-center tw-justify-center tw-align-middle tw-gap-2 tw-flex-wrap"
-        style="max-height: 60vh"
-      >
-        <template v-for="item in projectClients" :key="item.clientIP">
-          <div class="md:tw-w-[48%] tw-w-full">
-            <ClientNode
-              :client-ip="item.clientIP"
-              :weight="item.weight"
-              :project-id="projectId"
-              :version="item.version"
-            ></ClientNode>
-          </div>
-        </template>
-      </q-card-section>
+        <q-card-section
+          class="tw-q-pt-none scroll tw-flex tw-items-center tw-justify-center tw-align-middle tw-gap-2 tw-flex-wrap"
+          style="max-height: 60vh"
+        >
+          <template v-for="item in items" :key="item.clientIP">
+            <div class="md:tw-w-[48%] tw-w-full">
+              <ClientNode
+                :client-ip="item.clientIP"
+                :weight="item.weight"
+                :project-id="projectId"
+                :version="item.version"
+                :region="item.region"
+              ></ClientNode>
+            </div>
+          </template>
+        </q-card-section>
+      </template>
 
       <q-card-actions align="right" class="text-teal">
         <q-btn v-close-popup="true" flat label="OK" />
@@ -160,6 +166,7 @@
   import { useRoute } from 'vue-router';
   import { useWindowSize } from 'vue-window-size';
 
+  import { ClientMeta } from '@/api/project';
   import ClientNode from '@/components/ClientNode.vue';
   import TaskDetail from '@/components/TaskDetail.vue';
   import TaskLogs from '@/components/TaskLogs.vue';
@@ -230,7 +237,23 @@
   onUnmounted(() => {
     store.commit('Project/setProjectClients', { clients: [] });
   });
+
   const projectClients = computed(() =>
     store.state.Project.projectClients.get(props.projectId),
   );
+
+  const regionClients = computed(() => {
+    const result = new Map<string, ClientMeta[]>();
+    if (projectClients.value) {
+      projectClients.value.forEach((v, k, a) => {
+        let rl = result.get(v.region);
+        if (!rl) {
+          result.set(v.region, []);
+          rl = result.get(v.region);
+        }
+        rl?.push(v);
+      });
+    }
+    return result;
+  });
 </script>

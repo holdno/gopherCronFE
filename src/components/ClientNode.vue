@@ -3,6 +3,8 @@
     <q-card-section class="text-center">
       <strong>{{ clientIp }}</strong>
       <br />
+      {{ region }}
+      <br />
       {{ version }}
     </q-card-section>
     <q-separator />
@@ -46,6 +48,10 @@
     },
     weight: {
       type: Number,
+      required: true,
+    },
+    region: {
+      type: String,
       required: true,
     },
   });
