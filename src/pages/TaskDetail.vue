@@ -124,30 +124,25 @@
       </div>
     </div>
   </div>
-  <q-dialog v-model="displayNodes" style="max-width: 80vw">
+  <q-dialog v-model="displayNodes">
     <q-card class="tw-w-full">
       <q-card-section>
-        <div class="tw-text-h3">节点列表</div>
+        <div class="text-h6">节点列表</div>
+        <div class="text-base">仅 v2.4.6 及以上版本支持权重变更</div>
       </q-card-section>
 
       <q-card-section
         class="tw-q-pt-none scroll tw-flex tw-items-center tw-justify-center tw-align-middle tw-gap-2 tw-flex-wrap"
         style="max-height: 60vh"
       >
-        <template v-for="props in projectClients" :key="props.clientIP">
+        <template v-for="item in projectClients" :key="item.clientIP">
           <div class="md:tw-w-[48%] tw-w-full">
-            <q-card flat bordered>
-              <q-card-section class="text-center">
-                <strong>{{ props.clientIP }}</strong>
-                <br />
-                {{ props.version }}
-              </q-card-section>
-              <q-separator />
-              <q-card-section class="flex flex-center">
-                权重：
-                <div>{{ props.weight }}</div>
-              </q-card-section>
-            </q-card>
+            <ClientNode
+              :client-ip="item.clientIP"
+              :weight="item.weight"
+              :project-id="projectId"
+              :version="item.version"
+            ></ClientNode>
           </div>
         </template>
       </q-card-section>
@@ -165,6 +160,7 @@
   import { useRoute } from 'vue-router';
   import { useWindowSize } from 'vue-window-size';
 
+  import ClientNode from '@/components/ClientNode.vue';
   import TaskDetail from '@/components/TaskDetail.vue';
   import TaskLogs from '@/components/TaskLogs.vue';
   import TemporaryTaskDetail from '@/components/TemporaryTaskDetail.vue';

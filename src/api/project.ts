@@ -65,3 +65,15 @@ export async function getProjectToken(projectId: number): Promise<string> {
   const r = data.response;
   return r;
 }
+
+export async function changeNodeWeight(
+  projectId: number,
+  clientIP: string,
+  weight: number,
+) {
+  await apiv1.post('/client/weight', {
+    project_id: projectId,
+    client_ip: clientIP,
+    weight: weight,
+  });
+}

@@ -165,6 +165,7 @@ const mutations: MutationTree<State> = {
         message = error;
       }
       q.notify({
+        html: true,
         message: message,
         color: 'red',
         icon: 'announcement',
@@ -177,6 +178,7 @@ const mutations: MutationTree<State> = {
     if (message && state.$q) {
       // type: 'positive', 'negative', 'warning', 'info', 'ongoing'
       state.$q.notify({
+        html: true,
         message: message,
         type: type || 'info',
         position: 'top-right',
@@ -194,6 +196,7 @@ const mutations: MutationTree<State> = {
     if (message && state.$q) {
       // type: 'positive', 'negative', 'warning', 'info', 'ongoing'
       state.$q.notify({
+        html: true,
         message: message,
         type: type || 'info',
         position: 'bottom-right',
