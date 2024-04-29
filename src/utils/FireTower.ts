@@ -141,7 +141,7 @@ export function FireTowerPlugin(user: User, store: Store<any>, token: string) {
       let endpoint = import.meta.env.VITE_API_V1_WS_URL;
       if (!endpoint) {
         let protocol = 'ws://';
-        if (window.location.protocol === 'https') {
+        if (window.location.protocol === 'https:') {
           protocol = 'wss://';
         }
         endpoint = protocol + window.location.host + '/api/v1/connect';
