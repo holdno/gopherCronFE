@@ -91,6 +91,7 @@
   import { WorkFlowTask } from '@/api/request';
   import Confirm from '@/components/Confirm.vue';
   import { useStore } from '@/store/index';
+  
   import { formatTimestamp } from '@/utils/datetime';
   import { barStyle, thumbStyle } from '@/utils/thumbStyle';
 
@@ -108,6 +109,11 @@
     watchEffect(async () => {
       await fetchTasks();
     });
+
+    store.dispatch('subscribeTopic', [
+      '/task/status/project/' + props.projectId,
+    ]);
+
     store.watch(
       (state) => [state.Root.eventWorkFlowTask],
       ([eventWorkFlowTask]) => {

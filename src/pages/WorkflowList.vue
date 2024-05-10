@@ -11,7 +11,7 @@
       <WorkflowList v-if="orgId" :org-id="orgId" />
     </div>
     <div class="tw-w-full tw-h-full tw-grow tw-overflow-hidden">
-      <router-view />
+      <router-view></router-view>
     </div>
   </div>
 </template>

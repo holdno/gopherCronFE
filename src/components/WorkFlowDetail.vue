@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
   import {
@@ -80,7 +80,7 @@
     },
   });
 
-  const DefaultTaskValues = computed<WorkFlow>(() => ({
+  const DefaultTaskValues = ref<WorkFlow>({
     id: 0,
     title: '',
     oid: '',
@@ -89,16 +89,25 @@
     createTime: 0,
     status: STATUS_WORK_FLOW_DISABLE,
     state: null,
-  }));
+  });
 
   const router = useRouter();
   const store = useStore();
   const workflowInfo = computed(() =>
     store.state.WorkFlow.workflows.get(props.id),
   );
-  const editable = ref(
-    Object.assign({}, workflowInfo.value || DefaultTaskValues.value),
-  );
+
+  const editable = ref<WorkFlow>(DefaultTaskValues.value);
+  const needToRefreshTask = ref(true);
+  watch(workflowInfo, (o, n) => {
+    if (needToRefreshTask.value) {
+      editable.value = Object.assign(
+        {},
+        workflowInfo.value || DefaultTaskValues.value,
+      );
+    }
+  });
+
   function onReset() {
     editable.value = Object.assign(
       {},
@@ -106,12 +115,12 @@
     );
   }
 
-  watchEffect(() => {
-    editable.value = Object.assign(
-      {},
-      workflowInfo.value || DefaultTaskValues.value,
-    );
-  });
+  // watchEffect(() => {
+  //   editable.value = Object.assign(
+  //     {},
+  //     workflowInfo.value || DefaultTaskValues.value,
+  //   );
+  // });
 
   const loading = ref(false);
   async function onSubmit() {
@@ -132,6 +141,7 @@
         });
       } else {
         await updateWorkflow(store.getters.apiv1, editable.value);
+        needToRefreshTask.value = true;
         store.commit('success', {
           message: '更新成功',
         });

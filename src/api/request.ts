@@ -237,6 +237,22 @@ export async function startTask(
   });
 }
 
+export async function startWorkflowTask(
+  api: AxiosInstance,
+  projectId: number,
+  taskId: string,
+) {
+  const payload = JSON.stringify({
+    project_id: projectId,
+    task_id: taskId,
+  });
+  return await api.post('/crontab/flow_task/execute', payload, {
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+}
+
 export async function deleteTask(
   api: AxiosInstance,
   projectId: number,

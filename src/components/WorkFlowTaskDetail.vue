@@ -127,11 +127,12 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, onMounted, ref, watchEffect } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { WorkFlowTask, startTask } from '@/api/request';
+  import { WorkFlowTask, startWorkflowTask } from '@/api/request';
   import { useStore } from '@/store/index';
+  import { TASK_STATUS } from '@/types/task';
 
   const props = defineProps({
     id: {
@@ -167,9 +168,15 @@
   const editable = ref(
     Object.assign({}, task.value || DefaultTaskValues.value),
   );
-  watchEffect(() => {
-    editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
+
+  const needToRefreshTask = ref(true);
+  watch(task, () => {
+    if (needToRefreshTask.value) {
+      needToRefreshTask.value = false;
+      editable.value = Object.assign({}, task.value || DefaultTaskValues.value);
+    }
   });
+
   const modified = computed(() => {
     return JSON.stringify(task.value) !== JSON.stringify(editable.value);
   });
@@ -202,6 +209,7 @@
       await store.dispatch('saveWorkFlowTask', {
         task: editable.value,
       });
+      needToRefreshTask.value = true;
       await store.dispatch('WorkFlowTask/fetchTasks', {
         projectId: props.projectId,
       });
@@ -252,9 +260,9 @@
   async function execute(projectId: number, taskId: string) {
     executing.value = true;
     try {
-      await startTask(store.getters.apiv1, projectId, taskId);
-    } finally {
-      executing.value = false;
+      await startWorkflowTask(store.getters.apiv1, projectId, taskId);
+    } catch (e: any) {
+      console.error(e);
     }
   }
 
@@ -262,16 +270,48 @@
     store.watch(
       (state) => [state.Root.eventWorkFlowTask],
       ([eventWorkFlowTask]) => {
+        console.log(eventWorkFlowTask);
         if (
           !eventWorkFlowTask ||
           eventWorkFlowTask.projectId !== props.projectId ||
           eventWorkFlowTask.taskId !== props.id
-        )
+        ) {
           return;
+        }
 
-        store.dispatch('WorkFlowTask/fetchTasks', {
-          projectId: props.projectId,
+        store.commit('notifySuccess', {
+          message: `任务 ${task.value?.name} 当前状态: ${eventWorkFlowTask.status}`,
         });
+
+        if (TASK_STATUS.isRunning(eventWorkFlowTask.status)) {
+          executing.value = true;
+        } else if (TASK_STATUS.isFinished(eventWorkFlowTask.status)) {
+          executing.value = false;
+        }
+      },
+    );
+
+    store.watch(
+      (state) => [state.Root.eventTask],
+      ([eventTask]) => {
+        console.log(33333, eventTask);
+        if (
+          !eventTask ||
+          eventTask.projectId !== props.projectId ||
+          eventTask.taskId !== props.id
+        ) {
+          return;
+        }
+
+        store.commit('notifySuccess', {
+          message: `任务 ${task.value?.name} 当前状态: ${eventTask.status}`,
+        });
+
+        if (TASK_STATUS.isRunning(eventTask.status)) {
+          executing.value = true;
+        } else if (TASK_STATUS.isFinished(eventTask.status)) {
+          executing.value = false;
+        }
       },
     );
   });
