@@ -22,13 +22,15 @@
         <div class="text-h6">添加新的任务节点</div>
       </q-card-section>
       <q-card-section>
-        <SelectProject v-model="project" :org-id="orgId" />
-        <SelectWorkFlowTask
-          v-model="task"
-          :disabled="project === undefined"
-          :project-id="project ? project.id : 0"
-          :workflow-id="props.workflowId"
-        />
+        <div class="tw-flex tw-flex-col tw-gap-2">
+          <SelectProject v-model="project" :org-id="orgId" />
+          <SelectWorkFlowTask
+            v-model="task"
+            :disabled="project === undefined"
+            :project-id="project ? project.id : 0"
+            :workflow-id="props.workflowId"
+          />
+        </div>
       </q-card-section>
       <q-card-actions align="around">
         <q-btn

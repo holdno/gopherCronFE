@@ -7,7 +7,7 @@
     >
       <LogoTpl class="tw-w-24 md:tw-w-32" src="./logo_white.png"></LogoTpl>
       <div
-        class="tw-bg-[#1D1D1D] tw-shadow tw-rounded tw-max-w-md lg:tw-w-1/3 sm:tw-w-2/3 tw-w-full tw-p-10 md:tw-mt-6 tw-mt-2"
+        class="tw-bg-[#1D1D1D] tw-shadow tw-rounded-2xl tw-max-w-md lg:tw-w-1/3 sm:tw-w-2/3 tw-w-full tw-p-10 md:tw-mt-6 tw-mt-2"
       >
         <q-btn
           v-if="allowLoginMethods?.oidc"

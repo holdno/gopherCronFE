@@ -4,6 +4,9 @@
     label="项目列表"
     map-options
     emit-value
+    dark
+    color="text-white"
+    standout="bg-white text-black"
     behavior="menu"
     :options="
       projects.map((p) => ({
