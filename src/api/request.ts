@@ -19,6 +19,28 @@ export interface Meta {
   message: string;
 }
 
+export class BaseResponse {
+  meta?: {
+    code: number;
+    log: string;
+    msg: string;
+    requestId: string;
+  };
+
+  response?: any;
+
+  fromJson(data: string) {
+    const a = JSON.parse(data);
+    this.meta = {
+      code: a.meta.code,
+      log: a.meta.log,
+      msg: a.meta.msg,
+      requestId: a.meta.request_id,
+    };
+    this.response = a.response;
+  }
+}
+
 export function installApiv1(app: App, { store }: { store: Store<State> }) {
   app.provide(keyApiv1, apiv1);
   app.config.globalProperties.$apiv1 = apiv1;
@@ -34,7 +56,7 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
       }
       return response;
     },
-    function (error: AxiosError) {
+    function (error: AxiosError<BaseResponse>) {
       let e = new Error(error.message);
       // Any status codes that falls outside the range of 2xx cause this function to trigger
       // Do something with response error
@@ -49,9 +71,12 @@ export function installApiv1(app: App, { store }: { store: Store<State> }) {
           default:
         }
         try {
-          let err = error.response.data.meta.msg;
-          if (error.response.data.meta.log) {
-            err += '</br>' + error.response.data.meta.log;
+          let err = error.response?.data.meta?.msg;
+          if (
+            error.response?.data.meta?.log &&
+            error.response?.data.meta?.log !== err
+          ) {
+            err += '</br>' + error.response.data.meta?.log;
           }
           e = new Error(err || '请求失败，请稍后再试');
         } catch (_) {
