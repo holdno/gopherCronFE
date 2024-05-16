@@ -158,7 +158,15 @@
       filled
       class="tw-mb-4"
     />
-
+    <q-input
+      key="timeout"
+      :model-value="task.host || '随机'"
+      label="指定执行节点"
+      square
+      disable
+      filled
+      class="tw-mb-4"
+    />
     <q-input
       key="noseize"
       :model-value="task.noseize === 1 ? '是' : '否'"
@@ -178,7 +186,7 @@
   import { useRouter } from 'vue-router';
 
   import { GetTemporaryTaskLogDetail, TaskLog } from '@/api/log';
-  import { Task, TemporaryTask } from '@/api/request';
+  import { TemporaryTask } from '@/api/request';
   import { killTask, removeTemporaryTask } from '@/api/task';
   import Confirm from '@/components/Confirm.vue';
   import DialogTemporaryTaskForm from '@/components/DialogTemporaryTaskForm.vue';
@@ -200,23 +208,22 @@
   });
 
   const showCopyConfirm = ref(false);
-  const copiedTask = ref<Task | undefined>();
+  const copiedTask = ref<TemporaryTask | undefined>();
   function copyTask(t: TemporaryTask) {
     copiedTask.value = {
-      id: t.taskId,
+      taskId: t.taskId,
       projectId: t.projectId,
       remark: t.remark,
       command: t.command,
       timeout: t.timeout,
-      cronExpr: '',
+      host: t.host,
       createTime: 0,
-      name: '',
-      status: 0,
       isRunning: 0,
       noseize: 0,
-      exclusion: 0,
-      clientIp: '',
       tmpId: '',
+      scheduleTime: 0,
+      userId: 0,
+      userName: '',
     };
   }
 

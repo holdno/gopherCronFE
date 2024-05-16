@@ -2,7 +2,7 @@
   <div class="tw-h-full tw-w-full tw-flex tw-flex-col">
     <DialogTemporaryTaskForm
       v-model="showCreateTemporaryTask"
-      :task="task"
+      :task="tmpTask"
       @created="createdTemporaryTask"
     ></DialogTemporaryTaskForm>
     <Confirm
@@ -202,7 +202,7 @@
   import { Ref, computed, onMounted, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
 
-  import { Project, Task, startTask } from '@/api/request';
+  import { Project, Task, TemporaryTask, startTask } from '@/api/request';
   import { killTask } from '@/api/task';
   import Confirm from '@/components/Confirm.vue';
   import DialogTemporaryTaskForm from '@/components/DialogTemporaryTaskForm.vue';
@@ -276,6 +276,30 @@
       .get(props.projectId)
       ?.find((t) => t.id === props.id || t.id === route.query.copyid);
   });
+
+  const tmpTask = ref<TemporaryTask>();
+  function updateTemporaryTask(task: Task) {
+    tmpTask.value = {
+      command: task.command,
+      createTime: task.createTime,
+      projectId: task.projectId,
+      scheduleTime: 0,
+      taskId: task.id,
+      userId: 0,
+      userName: '',
+      noseize: 0,
+      timeout: task.timeout,
+      remark: '',
+      host: '',
+      isRunning: -1,
+      tmpId: '',
+    };
+  }
+
+  if (task.value) {
+    updateTemporaryTask(task.value);
+  }
+
   const project = computed(() =>
     store.state.Project.projects.find((p) => p.id === props.projectId),
   );
@@ -332,6 +356,9 @@
         );
       }
       editable.value.isRunning = -1;
+      if (task.value) {
+        updateTemporaryTask(task.value);
+      }
     },
   );
   const modified = computed(() => {

@@ -11,7 +11,7 @@
         <q-input
           v-if="task"
           key="id"
-          :model-value="task.id"
+          :model-value="task.taskId"
           disable
           label="关联任务 ID"
           square
@@ -186,7 +186,7 @@
 <script setup lang="ts">
   import { PropType, computed, onMounted, ref, watchEffect } from 'vue';
 
-  import { Task } from '@/api/request';
+  import { TemporaryTask } from '@/api/request';
   import { CreateTemporaryTask, CreateTemporaryTaskRequest } from '@/api/task';
   import { useStore } from '@/store/index';
   import { afterTimeStr } from '@/utils/datetime';
@@ -197,7 +197,7 @@
       default: false,
     },
     task: {
-      type: Object as PropType<Task>,
+      type: Object as PropType<TemporaryTask>,
       default: () => {
         return {};
       },
@@ -241,14 +241,14 @@
   const store = useStore();
 
   const editable = ref<CreateTemporaryTaskRequest>({
-    taskId: props.task.id,
+    taskId: props.task.taskId,
     projectId: props.task.projectId,
     command: props.task.command,
     remark: props.task.remark,
     noseize: props.task.noseize,
     scheduleTime: 0,
     timeout: props.task.timeout,
-    host: '',
+    host: props.task.host,
   });
   const scheduleTime = ref('');
   function afterTime(t: number) {
@@ -261,14 +261,14 @@
         editable.value = Object.assign(
           {},
           {
-            taskId: props.task.id,
+            taskId: props.task.taskId,
             projectId: props.task.projectId,
             command: props.task.command,
             remark: props.task.remark,
             noseize: props.task.noseize,
             scheduleTime: 0,
             timeout: props.task.timeout,
-            host: '',
+            host: props.task.host,
           },
         );
       }

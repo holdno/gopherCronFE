@@ -837,6 +837,7 @@ export interface TemporaryTask {
   noseize: number;
   timeout: number;
   remark: string;
+  host: string;
   isRunning: number;
   tmpId: string;
 }

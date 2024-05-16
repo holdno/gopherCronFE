@@ -51,6 +51,7 @@ export async function fetchTemporaryTasks(
     userName: v.user_name,
     tmpId: v.tmp_id,
     isRunning: v.is_running,
+    host: v.host,
     timeout: v.timeout,
     remark: v.remark,
   }));

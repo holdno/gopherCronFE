@@ -33,7 +33,7 @@
       :disable="modified"
       class="tw-w-24"
       :loading="executing"
-      @click="() => task && execute(projectId, task.id)"
+      @click="() => (showExecuteConfirm = true)"
     >
       执行
     </q-btn>
@@ -124,6 +124,11 @@
       />
     </div>
   </q-form>
+  <Confirm
+    v-model="showExecuteConfirm"
+    content="确定要立即执行吗？"
+    @confirm="task && execute(projectId, task.id)"
+  ></Confirm>
 </template>
 
 <script setup lang="ts">
@@ -131,6 +136,7 @@
   import { useRoute, useRouter } from 'vue-router';
 
   import { WorkFlowTask, startWorkflowTask } from '@/api/request';
+  import Confirm from '@/components/Confirm.vue';
   import { useStore } from '@/store/index';
   import { TASK_STATUS } from '@/types/task';
 
@@ -167,6 +173,22 @@
   );
   const editable = ref(
     Object.assign({}, task.value || DefaultTaskValues.value),
+  );
+
+  watch(
+    () => props.id,
+    (o, n) => {
+      if (
+        props.id !== task.value?.id ||
+        (!isCreateMode.value && editable.value.id === '') ||
+        editable.value.id !== task.value.id
+      ) {
+        editable.value = Object.assign(
+          {},
+          task.value || DefaultTaskValues.value,
+        );
+      }
+    },
   );
 
   const needToRefreshTask = ref(true);
@@ -257,11 +279,14 @@
   );
 
   const executing = ref(false);
+  const showExecuteConfirm = ref(false);
   async function execute(projectId: number, taskId: string) {
+    showExecuteConfirm.value = false;
     executing.value = true;
     try {
       await startWorkflowTask(store.getters.apiv1, projectId, taskId);
     } catch (e: any) {
+      executing.value = true;
       console.error(e);
     }
   }
@@ -294,7 +319,6 @@
     store.watch(
       (state) => [state.Root.eventTask],
       ([eventTask]) => {
-        console.log(33333, eventTask);
         if (
           !eventTask ||
           eventTask.projectId !== props.projectId ||
