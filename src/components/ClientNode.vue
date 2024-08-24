@@ -73,6 +73,11 @@
       await store.dispatch('Project/fetchProjectClients', {
         projectId: props.projectId,
       });
+      // setTimeout(() => {
+      //   store.dispatch('Project/fetchProjectClients', {
+      //     projectId: props.projectId,
+      //   });
+      // }, 1000);
       store.commit('success', { message: '修改成功' });
     } catch (e) {
       console.error(e);

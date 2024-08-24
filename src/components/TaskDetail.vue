@@ -385,8 +385,8 @@
     return '';
   });
 
-  async function fetchTasks() {
-    await store.dispatch('Task/fetchTasks', { projectId: props.projectId });
+  async function fetchTasks(projectId: number) {
+    await store.dispatch('Task/fetchTasks', { projectId: projectId });
   }
 
   const router = useRouter();
@@ -407,7 +407,7 @@
         task: JSON.parse(JSON.stringify(editable.value)),
       });
       if (isCreateMode.value) {
-        await fetchTasks();
+        await fetchTasks(editable.value.projectId);
         router.push({
           name: 'crontab_task',
           params: {
@@ -433,11 +433,11 @@
     try {
       await store.dispatch('deleteTask', { projectId, taskId });
       if (store.state.Root.currentError === undefined) {
-        await fetchTasks();
+        await fetchTasks(props.projectId);
         router.push({
           name: 'crontab_tasks',
           params: {
-            projectId: route.params.projectId,
+            projectId: props.projectId,
           },
         });
         showDeleteConfirm.value = false;
@@ -486,7 +486,7 @@
     waitingKill.value = true;
     try {
       await killTask({ projectId: props.projectId, taskId: props.id });
-      await fetchTasks();
+      await fetchTasks(props.projectId);
       editable.value.status = 0;
     } catch (e) {
       console.error(e);

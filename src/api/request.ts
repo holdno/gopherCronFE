@@ -10,6 +10,8 @@ export const apiv1 = axios.create({
   baseURL: import.meta.env.VITE_API_V1_BASE_URL,
 });
 
+console.log(import.meta.env.VITE_API_V1_BASE_URL)
+
 export const keyApiv1: InjectionKey<AxiosInstance> = Symbol(
   'ApiV1 Axio Instance',
 );

@@ -130,29 +130,30 @@
         <div class="text-h6">节点列表</div>
         <div class="text-base">仅 v2.4.6 及以上版本支持权重变更</div>
       </q-card-section>
-      <template v-for="[key, items] in regionClients" :key="key">
-        <q-card-section>
-          <div class="tw-text-lg">Region: {{ key }}</div>
-        </q-card-section>
+      <q-scroll-area style="height: 50vh">
+        <template v-for="[key, items] in regionClients" :key="key">
+          <q-card-section>
+            <div class="tw-text-lg">Region: {{ key }}</div>
+          </q-card-section>
 
-        <q-card-section
-          class="tw-q-pt-none scroll tw-flex tw-items-center tw-justify-center tw-align-middle tw-gap-2 tw-flex-wrap"
-          style="max-height: 60vh"
-        >
-          <template v-for="item in items" :key="item.clientIP">
-            <div class="md:tw-w-[48%] tw-w-full">
-              <ClientNode
-                :client-ip="item.clientIP"
-                :weight="item.weight"
-                :project-id="projectId"
-                :version="item.version"
-                :region="item.region"
-              ></ClientNode>
-            </div>
-          </template>
-        </q-card-section>
-      </template>
-
+          <q-card-section
+            class="tw-q-pt-none scroll tw-flex tw-items-center tw-justify-center tw-align-middle tw-gap-2 tw-flex-wrap"
+            style="max-height: 60vh"
+          >
+            <template v-for="item in items" :key="item.clientIP">
+              <div class="md:tw-w-[48%] tw-w-full">
+                <ClientNode
+                  :client-ip="item.clientIP"
+                  :weight="item.weight"
+                  :project-id="projectId"
+                  :version="item.version"
+                  :region="item.region"
+                ></ClientNode>
+              </div>
+            </template>
+          </q-card-section>
+        </template>
+      </q-scroll-area>
       <q-card-actions align="right" class="text-teal">
         <q-btn v-close-popup="true" flat label="OK" />
       </q-card-actions>
