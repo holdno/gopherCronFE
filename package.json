@@ -16,7 +16,7 @@
     "js-cookie": "^3.0.1",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.35",
-    "quasar": "^2.14.1",
+    "quasar": "^2.17.7",
     "v-network-graph": "^0.3.11",
     "vue": "^3.2.25",
     "vue-router": "^4.0.12",
@@ -24,7 +24,7 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@quasar/vite-plugin": "^1.6.0",
+    "@quasar/vite-plugin": "^1.7.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/node": "^20.4.5",
     "@typescript-eslint/eslint-plugin": "^5.9.0",

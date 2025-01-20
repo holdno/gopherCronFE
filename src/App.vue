@@ -14,7 +14,6 @@
   }
   .q-menu {
     border-radius: $borderRadius !important;
-    overflow: hidden !important;
   }
   .q-field {
     border-radius: $borderRadius !important;
