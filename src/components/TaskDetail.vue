@@ -407,7 +407,6 @@
       });
       if (isCreateMode.value) {
         await fetchTasks(editable.value.projectId);
-        // 跳转时任务还没有被创建出来
         router.push({
           name: 'crontab_task',
           params: {
