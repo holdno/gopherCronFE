@@ -271,9 +271,18 @@
   const store = useStore();
   const route = useRoute();
   const task = computed(() => {
-    return store.state.Task.tasks
+    const t = store.state.Task.tasks
       .get(props.projectId)
       ?.find((t) => t.id === props.id || t.id === route.query.copyid);
+
+    if (route.query.copyid && t) {
+      const tt = JSON.parse(JSON.stringify(t));
+      tt.isRunning = -1;
+      tt.id = '';
+      return tt;
+    }
+
+    return t;
   });
 
   const tmpTask = ref<TemporaryTask>();
@@ -335,11 +344,6 @@
   const isCopyMode = computed(
     () => route.query.copyid && route.query.copyid !== '',
   );
-
-  if (isCreateMode.value) {
-    editable.value.id = '';
-    editable.value.isRunning = -1;
-  }
 
   watch(
     () => props.id,
@@ -415,7 +419,9 @@
           },
         });
       }
-    } catch (e: any) {}
+    } catch (e: any) {
+      console.error(e);
+    }
 
     loading.value = false;
   }
@@ -428,7 +434,6 @@
   async function deleteTask(projectId: number, taskId: string) {
     store.commit('cleanError');
     deleteLoading.value = true;
-    console.log('delete loading', deleteLoading.value);
     try {
       await store.dispatch('deleteTask', { projectId, taskId });
       if (store.state.Root.currentError === undefined) {
@@ -449,16 +454,23 @@
     deleteLoading.value = false;
   }
 
-  const executing = ref(false);
+  const executing = computed(() => {
+    if (onExecuting.value) {
+      return true;
+    }
+    return task.value.isRunning === 1;
+  });
+  const onExecuting = ref(false);
   const showExecuteConfirm = ref(false);
   async function execute(projectId: number, taskId: string) {
     showExecuteConfirm.value = false;
-    executing.value = true;
+    onExecuting.value = true;
     try {
       await startTask(store.getters.apiv1, projectId, taskId);
     } catch (e: any) {
-      executing.value = false;
+      console.error(e);
     }
+    onExecuting.value = false;
   }
 
   onMounted(() => {
@@ -472,7 +484,7 @@
         )
           return;
         if (TASK_STATUS.isFinished(eventTask.status)) {
-          executing.value = false;
+          onExecuting.value = false;
         }
       },
     );

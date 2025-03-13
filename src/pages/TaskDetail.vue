@@ -138,7 +138,6 @@
 
           <q-card-section
             class="tw-q-pt-none scroll tw-flex tw-items-center tw-justify-center tw-align-middle tw-gap-2 tw-flex-wrap"
-            style="max-height: 60vh"
           >
             <template v-for="item in items" :key="item.clientIP">
               <div class="md:tw-w-[48%] tw-w-full">
